@@ -18,6 +18,9 @@ It runs in Chrome/Edge (Web Bluetooth) or as a Mac app.
 - **Cab/IR**: slots, level, high/low pass, mic and position; load factory or user IRs from the device library into a slot
 - **Tuner**: note and cents display, reference pitch (400–480 Hz), mute
 - **Expression pedal**: per-preset assignments for Gain, Bass, Mid, Treble, Level, Gate and FX amounts (min/max, invert) and bypass switching (Heel-Toe, Switch, Stop)
+- **MIDI controller with MIDI Learn**: map knobs and buttons of any USB/Bluetooth MIDI controller to amp, FX, gate, capture and cab controls, block on/off, tuner and preset up/down; optional pickup mode (no value jumps) and Program Change → preset
+- **Morningstar MC6 Pro export**: pick up to five presets and create a bank file: page 1 A–E recall the presets, F opens an FX page where A–E switch the five FX slots on/off. The switches are named after the effect type, use the category colours and MC6 Pro icons, and show which effects each preset uses
+- Drawn, brand-free pedal pictures for every effect model (your own pictures in `img/` are used when present)
 - Log export for troubleshooting
 
 ## Use it
@@ -51,11 +54,34 @@ The app is a small [Electron](https://www.electronjs.org) shell around `index.ht
 (Safari/WKWebView has no Web Bluetooth). It connects to the first Bluetooth device whose name contains
 "Nano" or "Cortex".
 
-## Pedal pictures (optional)
+## MIDI controller
 
-The editor can show a picture for each effect model. The pictures are not part of this repository.
-Put your own PNG files into an `img/` folder next to `index.html`, using the file names listed in
-`MODEL_IMAGES` inside `index.html`. Missing pictures are simply not shown.
+Click **MIDI** → **Start MIDI Learn**, click a knob, slider or switch in the editor and move a control on your
+MIDI controller. Assigned controls show their CC number; right-click a control to remove its assignment.
+Assignments are stored in the browser/app. MIDI needs Chrome, Edge or the Mac app.
+
+## Morningstar MC6 Pro
+
+Click **MC6 Pro**, tick up to five presets, check the Nano's MIDI channel (read from the Nano automatically)
+and press **Create bank file**. To read which FX are on in each preset, the editor loads each selected preset on the
+Nano for a moment and then returns to the current one (save unsaved changes first). Load the file in the Morningstar editor (open a bank → *Load from File*) and save it
+to the controller. Connect the MC6 Pro's USB Host port to the Nano's USB port: the Nano only accepts MIDI via USB.
+
+**Expression switch (optional):** choose one FX switch (for example E for a reverb in Post FX 3) under *Expression switch*.
+Instead of on/off it sends the expression pedal position (CC#1): dim = heel = *Min*, lit = toe = *Max* of that slot's
+Amount under **Expression** in each preset. Every preset switch starts at heel. Once an expression switch is chosen, its
+FX block in the editor shows two sliders, **Pos 1** and **Pos 2**: they set this range for the loaded preset, and dragging
+one also sets the effect's Mix so you hear the result. The export preview warns about presets without that assignment
+and lists other parameters that the expression pedal moves too.
+
+The long name of each preset switch lists the effect types in Pre FX 1, Pre FX 2 and Post FX 1, for example
+`Pit-Com-Cho` for pitch, compressor and chorus.
+
+## Pedal pictures
+
+Every effect model is shown as a simple drawn pedal in its category colour. If you prefer pictures, put your own PNG
+files into an `img/` folder next to `index.html`, using the file names listed in `MODEL_IMAGES` inside
+`index.html`. The `img/` folder is not part of this repository.
 
 ## How it works
 
@@ -79,7 +105,7 @@ The message layouts used here are documented in comments in `index.html`.
 
 Inoffizieller Editor für den Neural DSP Nano Cortex per Bluetooth. Er läuft in Chrome/Edge oder als Mac-App.
 Du kannst Presets wechseln, umbenennen und speichern und Amp, Gate und Effekte live bearbeiten.
-Captures und Cabs lädst du aus der Library des Geräts. Dazu gibt es einen Tuner und die Zuweisungen
-für das Expression-Pedal.
+Captures und Cabs lädst du aus der Library des Geräts. Dazu gibt es einen Tuner, die Zuweisungen
+für das Expression-Pedal und die Steuerung per MIDI-Controller mit MIDI Learn.
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.

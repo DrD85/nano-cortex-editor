@@ -203,6 +203,9 @@
     .fx-icon-empty { background: none; border: 1px dashed #4a4a4a; }
     .fx-icon-empty::after { display: none; }
     .amp-panel h2 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; color: #ececec; text-transform: uppercase; }
+    .pedal-picture { display: flex; justify-content: center; align-items: center; min-height: 128px; margin: 12px 0 4px; }
+    .pedal-picture img { max-width: 100%; max-height: 120px; object-fit: contain; border-radius: 4px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+    .pedal-svg { height: 124px; width: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.55)); }
     .model-select { border-color: color-mix(in srgb, var(--block-color) 42%, #333); margin-bottom: 14px; }
     .divider { height: 1px; background: #2d3033; margin: 12px 0 18px; }
 
@@ -359,6 +362,8 @@
       --ico-amp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='6' width='20' height='12' rx='2'/><path d='M2 11h20'/><circle cx='7' cy='14.5' r='1'/><circle cx='12' cy='14.5' r='1'/><circle cx='17' cy='14.5' r='1'/></g></svg>");
       --ico-tuner: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2v8a4 4 0 0 0 8 0V2'/><path d='M12 14v8'/></g></svg>");
       --ico-exp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 18l14-5'/><path d='M5 21v-3M19 21v-8'/><path d='M6 9a9 9 0 0 1 12-4'/><path d='M15 3l3 2-2 3'/></g></svg>");
+      --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
+      --ico-export: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='M7 10l5 5 5-5'/><path d='M4 17v3h16v-3'/></g></svg>");
       --ico-unknown: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7'/><path d='M12 17h0'/></g></svg>");
       --ico-cap-amp-head: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='7' width='20' height='10' rx='2'/><path d='M2 12h20'/><circle cx='6' cy='14.5' r='0.8'/><circle cx='10' cy='14.5' r='0.8'/><circle cx='14' cy='14.5' r='0.8'/><circle cx='18' cy='14.5' r='0.8'/></g></svg>");
       --ico-cap-amp-combo: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 8h18'/><circle cx='12' cy='14.5' r='4'/></g></svg>");
@@ -583,6 +588,83 @@
     .exp-invert.active { background: #f2f2f2; color: #000; border-color: #f2f2f2; }
     .exp-status { color: var(--muted); font-size: 12px; min-height: 16px; }
 
+    body.midi-learning [data-midi-target] { outline: 2px dashed rgba(69, 248, 98, 0.55); outline-offset: 3px; cursor: crosshair; }
+    body.midi-learning [data-midi-target].midi-selected { outline: 2px solid #45F862; box-shadow: 0 0 16px rgba(69, 248, 98, 0.55); }
+    body:not(.midi-learning) [data-midi-mapped] { outline: 1px solid rgba(69, 248, 98, 0.6); outline-offset: 3px; }
+    .midi-badge {
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: rgba(69, 248, 98, 0.14);
+      color: #7dfa93;
+      font-size: 9.5px;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .midi-banner {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 70;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 14px 12px 18px;
+      border: 1px solid #45F862;
+      border-radius: 12px;
+      background: #0d0d0d;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      color: #e8e8e8;
+      font-size: 14px;
+    }
+    .midi-banner[hidden] { display: none; }
+    .midi-banner b { color: #7dfa93; font-weight: 600; }
+    .midi-btn .fx-icon { --block-color: #f2f2f2; }
+    .midi-options { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; color: #cfcfcf; font-size: 13px; }
+    .midi-options label { display: flex; align-items: center; gap: 8px; }
+    .midi-options select { width: auto; padding: 6px 10px; font-size: 13px; }
+    .midi-map-row {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr) auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 9px 12px;
+      border: 1px solid #262626;
+      border-radius: 10px;
+      background: #121212;
+      font-size: 13px;
+    }
+    .midi-map-row .src { color: #7dfa93; font-variant-numeric: tabular-nums; }
+    @media (max-width: 760px) {
+      .midi-map-row { grid-template-columns: minmax(0, 1fr) auto; }
+      .midi-map-row select { grid-column: 1; }
+    }
+    .midi-map-row select { width: auto; padding: 4px 8px; font-size: 12px; }
+
+    .mc6-panel { width: min(1100px, calc(100vw - 32px)); grid-template-rows: auto auto auto minmax(140px, 1fr) auto auto; overflow-y: auto; }
+    .mc6-presets { overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px; align-content: start; padding-right: 4px; }
+    .mc6-preset { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid #262626; border-radius: 8px; background: #121212; font-size: 13px; color: #d8d8d8; cursor: pointer; min-width: 0; }
+    .mc6-preset.on { border-color: #f2f2f2; background: #1c1c1c; }
+    .mc6-preset.disabled { opacity: 0.4; cursor: not-allowed; }
+    .mc6-preset span.n { color: #8a8a8a; font-variant-numeric: tabular-nums; }
+    .mc6-preset span.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mc6-letter { margin-left: auto; padding: 1px 7px; border-radius: 6px; background: #f2f2f2; color: #000; font-weight: 700; font-size: 11px; }
+    .mc6-preview { display: grid; gap: 8px; }
+    .mc6-page { display: grid; grid-template-columns: 70px repeat(6, minmax(0, 1fr)); gap: 6px; align-items: stretch; }
+    .mc6-page > .lbl { color: var(--muted); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; align-self: center; }
+    .mc6-tile { border-radius: 6px; padding: 8px 6px; min-height: 52px; display: grid; align-content: center; justify-items: center; gap: 4px; font-size: 11px; font-weight: 700; text-align: center; border: 2px solid #2a2a2a; overflow: hidden; }
+    .mc6-tile .sw { font-size: 9px; opacity: 0.7; font-weight: 600; }
+    .mc6-map { display: grid; gap: 3px; font-size: 12px; color: #cfcfcf; }
+    .mc6-map > .lbl { color: var(--muted); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; }
+    .mc6-map b { color: #f2f2f2; font-weight: 600; }
+    .mc6-map .note { color: #9a9a9a; }
+    .mc6-exp { margin-top: 16px; padding-top: 12px; border-top: 1px solid #2d3033; display: grid; gap: 8px; }
+    .mc6-exp-title { color: var(--muted); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+    .mc6-exp-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 48px; align-items: center; gap: 8px; font-size: 11px; color: #cfcfcf; }
+    .mc6-exp-row input[type=range] { width: 100%; accent-color: var(--block-color); }
+    .mc6-exp-row .v { text-align: right; font-variant-numeric: tabular-nums; }
+    .mc6-exp-hint { color: #8a8a8a; font-size: 11px; line-height: 1.4; }
+
     .ask-overlay { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(0, 0, 0, 0.8); }
     .ask-overlay[hidden] { display: none; }
     .ask-panel {
@@ -623,13 +705,15 @@
         <button id="connectBtn" class="primary">Connect</button>
         <button id="saveBtn" class="primary">Save</button>
         <button id="renameBtn">Rename</button>
+        <button id="mc6Btn" class="tuner-btn midi-btn" title="Export a bank for the Morningstar MC6 Pro"><span class="fx-icon" style="--icon: var(--ico-export)"></span>MC6 Pro</button>
+        <button id="midiBtn" class="tuner-btn midi-btn"><span class="fx-icon" style="--icon: var(--ico-midi)"></span>MIDI</button>
         <button id="expBtn" class="tuner-btn exp-btn"><span class="fx-icon" style="--icon: var(--ico-exp)"></span>Expression</button>
-        <button id="tunerBtn" class="tuner-btn"><span class="fx-icon" style="--icon: var(--ico-tuner)"></span>Tuner</button>
+        <button id="tunerBtn" class="tuner-btn" data-midi-id="tuner::" data-midi-target='{"kind":"tuner"}'><span class="fx-icon" style="--icon: var(--ico-tuner)"></span>Tuner</button>
       </div>
       <div class="preset-bar">
-        <button id="presetPrev" class="preset-step" title="Previous preset" aria-label="Previous preset">&#8249;</button>
+        <button id="presetPrev" data-midi-id="preset::prev" data-midi-target='{"kind":"preset","key":"prev"}' class="preset-step" title="Previous preset" aria-label="Previous preset">&#8249;</button>
         <div class="preset-field"><label for="presetSelect">Preset</label><select id="presetSelect"></select></div>
-        <button id="presetNext" class="preset-step" title="Next preset" aria-label="Next preset">&#8250;</button>
+        <button id="presetNext" data-midi-id="preset::next" data-midi-target='{"kind":"preset","key":"next"}' class="preset-step" title="Next preset" aria-label="Next preset">&#8250;</button>
       </div>
     </section>
 
@@ -640,7 +724,7 @@
         <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-capture)"></span><h2>Capture</h2></div>
         <div class="head-actions">
           <button id="libraryBtn" class="btn-small" title="Browse the capture library">Library</button>
-          <div id="captureToggle" class="toggle-switch on">
+          <div id="captureToggle" class="toggle-switch on" data-midi-id="toggle::capture" data-midi-target='{"kind":"toggle","target":"capture"}'>
             <div class="toggle-dot"></div>
           </div>
         </div>
@@ -666,6 +750,8 @@
 
         <input
           id="captureVolumeSlider"
+          data-midi-id="captureVolume::"
+          data-midi-target='{"kind":"captureVolume"}'
           type="range"
           min="-24"
           max="12"
@@ -693,7 +779,7 @@
   <div class="top-card" style="--block-color: var(--white);">
     <div class="block-head">
       <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-cab)"></span><h2>Cab / IR</h2></div>
-      <div id="cabIRToggle" class="toggle-switch on">
+      <div id="cabIRToggle" class="toggle-switch on" data-midi-id="toggle::cab" data-midi-target='{"kind":"toggle","target":"cab"}'>
         <div class="toggle-dot"></div>
       </div>
     </div>
@@ -712,7 +798,7 @@
 
       <div>
         <div class="block-title" style="margin-bottom:10px"><span class="fx-icon" style="--icon: var(--ico-gate)"></span><h2>Gate</h2></div>
-        <div id="gateToggle" class="toggle-switch">
+        <div id="gateToggle" class="toggle-switch" data-midi-id="toggle::gate" data-midi-target='{"kind":"toggle","target":"gate"}'>
           <div class="toggle-dot"></div>
         </div>
       </div>
@@ -748,6 +834,61 @@
         <button type="submit" class="primary">OK</button>
       </div>
     </form>
+  </div>
+
+  <div id="mc6Overlay" class="lib-overlay" hidden>
+    <div class="lib-panel mc6-panel" role="dialog" aria-label="Morningstar MC6 Pro export">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-export)"></span><h2 style="margin:0;font-size:13px;letter-spacing:.14em;color:#ececec;text-transform:uppercase;">Morningstar MC6 Pro Export</h2></div>
+        <button id="mc6Close" class="btn-small">Close</button>
+      </div>
+      <div class="exp-status">Page 1: A–E = your presets, F = FX page. Page 2: A–E = the five FX slots (on/off), F = back. An expression switch moves the Amount of its FX (the AMOUNT knob) between the Min and Max set under Expression in each preset. To read which FX are on, the export loads each selected preset on the Nano for a moment and then returns to the current one. Connect the MC6 Pro to the Nano via USB (MC6 Pro USB Host port).</div>
+      <div class="midi-options">
+        <label>Nano MIDI channel <select id="mc6Channel"></select></label>
+        <label>Bank name <input id="mc6BankName" class="lib-search" style="width:180px;padding:7px 10px;font-size:13px" maxlength="16"></label>
+        <label title="This FX switch sends the expression pedal position (CC#1) instead of on/off: dim = heel = Min, lit = toe = Max of the slot's Amount in Expression.">Expression switch <select id="mc6MixSlot">
+          <option value="-1">Off (on/off for all FX)</option>
+          <option value="0">A · Pre FX 1 Amount</option>
+          <option value="1">B · Pre FX 2 Amount</option>
+          <option value="2">C · Post FX 1 Amount</option>
+          <option value="3">D · Post FX 2 Amount</option>
+          <option value="4">E · Post FX 3 Amount</option>
+        </select></label>
+        <span id="mc6Count" class="exp-status"></span>
+      </div>
+      <div id="mc6Presets" class="mc6-presets"></div>
+      <div id="mc6Preview" class="mc6-preview"></div>
+      <div class="midi-options">
+        <button id="mc6Create" class="primary">Create bank file</button>
+        <span id="mc6Status" class="exp-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <div id="midiOverlay" class="lib-overlay" hidden>
+    <div class="lib-panel exp-panel" role="dialog" aria-label="MIDI controller">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-midi)"></span><h2 style="margin:0;font-size:13px;letter-spacing:.14em;color:#ececec;text-transform:uppercase;">MIDI Controller</h2></div>
+        <button id="midiClose" class="btn-small">Close</button>
+      </div>
+      <div class="lib-filters">
+        <div id="midiStatus" class="exp-status"></div>
+        <div class="midi-options">
+          <button id="midiLearnStart" class="primary">Start MIDI Learn</button>
+          <label>Input <select id="midiInput"></select></label>
+          <label><input type="checkbox" id="midiPickup"> Pickup (no value jumps)</label>
+          <label><input type="checkbox" id="midiPc"> Program Change switches presets</label>
+          <button id="midiClearAll" class="btn-small">Clear all</button>
+        </div>
+      </div>
+      <div id="midiList" class="exp-list"></div>
+      <div class="exp-status">Tip: right-click a control to remove its assignment.</div>
+    </div>
+  </div>
+
+  <div id="midiBanner" class="midi-banner" hidden>
+    <span id="midiBannerText"></span>
+    <button id="midiLearnDone" class="btn-small">Done</button>
   </div>
 
   <div id="expOverlay" class="lib-overlay" hidden>
@@ -1456,6 +1597,7 @@
     // Cancel in-flight parameter reads of the old preset and (debounced, so
     // fast preset switching only loads the last one) re-read the full state.
     function beginPresetLoad() {
+      resetMidiPickup();
       state.protocol.presetLoad = true;
       state.protocol.skipFXModelApply = false;
       cancelFXParamRefresh();
@@ -1529,12 +1671,16 @@
       for (const b of payload) state.stateBytes.push(b);
     }
 
+    // Callbacks run after every parsed preset state (used by the MC6 Pro export).
+    const presetStateWaiters = [];
+
     function scheduleCurrentStateParse() {
       if (state.stateTimer) clearTimeout(state.stateTimer);
       state.stateTimer = setTimeout(parseBufferedCurrentState, 600);
     }
 
     function parseBufferedCurrentState() {
+      resetMidiPickup();
       if (state.stateBytes.length === 0) return;
 
       const bytes = state.stateBytes.slice();
@@ -1578,7 +1724,7 @@
       }
       state.tuner.muted = Boolean(varintField(63, 0));
       log('Current preset: ' + state.selectedPreset + (state.presetDirty ? ' (edited)' : ''));
-      if (!$('expOverlay').hidden && state.exp.preset !== state.selectedPreset) requestExpAssignments();
+      if ((!$('expOverlay').hidden || state.mc6.mixSlot >= 0) && (state.exp.preset !== state.selectedPreset || !state.exp.loaded)) requestExpAssignments();
 
     if (fields[31] && fields[31][0]) {
       log('FX enable field 31 raw: ' + hex(fields[31][0].raw));
@@ -1658,6 +1804,7 @@
       applyFXEnabledStatesFromCurrentState(fields);
 
       render();
+      presetStateWaiters.slice().forEach(waiter => waiter());
 
       log('CURRENT STATE BUFFER len=' + bytes.length);
       log('CURRENT STATE capture=' + (state.currentCapture.name || 'unknown') + ', ir=' + (state.currentIR.shortName || 'unknown'));
@@ -2165,6 +2312,7 @@
     }
 
     function handleFXParamRefreshResponse(data) {
+      resetMidiPickup();
       const blockKey = state.pendingParamBlock;
 
       if (!blockKey) {
@@ -2461,6 +2609,8 @@ function parseSelectedCaptureState(payload) {
       RetrieveExpAssignmentsResponse: 61,
       SaveExpAssignmentsRequest: 62,
       TunerMetering: 128,
+      RetrieveSettingsRequest: 65,
+      RetrieveSettingsResponse: 66,
       RenamePresetRequest: 111,
       RenamePresetResponse: 112,
       PresetDirtyStateChanged: 115
@@ -2567,6 +2717,15 @@ function parseSelectedCaptureState(payload) {
 
       if (type === MSG.RetrieveExpAssignmentsResponse) {
         parseExpAssignments(data);
+        return true;
+      }
+
+      if (type === MSG.RetrieveSettingsResponse) {
+        const fields = framePayloadFields(data);
+        const channel = fields[8] && fields[8][0] ? fields[8][0].value : 1; // 1-16; omitted = default
+        state.mc6.channel = clamp(channel || 1, 1, 16);
+        log('Nano MIDI channel: ' + state.mc6.channel);
+        if (!$('mc6Overlay').hidden) renderMc6Panel();
         return true;
       }
 
@@ -2802,6 +2961,9 @@ function parseSelectedCaptureState(payload) {
     const rawToPct = raw => Math.round(clamp(raw, 0, 255) * 100 / 255);
     const pctToRaw = pct => Math.round(clamp(pct, 0, 100) * 255 / 100);
 
+    // Callbacks run after every parsed expression assignment reply (used by the MC6 Pro export).
+    const expAssignmentWaiters = [];
+
     function defaultExpRange() { return { on: false, inverted: false, min: 0, max: 100 }; }
     function defaultExpBypass() { return { on: false, mode: 'heelToe', inverted: false, delay: 600, latch: false }; }
 
@@ -2842,6 +3004,8 @@ function parseSelectedCaptureState(payload) {
 
       state.exp.loaded = true;
       state.exp.status = 'Loaded from preset ' + state.exp.preset + '.';
+      expAssignmentWaiters.slice().forEach(waiter => waiter());
+      if (state.mc6.mixSlot >= 0) render();
       log('Expression assignments loaded: ' + EXP_RANGES.filter(r => state.exp.ranges[r.key].on).map(r => r.key)
         .concat(EXP_BYPASS.filter(b => state.exp.bypass[b.key].on).map(b => b.key + ' bypass')).join(', ') || 'none');
       renderExpPanel();
@@ -2868,16 +3032,18 @@ function parseSelectedCaptureState(payload) {
     }
 
     // Debounced: dragging a slider sends one save when it settles.
+    // The frame is built when the edit happens, so a preset change before the timer fires cannot redirect it.
     function scheduleExpSave() {
       state.exp.status = 'Saving…';
       $('expStatus').textContent = state.exp.status;
+      const preset = state.exp.preset;
+      const frame = expSaveFrame();
       if (state.exp.saveTimer) clearTimeout(state.exp.saveTimer);
       state.exp.saveTimer = setTimeout(async () => {
         state.exp.saveTimer = null;
-        const frame = expSaveFrame();
         if (frame.length - 2 > 255) { state.exp.status = 'Too many assignments for one message.'; renderExpPanel(); return; }
-        await writeC304('Save expression assignments (preset ' + state.exp.preset + ')', frame);
-        state.exp.status = 'Saved to preset ' + state.exp.preset + '.';
+        await writeC304('Save expression assignments (preset ' + preset + ')', frame);
+        state.exp.status = 'Saved to preset ' + preset + '.';
         $('expStatus').textContent = state.exp.status;
       }, 500);
     }
@@ -3876,6 +4042,8 @@ function parseSelectedCaptureState(payload) {
 
       const slider = document.createElement('input');
       slider.id = id;
+      const cabKey = { cabLevelSlider: 'level', cabHighPassSlider: 'highPass', cabLowPassSlider: 'lowPass' }[id];
+      if (cabKey) tagMidi(slider, { kind: 'cab', key: cabKey });
       slider.type = 'range';
       slider.min = min;
       slider.max = max;
@@ -3947,6 +4115,7 @@ function renderGate() {
 
       const pill = document.createElement('button');
       pill.className = 'switch-pill';
+      tagMidi(pill, { kind: 'param', block: blockKey, param: param.name });
       pill.textContent = param.meta.options[param.value] || param.meta.options[0] || '—';
       pill.title = param.meta.options.join(' → ');
 
@@ -3975,6 +4144,7 @@ function renderGate() {
 
       const select = document.createElement('select');
       select.className = 'stepped-select';
+      tagMidi(select, { kind: 'param', block: blockKey, param: param.name });
       select.disabled = disabled;
 
       param.meta.options.forEach((label, idx) => {
@@ -4008,6 +4178,7 @@ function renderGate() {
 
       const knobEl = document.createElement('div');
       knobEl.className = 'knob';
+      tagMidi(knobEl, { kind: 'param', block: blockKey, param: param.name });
 
       const normalized = paramValueToNormalized(param);
       const pct = Math.round(normalized * 73);
@@ -4097,6 +4268,7 @@ function renderGate() {
 
       const knobEl = document.createElement('div');
       knobEl.className = 'knob';
+      tagMidi(knobEl, { kind: 'amp', key });
 
       const raw = state.amp[key];
       const normalized = clamp(raw / 255, 0, 1);
@@ -4231,6 +4403,70 @@ function renderGate() {
       return icon ? '<span class="fx-icon" style="--icon: var(--ico-' + icon + ')"></span>' : '<span class="fx-icon fx-icon-empty"></span>';
     }
 
+    // Brand-free pedal drawing: enclosure in the category colour, one knob per continuous
+    // parameter (up to 6, pointing at the current values), model name, status LED and footswitch.
+    const PEDAL_CATEGORY_LABELS = {
+      overdrive: 'Overdrive', 'bass-overdrive': 'Bass Overdrive', fuzz: 'Fuzz', compressor: 'Compressor',
+      equalizer: 'Equalizer', filter: 'Filter', wah: 'Wah', utility: 'Utility', gate: 'Gate', doubler: 'Doubler',
+      pitch: 'Pitch', modulation: 'Modulation', delay: 'Delay', reverb: 'Reverb'
+    };
+
+    function pedalGraphicSVG(id, block, style) {
+      const body = style.color === FX_COLORS.utility ? '#d6d6d6' : style.color;
+      const ink = iconInk(body) === '#fff' ? '#ffffff' : '#141414';
+      const name = escapeHTML(block.model.toUpperCase());
+      const category = escapeHTML((PEDAL_CATEGORY_LABELS[style.icon] || '').toUpperCase());
+      const led = block.on ? '#ff3b30' : '#4a1d1a';
+      const gid = 'pg-' + id;
+      const nameAttrs = block.model.length > 10 ? ' textLength="72" lengthAdjust="spacingAndGlyphs"' : '';
+      const defs = '<defs>' +
+        '<linearGradient id="' + gid + '-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.22"/><stop offset="0.5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.28"/></linearGradient>' +
+        '<radialGradient id="' + gid + '-m" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#f4f4f4"/><stop offset="1" stop-color="#7c7c7c"/></radialGradient>' +
+        '</defs>';
+
+      if (style.icon === 'wah') {
+        // Wah: treadle seen from above.
+        return '<svg class="pedal-svg" viewBox="0 0 100 150" role="img" aria-label="' + name + '">' + defs +
+          '<rect x="10" y="6" width="80" height="138" rx="12" fill="#2b2b2b"/>' +
+          '<rect x="10" y="6" width="80" height="138" rx="12" fill="url(#' + gid + '-b)"/>' +
+          '<rect x="18" y="14" width="64" height="88" rx="8" fill="#161616" stroke="#000" stroke-opacity="0.5"/>' +
+          Array.from({ length: 9 }, (_, i) => '<line x1="26" x2="74" y1="' + (24 + i * 8) + '" y2="' + (24 + i * 8) + '" stroke="#3a3a3a" stroke-width="2.4" stroke-linecap="round"/>').join('') +
+          '<rect x="18" y="108" width="64" height="22" rx="4" fill="' + body + '"/>' +
+          '<text x="50" y="123" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-size="8.5" font-weight="800" fill="' + ink + '"' + nameAttrs.replace('74', '58') + '>' + name + '</text>' +
+          '<circle cx="80" cy="138" r="2.2" fill="' + led + '"/>' +
+          '</svg>';
+      }
+
+      const knobs = (block.params || []).filter(param => !(param.meta && param.meta.kind === 'enum')).slice(0, 6);
+      const rows = knobs.length <= 3 ? [knobs] : knobs.length === 4 ? [knobs.slice(0, 2), knobs.slice(2)] : [knobs.slice(0, 3), knobs.slice(3)];
+      const r = knobs.length <= 3 ? 9 : 8;
+      let knobSVG = '';
+      rows.forEach((row, rowIndex) => {
+        const y = rows.length === 1 ? 36 : 28 + rowIndex * 26;
+        row.forEach((param, i) => {
+          const x = 50 + (i - (row.length - 1) / 2) * (row.length === 2 ? 30 : 26);
+          const a = (-225 + paramValueToNormalized(param) * 270) * Math.PI / 180;
+          knobSVG += '<circle cx="' + x + '" cy="' + (y + 1.5) + '" r="' + r + '" fill="#000" opacity="0.25"/>' +
+            '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#1b1b1b" stroke="#000" stroke-opacity="0.6"/>' +
+            '<line x1="' + x + '" y1="' + y + '" x2="' + (x + Math.cos(a) * (r - 2)).toFixed(1) + '" y2="' + (y + Math.sin(a) * (r - 2)).toFixed(1) + '" stroke="#f2f2f2" stroke-width="1.8" stroke-linecap="round"/>';
+        });
+      });
+
+      return '<svg class="pedal-svg" viewBox="0 0 100 150" role="img" aria-label="' + name + '">' + defs +
+        '<rect x="7" y="16" width="5" height="12" rx="1.5" fill="#9a9a9a"/><rect x="88" y="16" width="5" height="12" rx="1.5" fill="#9a9a9a"/>' +
+        '<rect x="10" y="4" width="80" height="142" rx="9" fill="' + body + '"/>' +
+        '<rect x="10" y="4" width="80" height="142" rx="9" fill="url(#' + gid + '-b)"/>' +
+        '<rect x="10.5" y="4.5" width="79" height="141" rx="8.5" fill="none" stroke="#000" stroke-opacity="0.35"/>' +
+        knobSVG +
+        '<text x="50" y="' + (rows.length === 1 ? 74 : 86) + '" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" letter-spacing="0.4" fill="' + ink + '"' + nameAttrs + '>' + name + '</text>' +
+        '<text x="50" y="' + (rows.length === 1 ? 85 : 96) + '" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-size="5.6" letter-spacing="1.2" fill="' + ink + '" opacity="0.65">' + category + '</text>' +
+        '<circle cx="50" cy="108" r="3" fill="' + led + '"/>' +
+        (block.on ? '<circle cx="50" cy="108" r="6" fill="' + led + '" opacity="0.25"/>' : '') +
+        '<circle cx="50" cy="128" r="10" fill="url(#' + gid + '-m)" stroke="#000" stroke-opacity="0.45"/>' +
+        '<circle cx="50" cy="128" r="5.5" fill="#cfcfcf" stroke="#000" stroke-opacity="0.3"/>' +
+        '</svg>';
+    }
+
     function renderBlock(key, block) {
       const style = fxStyle(block.models.find(m => m.name === block.model));
       const el = document.createElement('div');
@@ -4244,6 +4480,7 @@ function renderGate() {
 
       const toggle = document.createElement('div');
       toggle.className = 'toggle-switch ' + (block.on ? 'on' : '');
+      tagMidi(toggle, { kind: 'toggle', target: key });
       toggle.innerHTML = '<div class="toggle-dot"></div>';
       toggle.addEventListener('click', () => {
         if (!block.on && block.model === 'None') return;
@@ -4293,25 +4530,21 @@ function renderGate() {
       el.appendChild(select);
 
       
-      if (typeof MODEL_IMAGES !== 'undefined' && MODEL_IMAGES[block.model]) {
+      // Pedal picture: your own image from img/ if available, otherwise a drawn, brand-free pedal.
+      if (block.model !== 'None') {
         const imgWrap = document.createElement('div');
-        imgWrap.style.textAlign = 'center';
-        imgWrap.style.marginTop = '12px';
-        imgWrap.style.marginBottom = '4px';
-        imgWrap.style.minHeight = '120px'; // Prevent jumping UI
-        
-        const img = document.createElement('img');
-        img.src = MODEL_IMAGES[block.model];
-        img.alt = block.model;
-        img.onerror = () => imgWrap.remove(); // pedal pictures are optional (img/ is not in the repository)
-        
-        img.style.maxWidth = '100%';
-        img.style.maxHeight = '120px'; 
-        img.style.objectFit = 'contain';
-        img.style.borderRadius = '4px';
-        img.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.5))';
-        
-        imgWrap.appendChild(img);
+        imgWrap.className = 'pedal-picture';
+        const showGraphic = () => { imgWrap.innerHTML = pedalGraphicSVG(key, block, style); };
+        const picture = typeof MODEL_IMAGES !== 'undefined' && MODEL_IMAGES[block.model];
+        if (picture) {
+          const img = document.createElement('img');
+          img.src = picture;
+          img.alt = block.model;
+          img.onerror = showGraphic;
+          imgWrap.appendChild(img);
+        } else {
+          showGraphic();
+        }
         el.appendChild(imgWrap);
       }
 
@@ -4330,6 +4563,8 @@ function renderGate() {
       orderedParams.forEach(param => grid.appendChild(renderParam(key, param, style.color, FX_BLOCK_KEYS.includes(key), block)));
 
       el.appendChild(grid);
+      const mc6Exp = renderMc6ExpControls(key, block, style.color);
+      if (mc6Exp) el.appendChild(mc6Exp);
       return el;
     }
 
@@ -4379,6 +4614,773 @@ function renderGate() {
     $('presetNext').addEventListener('click', () => selectPreset(Math.min(64, state.selectedPreset + 1)));
     $('copyLogBtn').addEventListener('click', copyLog);
     $('presetSelect').addEventListener('change', e => selectPreset(Number(e.target.value)));
+
+    // ---- Morningstar MC6 Pro bank export ----
+    // Bank file format (Morningstar editor "singleBank" dump): 24 presets (4 pages x A-F), 32 messages each.
+    // Message types: 1 PC {data[0]=program}, 2 CC {data[0]=cc, data[1]=value}, 14 Toggle Page {data[0]: 3=page 1, 4=page 2},
+    // 15 Set Toggle {data[0..3] = 7-bit masks of presets 0-6, 7-13, 14-20, 21-23; c = mode + 1: 1 disengage, 2 engage,
+    //    3 toggle, 7 "Set Toggle" = checked presets to position 2, all others to position 1 (their messages are not sent)}.
+    // Action a=1 press; tg = 0 position 1, 1 position 2, 2 both. Names may start with "\x" = firmware icon x.
+    // hash = Java string hash of JSON.stringify(data). Nano: PC 0-63 = presets, CC 37-41 = FX slots 1-5 (127 on, 0 off),
+    // CC 1 = expression pedal position (0 heel, 127 toe) for the preset's expression assignments.
+    const MC6_STORE = 'nanoCortexMc6';
+    state.mc6 = { selected: [1, 2, 3, 4, 5], channel: 1, bankName: 'Nano Cortex', mixSlot: -1, records: {}, busy: false };
+    try { state.mc6.mixSlot = Number(JSON.parse(localStorage.getItem(MC6_STORE) || '{}').mixSlot ?? -1); } catch (e) { /* storage unavailable */ }
+
+    const MC6_COLORS = { black: 0, lime: 1, blue: 2, yellow: 4, grey: 6, white: 7, orange: 8, red: 9, skyblue: 10, aqua: 29, turquoise: 30, gold: 47, blueviolet: 44, darkorange: 54 };
+    const mc6Dim = c => (c >= 1 && c < 15 ? c + 14 : c <= 63 ? c | 64 : c);   // the editor's "dim" variant of a colour
+    const MC6_HEX = { 0: '#000000', 1: '#00FF00', 2: '#0000FF', 4: '#FFFF00', 6: '#808080', 7: '#FFFFFF', 8: '#FFA500', 9: '#FF0000', 10: '#87CEEB', 29: '#00FFFF', 30: '#40E0D0', 44: '#8A2BE2', 47: '#FFD700', 54: '#FF8C00' };
+
+    // Effect category -> MC6 colour + firmware icon (character after the backslash) + short type name.
+    const MC6_CATEGORY = {
+      overdrive: { color: MC6_COLORS.darkorange, icon: 'v', name: 'DRIVE' },        // 118 bolt
+      'bass-overdrive': { color: MC6_COLORS.darkorange, icon: 'v', name: 'DRIVE' },
+      fuzz: { color: MC6_COLORS.darkorange, icon: 'y', name: 'FUZZ' },               // 121 square wave
+      compressor: { color: MC6_COLORS.lime, icon: 'o', name: 'COMP' },               // 111 up/down
+      equalizer: { color: MC6_COLORS.blue, icon: '8', name: 'EQ' },                  // 56 mixer
+      filter: { color: MC6_COLORS.skyblue, icon: 'O', name: 'FILTER' },              // 79 sweep
+      wah: { color: MC6_COLORS.white, icon: 'O', name: 'WAH' },
+      utility: { color: MC6_COLORS.white, icon: 'W', name: 'UTIL' },                 // 87 tune
+      gate: { color: MC6_COLORS.white, icon: 'g', name: 'GATE' },                    // 103 no volume
+      doubler: { color: MC6_COLORS.white, icon: 'F', name: 'DOUBLER' },              // 70 stack
+      pitch: { color: MC6_COLORS.gold, icon: 'Z', name: 'PITCH' },                   // 90 music note
+      modulation: { color: MC6_COLORS.blueviolet, icon: 'B', name: 'MOD' },          // 66 sine wave
+      delay: { color: MC6_COLORS.aqua, icon: ';', name: 'DELAY' },                   // 59 repeat
+      reverb: { color: MC6_COLORS.turquoise, icon: '9', name: 'REVERB' }             // 57 sound waves
+    };
+
+    // More specific type names for modulation models.
+    function mc6TypeName(model, category) {
+      const name = model.name;
+      if (category === 'modulation') {
+        if (/chorus|ce2w|229t/i.test(name)) return 'CHORUS';
+        if (/flang/i.test(name)) return 'FLANGER';
+        if (/phase/i.test(name)) return 'PHASER';
+        if (/trem/i.test(name)) return 'TREMOLO';
+        if (/vibe/i.test(name)) return 'VIBE';
+        if (/dc2w|dimension/i.test(name)) return 'DIMENSION';
+      }
+      return MC6_CATEGORY[category] ? MC6_CATEGORY[category].name : 'FX';
+    }
+
+    // Resolves true once the editor has parsed the state of `preset`, false after the timeout.
+    function waitForPresetState(preset, timeoutMs) {
+      return new Promise(resolve => {
+        const done = ok => { clearTimeout(timer); presetStateWaiters.splice(presetStateWaiters.indexOf(waiter), 1); resolve(ok); };
+        const waiter = () => { if (state.selectedPreset === preset) done(true); };
+        const timer = setTimeout(() => done(false), timeoutMs);
+        presetStateWaiters.push(waiter);
+      });
+    }
+
+    // The FX of the preset that is loaded right now, exactly as the editor shows them.
+    function snapshotCurrentPreset() {
+      return {
+        name: state.presetNames.get(state.selectedPreset) || 'Preset ' + state.selectedPreset,
+        slots: FX_BLOCK_KEYS.map(key => {
+          const block = state.blocks[key];
+          const model = block.models.find(m => m.name === block.model);
+          if (!model || model.name === 'None') return null;
+          return { model, category: fxStyle(model).icon || 'utility', on: Boolean(block.on) };
+        })
+      };
+    }
+
+    // Reads the expression assignments of the loaded preset; resolves null after the timeout.
+    function readExpAssignments(timeoutMs) {
+      return new Promise(resolve => {
+        const preset = state.selectedPreset;
+        const done = ok => {
+          clearTimeout(timer);
+          expAssignmentWaiters.splice(expAssignmentWaiters.indexOf(waiter), 1);
+          resolve(ok ? { ranges: structuredClone(state.exp.ranges), bypass: structuredClone(state.exp.bypass) } : null);
+        };
+        const waiter = () => { if (state.exp.loaded && state.exp.preset === preset) done(true); };
+        const timer = setTimeout(() => done(false), timeoutMs);
+        expAssignmentWaiters.push(waiter);
+        requestExpAssignments();
+      });
+    }
+
+    // What the expression switch does in one preset, for the preview: range of the slot's Amount plus warnings.
+    function mc6ExpNote(record, slotIndex) {
+      const key = FX_BLOCK_KEYS[slotIndex];
+      if (!record.exp) return 'expression assignments could not be read';
+      const range = record.exp.ranges[key];
+      const parts = [range && range.on
+        ? 'Amount ' + (range.inverted ? range.max + ' → ' + range.min : range.min + ' → ' + range.max) + ' %'
+        : '⚠ ' + FX_BLOCKS_TITLES[slotIndex] + ' Amount is not assigned to the expression pedal'];
+      if (record.exp.bypass[key] && record.exp.bypass[key].on) parts.push('⚠ ' + FX_BLOCKS_TITLES[slotIndex] + ' on/off is also on the expression pedal');
+      const others = EXP_RANGES.filter(r => r.key !== key && record.exp.ranges[r.key] && record.exp.ranges[r.key].on).map(r => r.label);
+      if (others.length) parts.push('also moves ' + others.join(', '));
+      return parts.join(' · ');
+    }
+
+    // Pos 1 / Pos 2 of the MC6 expression switch, shown in its FX block. They are the heel/toe values of the slot's
+    // Amount in this preset's expression assignments; dragging one also sets the Mix, so you hear the setting.
+    function renderMc6ExpControls(key, block, color) {
+      if (state.mc6.mixSlot < 0 || FX_BLOCK_KEYS[state.mc6.mixSlot] !== key || block.model === 'None') return null;
+      const box = document.createElement('div');
+      box.className = 'mc6-exp';
+      box.style.setProperty('--block-color', color);
+      const title = document.createElement('div');
+      title.className = 'mc6-exp-title';
+      title.textContent = 'MC6 Pro expression switch';
+      box.appendChild(title);
+      const hint = document.createElement('div');
+      hint.className = 'mc6-exp-hint';
+      if (!state.exp.loaded || state.exp.preset !== state.selectedPreset) {
+        hint.textContent = state.connected ? 'Loading expression assignments…' : 'Connect to the Nano to set Pos 1 and Pos 2.';
+        box.appendChild(hint);
+        return box;
+      }
+
+      const range = state.exp.ranges[key];
+      const pos = range.on ? (range.inverted ? [range.max, range.min] : [range.min, range.max]) : [0, 100];
+      const mix = block.params.find(p => /mix/i.test(p.name) && !(p.meta && p.meta.kind === 'enum'));
+      ['Pos 1', 'Pos 2'].forEach((label, i) => {
+        const row = document.createElement('label');
+        row.className = 'mc6-exp-row';
+        row.innerHTML = '<span>' + label + '</span><input type="range" min="0" max="100" value="' + pos[i] + '"><span class="v">' + pos[i] + ' %</span>';
+        const input = row.querySelector('input');
+        input.addEventListener('input', () => {
+          pos[i] = Number(input.value);
+          row.querySelector('.v').textContent = input.value + ' %';
+          Object.assign(range, { on: true, inverted: pos[0] > pos[1], min: Math.min(pos[0], pos[1]), max: Math.max(pos[0], pos[1]) });
+          scheduleExpSave();
+          if (mix) setFXParam(key, mix, roundToStep(mix.meta.min + (mix.meta.max - mix.meta.min) * pos[i] / 100, mix.meta.step || 0.1));
+        });
+        input.addEventListener('change', render);
+        box.appendChild(row);
+      });
+      hint.textContent = (range.on ? '' : 'Not assigned yet: moving a slider assigns the ' + block.title + ' Amount to the expression pedal. ') +
+        'Pos 1 = switch dim, Pos 2 = switch lit' + (mix ? '. Dragging sets ' + mix.name + ' so you hear it.' : '.');
+      box.appendChild(hint);
+      return box;
+    }
+
+    // "Pit-Com-Cho": abbreviated effect types in Pre FX 1, Pre FX 2 and Post FX 1 (empty slots are left out).
+    function mc6FxLineup(record) {
+      const names = [0, 1, 2].map(s => mc6Slot(record, s)).filter(Boolean).map(slot => {
+        const type = mc6TypeName(slot.model, slot.category);
+        return type.length <= 3 ? type : type[0] + type.slice(1, 3).toLowerCase();
+      });
+      return names.join('-') || 'No FX';
+    }
+
+    // The FX slot as seen in one preset: model + category + on, or null for an empty slot.
+    function mc6Slot(record, slotIndex) {
+      return record.slots[slotIndex];
+    }
+
+    function mc6Mask(presetNumbers) {
+      const data = new Array(18).fill(0);
+      presetNumbers.forEach(p => { data[Math.floor(p / 7)] |= 1 << (p % 7); });
+      return data;
+    }
+
+    function mc6Message(index, fields) {
+      return Object.assign({ data: new Array(18).fill(0), m: index, c: 1, t: 0, a: 0, tg: 2, mi: '' }, fields);
+    }
+
+    function mc6EmptyPreset(num, isExp) {
+      return {
+        presetNum: num, bankNum: 0, isExp, shortName: '', toggleName: '', longName: '', shiftName: '',
+        toToggle: false, toBlink: false, toMsgScroll: false, toggleGroup: 0,
+        ledColor: 0, ledToggleColor: 0, ledShiftColor: 0, nameColor: 0, nameToggleColor: 0, nameShiftColor: 0,
+        backgroundColor: 0, toggleBackgroundColor: 0, shiftBackgroundColor: 0,
+        msgArray: Array.from({ length: 32 }, (_, i) => mc6Message(i, {}))
+      };
+    }
+
+    function mc6SetMessages(preset, messages) {
+      messages.forEach((msg, i) => { preset.msgArray[i] = mc6Message(i, msg); });
+    }
+
+    const mc6Text = (text, max) => String(text).replace(/[^\x20-\x7E]/g, '').replace(/\\/g, '/').slice(0, max);
+    const mc6Ink = color => (['#FFFFFF', '#FFFF00', '#00FF00', '#00FFFF', '#40E0D0', '#87CEEB', '#FFD700', '#FFA500', '#FF8C00'].includes(MC6_HEX[color]) ? MC6_COLORS.black : MC6_COLORS.white);
+
+    function buildMc6Bank(presets, records) {
+      const ch = state.mc6.channel;
+      const mixSlot = state.mc6.mixSlot;
+      const bank = {
+        bankNumber: 0, bankName: mc6Text(state.mc6.bankName || 'Nano Cortex', 16), bankClearToggle: false,
+        bankMsgArray: Array.from({ length: 32 }, (_, i) => { const m = mc6Message(i, {}); m.data[9] = 127; return m; }),
+        presetArray: Array.from({ length: 24 }, (_, i) => mc6EmptyPreset(i, false)),
+        expPresetArray: Array.from({ length: 4 }, (_, i) => mc6EmptyPreset(i, true)),
+        bankDescription: 'Nano Cortex presets + FX switching', toDisplay: false, pageLimit: 0,
+        backgroundColor: 0, textColor: 7, isColorEnabled: true
+      };
+
+      // FX switches (page 2, presets 6-10): named after the effect type used most often in this slot.
+      const fx = [0, 1, 2, 3, 4].map(slotIndex => {
+        const slots = presets.map(p => mc6Slot(records[p], slotIndex)).filter(Boolean);
+        const counts = {};
+        slots.forEach(s => { const k = s.category + '|' + mc6TypeName(s.model, s.category); counts[k] = (counts[k] || 0) + 1; });
+        const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+        const [category, typeName] = top ? top[0].split('|') : ['none', 'EMPTY'];
+        const models = Array.from(new Set(slots.map(s => s.model.name)));
+        return { category, typeName, models, style: MC6_CATEGORY[category] || { color: MC6_COLORS.grey, icon: '', name: 'EMPTY' } };
+      });
+
+      const cc = (number, value, tg) => ({ t: 2, c: ch, a: 1, tg, data: [number, value].concat(new Array(16).fill(0)) });
+      fx.forEach((f, slotIndex) => {
+        const p = bank.presetArray[6 + slotIndex];
+        const color = f.style.color;
+        const label = (f.style.icon ? '\\' + f.style.icon : '') + f.typeName;
+        const isMix = slotIndex === mixSlot;
+        Object.assign(p, {
+          shortName: label, toggleName: isMix ? label + ' +' : label,
+          longName: mc6Text(FX_BLOCKS_TITLES[slotIndex] + ': ' + (isMix ? 'EXP Amount' : f.models.join(' / ') || 'empty'), 24),
+          toToggle: true,
+          ledColor: mc6Dim(color), nameColor: color, backgroundColor: MC6_COLORS.black,             // position 1 = effect off / Min
+          ledToggleColor: color, nameToggleColor: mc6Ink(color), toggleBackgroundColor: color         // position 2 = effect on / Max
+        });
+        // Expression switch: keeps the FX on and moves the expression pedal (CC 1) to toe (Max) or heel (Min).
+        mc6SetMessages(p, isMix
+          ? [cc(37 + slotIndex, 127, 2), cc(1, 127, 0), cc(1, 0, 1)]
+          : [cc(37 + slotIndex, 127, 0), cc(37 + slotIndex, 0, 1)]);
+      });
+
+      // Preset switches (page 1, A-E): PC + set the on/off state of the FX switches for this preset.
+      presets.forEach((presetNumber, i) => {
+        const record = records[presetNumber];
+        const p = bank.presetArray[i];
+        const fxOn = [0, 1, 2, 3, 4].filter(s => { const slot = mc6Slot(record, s); return s !== mixSlot && slot && slot.on; });
+        Object.assign(p, {
+          shortName: mc6Text(record.name, 16), toggleName: mc6Text(record.name, 16), longName: mc6Text(mc6FxLineup(record), 24),
+          ledColor: mc6Dim(MC6_COLORS.white), nameColor: MC6_COLORS.white, backgroundColor: MC6_COLORS.black,
+          ledToggleColor: MC6_COLORS.white, nameToggleColor: MC6_COLORS.black, toggleBackgroundColor: MC6_COLORS.white
+        });
+        // One Set Toggle in "Set Toggle" mode: this switch and the FX switches that are on in the preset go to
+        // position 2, everything else (other preset switches, FX that are off, the expression switch) to position 1.
+        // With an expression switch, the preset starts at heel (Min).
+        mc6SetMessages(p, [
+          { t: 1, c: ch, a: 1, tg: 2, data: [presetNumber - 1].concat(new Array(17).fill(0)) }
+        ].concat(mixSlot >= 0 ? [cc(1, 0, 2)] : [], [
+          { t: 15, c: 7, a: 1, tg: 2, data: mc6Mask([i].concat(fxOn.map(s => 6 + s))) }
+        ]));
+      });
+
+      // F on page 1 -> FX page, F on page 2 -> back to the presets.
+      Object.assign(bank.presetArray[5], { shortName: '\\XFX', toggleName: '\\XFX', longName: 'FX switches', ledColor: MC6_COLORS.grey, nameColor: MC6_COLORS.white });
+      mc6SetMessages(bank.presetArray[5], [{ t: 14, a: 1, tg: 2, data: [4].concat(new Array(17).fill(0)) }]);
+      Object.assign(bank.presetArray[11], { shortName: '\\lPRESETS', toggleName: '\\lPRESETS', longName: 'Back to presets', ledColor: MC6_COLORS.grey, nameColor: MC6_COLORS.white });
+      mc6SetMessages(bank.presetArray[11], [{ t: 14, a: 1, tg: 2, data: [3].concat(new Array(17).fill(0)) }]);
+
+      const data = { bank };
+      const json = JSON.stringify(data);
+      let hash = 0;
+      for (let i = 0; i < json.length; i++) { hash = (hash << 5) - hash + json.charCodeAt(i); hash |= 0; }
+      return { schemaVersion: 1, dumpType: 'singleBank', deviceModel: 6, downloadDate: new Date().toISOString(), hash, data, description: 'Created by Nano Cortex Editor' };
+    }
+    const FX_BLOCKS_TITLES = ['Pre FX 1', 'Pre FX 2', 'Post FX 1', 'Post FX 2', 'Post FX 3'];
+
+    function renderMc6Preview(dump, notes) {
+      const box = $('mc6Preview');
+      if (!dump) { box.innerHTML = ''; return; }
+      const presets = dump.data.bank.presetArray;
+      const tile = (p, letter) => {
+        const color = MC6_HEX[p.toToggle ? p.ledToggleColor : p.nameColor] || '#333';
+        const name = p.shortName.replace(/^\\./, '');
+        const icon = /^\\./.test(p.shortName) ? '◆ ' : '';
+        return '<div class="mc6-tile" style="border-color:' + color + ';color:' + (MC6_HEX[p.nameColor] || '#ccc') + '"><span class="sw">' + letter + '</span>' + escapeHTML(icon + (name || '—')) + '</div>';
+      };
+      // Which FX switches each preset switch sets to "on" (read back from its Set Toggle message).
+      const fxName = k => presets[k].shortName.replace(/^\\./, '');
+      const rows = presets.slice(0, 5).map((p, i) => {
+        const st = p.msgArray.find(m => m.t === 15);
+        if (!st) return '';
+        const on = [6, 7, 8, 9, 10].filter(k => st.data[Math.floor(k / 7)] & (1 << (k % 7)));
+        return '<div><b>' + 'ABCDE'[i] + ' ' + escapeHTML(p.shortName) + '</b> <span class="note">(' + escapeHTML(p.longName) + ')</span><b>:</b> ' +
+          (on.length ? on.map(k => escapeHTML('ABCDE'[k - 6] + ' ' + fxName(k))).join(', ') : notes ? 'no on/off FX on' : 'all FX off') +
+          (notes && notes[i] ? ' <span class="note">· ' + escapeHTML('ABCDE'[state.mc6.mixSlot] + ' ' + fxName(6 + state.mc6.mixSlot) + ': ' + notes[i]) + '</span>' : '') + '</div>';
+      }).join('');
+      box.innerHTML =
+        '<div class="mc6-page"><span class="lbl">Page 1</span>' + presets.slice(0, 6).map((p, i) => tile(p, 'ABCDEF'[i])).join('') + '</div>' +
+        '<div class="mc6-page"><span class="lbl">Page 2</span>' + presets.slice(6, 12).map((p, i) => tile(p, 'ABCDEF'[i])).join('') + '</div>' +
+        (rows ? '<div class="mc6-map"><span class="lbl">FX on (Set Toggle)' + (notes ? ' · expression switch ' + 'ABCDE'[state.mc6.mixSlot] : '') + '</span>' + rows + '</div>' : '');
+    }
+
+    function renderMc6Panel() {
+      const ch = $('mc6Channel');
+      if (!ch.options.length) ch.innerHTML = Array.from({ length: 16 }, (_, i) => '<option value="' + (i + 1) + '">' + (i + 1) + '</option>').join('');
+      ch.value = String(state.mc6.channel);
+      $('mc6BankName').value = state.mc6.bankName;
+      $('mc6MixSlot').value = String(state.mc6.mixSlot);
+      const sel = state.mc6.selected.slice().sort((a, b) => a - b);
+      $('mc6Count').textContent = sel.length + ' of 5 presets selected (A–E in preset order)';
+      const list = $('mc6Presets');
+      list.innerHTML = '';
+      for (let i = 1; i <= 64; i++) {
+        const idx = sel.indexOf(i);
+        const row = document.createElement('label');
+        row.className = 'mc6-preset' + (idx >= 0 ? ' on' : '') + (idx < 0 && sel.length >= 5 ? ' disabled' : '');
+        row.innerHTML = '<input type="checkbox"' + (idx >= 0 ? ' checked' : '') + (idx < 0 && sel.length >= 5 ? ' disabled' : '') + '>' +
+          '<span class="n">' + i + '</span><span class="name">' + escapeHTML(state.presetNames.get(i) || 'Preset ' + i) + '</span>' +
+          (idx >= 0 ? '<span class="mc6-letter">' + 'ABCDE'[idx] + '</span>' : '');
+        row.querySelector('input').addEventListener('change', e => {
+          if (e.target.checked) { if (state.mc6.selected.length < 5) state.mc6.selected.push(i); }
+          else state.mc6.selected = state.mc6.selected.filter(x => x !== i);
+          renderMc6Panel();
+        });
+        list.appendChild(row);
+      }
+    }
+
+    // The FX on/off states are read the same way the editor shows them: each selected preset is loaded
+    // on the Nano for a moment, then the original preset is loaded again.
+    async function createMc6Bank() {
+      if (state.mc6.busy) return;
+      const presets = state.mc6.selected.slice().sort((a, b) => a - b);
+      if (!presets.length) { $('mc6Status').textContent = 'Select at least one preset.'; return; }
+      if (!state.connected) { $('mc6Status').textContent = 'Connect to the Nano first: the FX of each preset are read from the device.'; return; }
+      if (state.presetDirty) { $('mc6Status').textContent = 'Preset ' + state.selectedPreset + ' has unsaved changes. Save or discard them first: the export loads each selected preset on the Nano.'; return; }
+      const original = state.selectedPreset;
+      state.mc6.busy = true;
+      $('mc6Create').disabled = true;
+      try {
+        // The preset that is loaded already is read first, without switching.
+        const order = presets.includes(original) ? [original].concat(presets.filter(p => p !== original)) : presets;
+        for (let i = 0; i < order.length; i++) {
+          const preset = order[i];
+          $('mc6Status').textContent = 'Reading preset ' + preset + ' (' + (i + 1) + '/' + order.length + ')…';
+          if (preset !== state.selectedPreset) {
+            const loaded = waitForPresetState(preset, 6000);
+            await selectPreset(preset);
+            if (!await loaded) { $('mc6Status').textContent = 'Preset ' + preset + ' could not be read. Please try again.'; return; }
+            await new Promise(r => setTimeout(r, 300));
+          }
+          state.mc6.records[preset] = snapshotCurrentPreset();
+          const rec = state.mc6.records[preset];
+          rec.exp = state.mc6.mixSlot >= 0 ? await readExpAssignments(3000) : null;
+          log('MC6 export, preset ' + preset + ' ' + rec.name + ': ' + rec.slots.map((sl, k) => FX_BLOCKS_TITLES[k] + '=' + (sl ? sl.model.name + (sl.on ? ' on' : ' off') : 'empty')).join(', '));
+        }
+        const dump = buildMc6Bank(presets, state.mc6.records);
+        renderMc6Preview(dump, state.mc6.mixSlot >= 0 ? presets.map(p => mc6ExpNote(state.mc6.records[p], state.mc6.mixSlot)) : null);
+        const blob = new Blob([JSON.stringify(dump)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'Morningstar_MC6PRO_Bank_' + mc6Text(state.mc6.bankName || 'Nano Cortex', 16).replace(/[^A-Za-z0-9]+/g, '_') + '.json';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        $('mc6Status').textContent = 'Bank file created. In the Morningstar editor: open a bank → "Load from File" → choose this file → save to the controller.';
+        log('MC6 Pro bank exported: presets ' + presets.join(', ') + ', MIDI channel ' + state.mc6.channel);
+      } finally {
+        if (state.connected && state.selectedPreset !== original) {
+          const back = waitForPresetState(original, 6000);
+          await selectPreset(original);
+          await back;
+        }
+        state.mc6.busy = false;
+        $('mc6Create').disabled = false;
+      }
+    }
+
+    function openMc6Panel() {
+      $('mc6Overlay').hidden = false;
+      renderMc6Panel();
+      renderMc6Preview(null);
+      $('mc6Status').textContent = '';
+      // RetrieveSettingsRequest (65) { 1: READ } -> 66 { 8: baseMidiChannel 1-16 }
+      if (state.connected) writeC304('Retrieve settings', buildFrame([0x08, 0x03], MSG.RetrieveSettingsRequest));
+    }
+
+    $('mc6Btn').addEventListener('click', openMc6Panel);
+    $('mc6Close').addEventListener('click', () => { $('mc6Overlay').hidden = true; });
+    $('mc6Overlay').addEventListener('click', e => { if (e.target === $('mc6Overlay')) $('mc6Overlay').hidden = true; });
+    $('mc6Channel').addEventListener('change', e => { state.mc6.channel = Number(e.target.value); });
+    $('mc6BankName').addEventListener('input', e => { state.mc6.bankName = e.target.value; });
+    $('mc6MixSlot').addEventListener('change', e => {
+      state.mc6.mixSlot = Number(e.target.value);
+      try { localStorage.setItem(MC6_STORE, JSON.stringify({ mixSlot: state.mc6.mixSlot })); } catch (err) { /* storage unavailable */ }
+      if (state.connected && state.mc6.mixSlot >= 0 && (!state.exp.loaded || state.exp.preset !== state.selectedPreset)) requestExpAssignments();
+      render();
+    });
+    $('mc6Create').addEventListener('click', createMc6Bank);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('mc6Overlay').hidden) $('mc6Overlay').hidden = true; });
+
+    // ---- MIDI controller: MIDI Learn for knobs and switches (Web MIDI) ----
+    // Assignments are stored in localStorage: { "cc:<ch>:<num>" | "note:<ch>:<num>": { target, mode } }.
+    const MIDI_STORE = 'nanoCortexMidi';
+    state.midi = { access: null, learn: false, learnTarget: null, map: {}, pickup: false, pcToPreset: false, input: 'all', picked: {}, last: {}, renderTimer: null, decorateQueued: false };
+
+    function midiTargetId(t) {
+      return t.kind + ':' + (t.block || '') + ':' + (t.param || t.key || t.target || '');
+    }
+
+    function tagMidi(el, target) {
+      el.dataset.midiId = midiTargetId(target);
+      el.dataset.midiTarget = JSON.stringify(target);
+    }
+
+    function midiEl(target) {
+      return document.querySelector('[data-midi-id="' + CSS.escape(midiTargetId(target)) + '"]');
+    }
+
+    const isMidiButton = t => t.kind === 'toggle' || t.kind === 'tuner' || t.kind === 'preset';
+
+    function midiKeyLabel(key) {
+      const [type, ch, num] = key.split(':');
+      return (type === 'cc' ? 'CC ' : 'Note ') + num + (ch !== '1' ? ' · Ch ' + ch : '');
+    }
+
+    function midiTargetLabel(t) {
+      const blockTitle = key => key === 'gate' ? 'Gate' : (state.blocks[key] ? state.blocks[key].title : key);
+      switch (t.kind) {
+        case 'param': return blockTitle(t.block) + ' · ' + t.param;
+        case 'amp': return 'Amp · ' + ((AMP_KNOBS.find(k => k.key === t.key) || {}).label || t.key);
+        case 'captureVolume': return 'Capture Volume';
+        case 'cab': return 'Cab · ' + { level: 'Level', highPass: 'High Pass', lowPass: 'Low Pass' }[t.key];
+        case 'toggle': return ({ capture: 'Capture', cab: 'Cab / IR', gate: 'Gate' }[t.target] || blockTitle(t.target)) + ' on/off';
+        case 'tuner': return 'Tuner on/off';
+        case 'preset': return t.key === 'prev' ? 'Previous preset' : 'Next preset';
+      }
+      return midiTargetId(t);
+    }
+
+    function loadMidiSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(MIDI_STORE) || '{}');
+        Object.assign(state.midi, { map: saved.map || {}, pickup: Boolean(saved.pickup), pcToPreset: Boolean(saved.pcToPreset), input: saved.input || 'all' });
+      } catch (err) { /* storage unavailable: start without saved assignments */ }
+    }
+
+    function saveMidiSettings() {
+      try {
+        localStorage.setItem(MIDI_STORE, JSON.stringify({ map: state.midi.map, pickup: state.midi.pickup, pcToPreset: state.midi.pcToPreset, input: state.midi.input }));
+      } catch (err) { log('Could not save MIDI settings: ' + err.message); }
+    }
+
+    async function initMidi() {
+      if (state.midi.access) return true;
+      if (!navigator.requestMIDIAccess) { log('Web MIDI is not available in this browser.'); return false; }
+      try {
+        const access = await navigator.requestMIDIAccess({ sysex: false });
+        state.midi.access = access;
+        const attach = () => {
+          access.inputs.forEach(input => { input.onmidimessage = e => onMidiMessage(input, e.data); });
+          renderMidiPanel();
+        };
+        access.onstatechange = attach;
+        attach();
+        log('MIDI inputs: ' + (Array.from(access.inputs.values()).map(i => i.name).join(', ') || 'none'));
+        return true;
+      } catch (err) {
+        log('MIDI access failed: ' + err.message);
+        return false;
+      }
+    }
+
+    function onMidiMessage(input, data) {
+      if (!data || data.length < 2) return;
+      if (state.midi.input !== 'all' && input.id !== state.midi.input) return;
+      const status = data[0] & 0xF0;
+      const channel = (data[0] & 0x0F) + 1;
+
+      if (status === 0xC0) {
+        if (state.midi.pcToPreset && !state.midi.learn) selectPreset(Math.min(64, data[1] + 1));
+        return;
+      }
+
+      let key, value;
+      if (status === 0xB0) { key = 'cc:' + channel + ':' + data[1]; value = data[2]; }
+      else if (status === 0x90 || status === 0x80) { key = 'note:' + channel + ':' + data[1]; value = status === 0x90 && data[2] > 0 ? 127 : 0; }
+      else return;
+
+      if (state.midi.learn) {
+        if (state.midi.learnTarget && (status === 0xB0 || value > 0)) assignMidi(key);
+        return;
+      }
+      const mapping = state.midi.map[key];
+      if (mapping) applyMidi(key, mapping, value);
+    }
+
+    function assignMidi(key) {
+      const target = state.midi.learnTarget;
+      const id = midiTargetId(target);
+      Object.keys(state.midi.map).forEach(k => { if (midiTargetId(state.midi.map[k].target) === id) delete state.midi.map[k]; });
+      state.midi.map[key] = { target, mode: 'toggle' };
+      delete state.midi.picked[key];
+      saveMidiSettings();
+      log('MIDI assigned: ' + midiKeyLabel(key) + ' -> ' + midiTargetLabel(target));
+      $('midiBannerText').innerHTML = '<b>' + escapeHTML(midiKeyLabel(key)) + '</b> → ' + escapeHTML(midiTargetLabel(target)) + '. Click the next control, or press Done.';
+      state.midi.learnTarget = null;
+      document.querySelectorAll('.midi-selected').forEach(el => el.classList.remove('midi-selected'));
+      decorateMidi();
+      renderMidiPanel();
+    }
+
+    function removeMidi(key) {
+      delete state.midi.map[key];
+      saveMidiSettings();
+      decorateMidi();
+      renderMidiPanel();
+    }
+
+    // Normalized (0..1) current value of a continuous target, for pickup mode.
+    function midiCurrentValue(t) {
+      switch (t.kind) {
+        case 'amp': return state.amp[t.key] / 255;
+        case 'param': {
+          const block = t.block === 'gate' ? state.gate : state.blocks[t.block];
+          const param = block && block.params.find(p => p.name === t.param);
+          return param ? paramValueToNormalized(param) : null;
+        }
+        case 'captureVolume': return (Number($('captureVolumeSlider').value) + 24) / 36;
+        case 'cab': {
+          if (t.key === 'level') return (state.cabIR.levelDb + 96) / 108;
+          if (t.key === 'highPass') return (state.cabIR.highPassHz - 20) / 780;
+          return (state.cabIR.lowPassHz - 1000) / 19000;
+        }
+      }
+      return null;
+    }
+
+    function resetMidiPickup() {
+      state.midi.picked = {};
+    }
+
+    function applyMidi(key, mapping, value) {
+      const t = mapping.target;
+      const previous = state.midi.last[key];
+      state.midi.last[key] = value;
+
+      if (isMidiButton(t)) {
+        const pressed = value >= 64;
+        if (mapping.mode === 'latch') { if (t.kind !== 'preset') setMidiButton(t, pressed); else if (pressed && !(previous >= 64)) triggerMidiButton(t); return; }
+        if (pressed && !(previous >= 64)) triggerMidiButton(t); // every press toggles
+        return;
+      }
+
+      const v = value / 127;
+      if (state.midi.pickup && !state.midi.picked[key]) {
+        const current = midiCurrentValue(t);
+        if (current === null) return;
+        const crossed = previous !== undefined && (previous / 127 - current) * (v - current) <= 0;
+        if (Math.abs(v - current) > 2 / 127 && !crossed) return; // knob has not reached the current value yet
+        state.midi.picked[key] = true;
+      }
+      setMidiValue(t, v);
+    }
+
+    function midiButtonIsOn(t) {
+      if (t.kind === 'tuner') return state.tuner.open;
+      if (t.target === 'gate') return state.gate.on;
+      if (t.target === 'capture') return state.capture.on;
+      if (t.target === 'cab') return state.cabIR.on;
+      return Boolean(state.blocks[t.target] && state.blocks[t.target].on);
+    }
+
+    function triggerMidiButton(t) {
+      if (t.kind === 'tuner') { if (state.tuner.open) closeTuner(); else openTuner(false); return; }
+      const el = midiEl(t);
+      if (el) el.click();
+    }
+
+    function setMidiButton(t, on) {
+      if (midiButtonIsOn(t) !== on) triggerMidiButton(t);
+    }
+
+    function setMidiValue(t, v) {
+      const el = midiEl(t);
+      const valueEl = el && el.parentElement ? el.parentElement.querySelector('.value-text') : null;
+
+      if (t.kind === 'amp') {
+        const raw = Math.round(v * 255);
+        if (raw === state.amp[t.key]) return;
+        state.amp[t.key] = raw;
+        if (el && valueEl) updateKnobVisual(el, valueEl, raw / 255, Math.round(raw / 255 * 100) + '%');
+        setAmpKnob(t.key, raw);
+        return;
+      }
+
+      if (t.kind === 'param') {
+        const block = t.block === 'gate' ? state.gate : state.blocks[t.block];
+        const param = block && block.params.find(p => p.name === t.param);
+        if (!param) return; // the model in this slot has no parameter with this name
+        const meta = param.meta || rangeMeta(0, 10, 0.1, '', 1);
+        const raw = meta.kind === 'enum' ? v * (meta.options.length - 1) : meta.min + v * (meta.max - meta.min);
+        const next = coerceParamValue(param, raw);
+        if (next === null || next === param.value) return;
+        param.value = next;
+        if (meta.kind === 'enum') scheduleMidiRender();
+        else if (el && valueEl) updateKnobVisual(el, valueEl, paramValueToNormalized(param), paramDisplayValue(param));
+        sendParamValue(t.block, param);
+        return;
+      }
+
+      if (t.kind === 'captureVolume') {
+        const db = Math.round((-24 + v * 36) * 10) / 10;
+        setCaptureVolumeUI(db);
+        setCaptureVolumeDb(db);
+        return;
+      }
+
+      if (t.kind === 'cab') {
+        const range = { level: [-96, 12, 0.1, 'dB', setCabIRLevelDb], highPass: [20, 800, 1, 'Hz', setCabIRHighPassHz], lowPass: [1000, 20000, 1, 'Hz', setCabIRLowPassHz] }[t.key];
+        const value = roundToStep(range[0] + v * (range[1] - range[0]), range[2]);
+        if (el) {
+          el.value = value;
+          const text = el.parentElement.querySelector('.value-text');
+          if (text) text.textContent = formatCabIRSliderValue(value, range[3], range[2]);
+        }
+        range[4](value);
+      }
+    }
+
+    // Enum parameters change the layout (e.g. Sync on/off), so they re-render, at most every 100 ms.
+    function scheduleMidiRender() {
+      if (state.midi.renderTimer) return;
+      state.midi.renderTimer = setTimeout(() => { state.midi.renderTimer = null; render(); }, 100);
+    }
+
+    // Marks assigned controls (outline + badge with the CC) after every re-render.
+    function decorateMidi() {
+      state.midi.decorateQueued = false;
+      const byId = {};
+      Object.entries(state.midi.map).forEach(([key, m]) => { byId[midiTargetId(m.target)] = key; });
+      document.querySelectorAll('[data-midi-id]').forEach(el => {
+        const key = byId[el.dataset.midiId];
+        const container = el.closest('.knob-param, .switch-param, .stepped-param, .placeholder-param');
+        let badge = container ? container.querySelector(':scope > .midi-badge') : null;
+        if (key) {
+          el.dataset.midiMapped = midiKeyLabel(key);
+          el.title = 'MIDI: ' + midiKeyLabel(key) + ' (right-click to remove)';
+          if (container) {
+            if (!badge) { badge = document.createElement('span'); badge.className = 'midi-badge'; container.appendChild(badge); }
+            badge.textContent = midiKeyLabel(key);
+          }
+        } else {
+          if (el.dataset.midiMapped) { delete el.dataset.midiMapped; el.removeAttribute('title'); }
+          if (badge) badge.remove();
+        }
+      });
+    }
+
+    function queueMidiDecorate() {
+      if (state.midi.decorateQueued) return;
+      state.midi.decorateQueued = true;
+      queueMicrotask(decorateMidi);
+    }
+
+    // Re-decorate whenever a part of the UI is rebuilt.
+    ['render', 'renderAmp', 'renderGate', 'renderCaptureIR', 'renderCaptureIRExtraParams'].forEach(name => {
+      const original = window[name];
+      window[name] = function (...args) {
+        const result = original.apply(this, args);
+        queueMidiDecorate();
+        return result;
+      };
+    });
+
+    async function startMidiLearn() {
+      if (!(await initMidi())) {
+        window.alert('MIDI is not available. Use Chrome, Edge or the Mac app and allow MIDI access.');
+        return;
+      }
+      $('midiOverlay').hidden = true;
+      state.midi.learn = true;
+      state.midi.learnTarget = null;
+      document.body.classList.add('midi-learning');
+      $('midiBannerText').innerHTML = '<b>MIDI Learn</b> · Click a knob, slider or switch, then move a control on your MIDI controller.';
+      $('midiBanner').hidden = false;
+    }
+
+    function stopMidiLearn() {
+      state.midi.learn = false;
+      state.midi.learnTarget = null;
+      document.body.classList.remove('midi-learning');
+      document.querySelectorAll('.midi-selected').forEach(el => el.classList.remove('midi-selected'));
+      $('midiBanner').hidden = true;
+      decorateMidi();
+    }
+
+    // While learning, clicks select controls instead of operating them.
+    ['pointerdown', 'mousedown', 'click', 'wheel'].forEach(type => {
+      document.addEventListener(type, e => {
+        if (!state.midi.learn || e.target.closest('#midiBanner')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (type !== 'click') return;
+        const el = e.target.closest('[data-midi-target]');
+        if (!el) return;
+        document.querySelectorAll('.midi-selected').forEach(x => x.classList.remove('midi-selected'));
+        el.classList.add('midi-selected');
+        state.midi.learnTarget = JSON.parse(el.dataset.midiTarget);
+        $('midiBannerText').innerHTML = '<b>' + escapeHTML(midiTargetLabel(state.midi.learnTarget)) + '</b> · now move a knob or press a button on your controller.';
+      }, { capture: true, passive: false });
+    });
+
+    // Right-click on an assigned control removes the assignment.
+    document.addEventListener('contextmenu', e => {
+      const el = e.target.closest('[data-midi-mapped]');
+      if (!el || state.midi.learn) return;
+      e.preventDefault();
+      const key = Object.keys(state.midi.map).find(k => midiTargetId(state.midi.map[k].target) === el.dataset.midiId);
+      if (key && window.confirm('Remove MIDI assignment ' + midiKeyLabel(key) + ' → ' + midiTargetLabel(state.midi.map[key].target) + '?')) removeMidi(key);
+    }, true);
+
+    function renderMidiPanel() {
+      if ($('midiOverlay').hidden) return;
+      const inputs = state.midi.access ? Array.from(state.midi.access.inputs.values()) : [];
+      $('midiStatus').textContent = state.midi.access
+        ? (inputs.length ? 'Connected MIDI inputs: ' + inputs.map(i => i.name).join(', ') : 'No MIDI controller found. Connect one via USB or Bluetooth MIDI.')
+        : 'MIDI access has not been granted yet.';
+
+      const select = $('midiInput');
+      select.innerHTML = '<option value="all">All inputs</option>' + inputs.map(i => '<option value="' + escapeHTML(i.id) + '">' + escapeHTML(i.name) + '</option>').join('');
+      select.value = inputs.some(i => i.id === state.midi.input) ? state.midi.input : 'all';
+      $('midiPickup').checked = state.midi.pickup;
+      $('midiPc').checked = state.midi.pcToPreset;
+
+      const list = $('midiList');
+      const entries = Object.entries(state.midi.map).sort((a, b) => midiTargetLabel(a[1].target).localeCompare(midiTargetLabel(b[1].target)));
+      list.innerHTML = entries.length ? '' : '<div class="lib-empty">No assignments yet. Press "Start MIDI Learn".</div>';
+      entries.forEach(([key, m]) => {
+        const row = document.createElement('div');
+        row.className = 'midi-map-row';
+        const modeSelect = isMidiButton(m.target) && m.target.kind !== 'preset'
+          ? '<select><option value="toggle"' + (m.mode !== 'latch' ? ' selected' : '') + '>Each press toggles</option><option value="latch"' + (m.mode === 'latch' ? ' selected' : '') + '>Button value = on/off</option></select>'
+          : '<span></span>';
+        row.innerHTML = '<span class="src">' + escapeHTML(midiKeyLabel(key)) + '</span><span>' + escapeHTML(midiTargetLabel(m.target)) + '</span>' + modeSelect + '<button class="btn-small">Remove</button>';
+        const sel = row.querySelector('select');
+        if (sel) sel.addEventListener('change', () => { m.mode = sel.value; saveMidiSettings(); });
+        row.querySelector('button').addEventListener('click', () => removeMidi(key));
+        list.appendChild(row);
+      });
+    }
+
+    async function openMidiPanel() {
+      $('midiOverlay').hidden = false;
+      renderMidiPanel();
+      await initMidi();
+      renderMidiPanel();
+    }
+
+    $('midiBtn').addEventListener('click', openMidiPanel);
+    $('midiClose').addEventListener('click', () => { $('midiOverlay').hidden = true; });
+    $('midiOverlay').addEventListener('click', e => { if (e.target === $('midiOverlay')) $('midiOverlay').hidden = true; });
+    $('midiLearnStart').addEventListener('click', startMidiLearn);
+    $('midiLearnDone').addEventListener('click', stopMidiLearn);
+    $('midiPickup').addEventListener('change', e => { state.midi.pickup = e.target.checked; resetMidiPickup(); saveMidiSettings(); });
+    $('midiPc').addEventListener('change', e => { state.midi.pcToPreset = e.target.checked; saveMidiSettings(); });
+    $('midiInput').addEventListener('change', e => { state.midi.input = e.target.value; saveMidiSettings(); });
+    $('midiClearAll').addEventListener('click', () => {
+      if (!Object.keys(state.midi.map).length || !window.confirm('Remove all MIDI assignments?')) return;
+      state.midi.map = {};
+      saveMidiSettings();
+      decorateMidi();
+      renderMidiPanel();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (state.midi.learn) stopMidiLearn();
+      else if (!$('midiOverlay').hidden) $('midiOverlay').hidden = true;
+    });
+
+    loadMidiSettings();
+    if (Object.keys(state.midi.map).length || state.midi.pcToPreset) initMidi();
 
     if (!navigator.bluetooth) $('unsupported').style.display = 'block';
 
