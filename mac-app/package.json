@@ -1,0 +1,16 @@
+{
+  "name": "nano-cortex-editor",
+  "productName": "Nano Cortex Editor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mac app for the Nano Cortex web editor",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "./build.sh"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^44.5.1"
+  }
+}

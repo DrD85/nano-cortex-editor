@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Pedal pictures are personal and not published (they show third-party brands)
+img/
+
+# Mac app build output and dependencies
+mac-app/node_modules/
+mac-app/dist/
+mac-app/app/
+release/
+
+# Python
+__pycache__/
