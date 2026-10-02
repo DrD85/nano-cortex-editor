@@ -12,7 +12,7 @@ It runs in Chrome/Edge (Web Bluetooth) or as a Mac app.
 
 ## Features
 
-- **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save; follows preset changes made on the pedal
+- **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
 - **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style)
 - **Captures**: 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot
 - **Cab/IR**: slots, level, high/low pass, mic and position; load factory or user IRs from the device library into a slot

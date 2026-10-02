@@ -21,6 +21,17 @@ mkdir -p app
 cp ../index.html app/index.html
 if [[ "$PUBLIC" == false && -d ../img ]]; then
   cp -R ../img app/img
+  # Optional personal icon set: ../img/icons.css overrides the drawn --ico-* icons.
+  if [[ -f ../img/icons.css ]]; then
+    node -e '
+      const fs = require("fs");
+      const html = fs.readFileSync("app/index.html", "utf8");
+      const css = fs.readFileSync("../img/icons.css", "utf8");
+      fs.writeFileSync("app/index.html", html.replace("</head>", "<style>\n" + css + "</style>\n</head>"));
+    '
+    rm app/img/icons.css
+    echo "Using personal icons from ../img/icons.css"
+  fi
 fi
 
 npx @electron/packager . "$APP_NAME" \

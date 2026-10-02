@@ -102,6 +102,8 @@
 
     button.btn-disconnect { border-color: #7a2020; color: #e07070; }
     button.btn-disconnect:hover { border-color: #e07070; }
+    button.save-ok { border-color: #45F862; color: #45F862; }
+    button.save-error { border-color: #e07070; color: #e07070; }
 
     main { padding: 24px; display: grid; gap: 18px; }
 
@@ -1378,7 +1380,7 @@
       c305: null,
       presetSlots: { a1: -1, b1: -1, a2: -1, b2: -1 },
       library: { factory: [], user: [], irFactory: [], irUser: [], loaded: false, requested: false },
-      exp: { preset: null, loaded: false, ranges: {}, bypass: {}, saveTimer: null, status: '' },
+      exp: { preset: null, loaded: false, ranges: {}, bypass: {}, saveTimer: null, status: '', pending: null, queue: [] },
       libBrowser: { q: '', source: 'all', type: 'all', instrument: 'all', tags: new Set() },
       tuner: { open: false, live: true, baseFrequency: 440, muted: false, logged: 0 },
       libraryBytes: [],
@@ -1474,6 +1476,7 @@
     const gattWriteQueue = [];
     let gattWritePumpRunning = false;
 
+    // Resolves true once the BLE write went through, false if it failed or there was no connection.
     function writeC304(label, payload, coalesceKey = null) {
       return new Promise(resolve => {
         if (coalesceKey) {
@@ -1497,17 +1500,19 @@
 
       while (gattWriteQueue.length > 0) {
         const job = gattWriteQueue.shift();
+        let ok = false;
         try {
           if (!state.c304) {
             log('ERROR: not connected - C304 characteristic not available');
           } else {
             log('TX ' + job.label + ': ' + hex(job.payload));
             await state.c304.writeValueWithResponse(job.payload);
+            ok = true;
           }
         } catch (err) {
           log('ERROR: BLE write failed for "' + job.label + '": ' + err);
         }
-        job.waiters.forEach(resolve => resolve());
+        job.waiters.forEach(resolve => resolve(ok));
       }
 
       gattWritePumpRunning = false;
@@ -1624,7 +1629,8 @@
       state.c305 = null;
       state.protocol.metadataLoaded = false;
       state.protocol.feSyncComplete = false;
-      gattWriteQueue.length = 0;
+      gattWriteQueue.splice(0).forEach(job => job.waiters.forEach(resolve => resolve(false)));
+      resetExpRequests();
       setStatus('Disconnected');
       log('Disconnected.');
     }
@@ -2475,10 +2481,11 @@ function parseSelectedCaptureState(payload) {
 
     function parseStructuredFE(bytes) {
       const top = parseProtoFields(bytes);
-      const captures = (top[17] || []).filter(entry => entry.wire === 2).map(entry => parseCaptureRecord(entry.raw)).filter(record => record.id && record.name).slice(0, 25);
+      // Slot lists keep every record in place: list position = slot number, even if a name cannot be read.
+      const captures = (top[17] || []).filter(entry => entry.wire === 2).map(entry => parseCaptureRecord(entry.raw)).slice(0, 25);
       const presets = (top[18] || []).filter(entry => entry.wire === 2).map(entry => parsePresetRecord(entry.raw)).filter(record => isValidPresetRecord(record)).slice(0, 64);
       while (presets.length < 64) presets.push({ name: '', captureName: '', captureID: '', irShortName: '', irFullName: '' });
-      const irs = (top[19] || []).filter(entry => entry.wire === 2).map(entry => parseIRRecord(entry.raw)).filter(record => record.shortName || record.fullName).slice(0, 5);
+      const irs = (top[19] || []).filter(entry => entry.wire === 2).map(entry => parseIRRecord(entry.raw)).slice(0, 5);
       return { captures, presets, irs };
     }
 
@@ -2548,7 +2555,7 @@ function parseSelectedCaptureState(payload) {
       const entries = fields[fieldNumber] || [];
       for (const entry of entries) {
         if (entry.wire !== 2) continue;
-        const text = decodePrintable(entry.raw);
+        const text = decodeText(entry.raw);
         if (text !== null) return text;
       }
       return '';
@@ -2584,6 +2591,15 @@ function parseSelectedCaptureState(payload) {
         shift += 7n;
       }
       return null;
+    }
+
+    // Protobuf strings are UTF-8 (umlauts, accents, curly quotes). Returns null for bytes that are not valid
+    // UTF-8 or contain control characters, i.e. for nested messages.
+    const strictUtf8 = new TextDecoder('utf-8', { fatal: true });
+    function decodeText(bytes) {
+      if (bytes.length === 0) return '';
+      for (const b of bytes) if (b < 32 || b === 127) return null;
+      try { return strictUtf8.decode(new Uint8Array(bytes)); } catch (e) { return null; }
     }
 
     function decodePrintable(bytes) {
@@ -2784,11 +2800,12 @@ function parseSelectedCaptureState(payload) {
       if (nameBytes.length > 64) { window.alert('Preset name is too long.'); return; }
 
       // RenamePresetRequestMessage { 1: action=UPDATE, 3: presetIndex, 4: presetNewName }
-      await writeC304('Rename preset ' + preset + ' to "' + name + '"', buildFrame([
+      const sent = await writeC304('Rename preset ' + preset + ' to "' + name + '"', buildFrame([
         0x08, 0x01,
         0x18, ...encodeVarint(preset - 1),
         0x22, nameBytes.length, ...nameBytes
       ], MSG.RenamePresetRequest));
+      if (!sent) { window.alert('Rename failed: the Bluetooth write did not go through.'); return; }
 
       state.presetNames.set(preset, name);
       renderPresetSelect();
@@ -2967,25 +2984,70 @@ function parseSelectedCaptureState(payload) {
     function defaultExpRange() { return { on: false, inverted: false, min: 0, max: 100 }; }
     function defaultExpBypass() { return { on: false, mode: 'heelToe', inverted: false, delay: 600, latch: false }; }
 
+    // The reply (61) carries no preset index. Requests are therefore sent one at a time and a reply always
+    // belongs to the request that is outstanding; replies for a preset that is no longer shown are dropped.
+    // Requests: { preset, verify? } - verify holds the assignments that were just saved and only checks them.
     function requestExpAssignments() {
       state.exp.preset = state.selectedPreset;
       state.exp.loaded = false;
-      state.exp.status = 'Loading assignments…';
+      setExpStatus('Loading assignments…');
       renderExpPanel();
-      if (state.connected) {
-        writeC304('Expression assignments request (preset ' + state.selectedPreset + ')',
-          buildFrame([0x08, 0x03, 0x18, ...encodeVarint(state.selectedPreset - 1)], MSG.RetrieveExpAssignmentsRequest));
+      state.exp.queue = state.exp.queue.filter(req => req.verify);
+      const pending = state.exp.pending;
+      if (!(pending && !pending.verify && pending.preset === state.exp.preset)) state.exp.queue.push({ preset: state.exp.preset });
+      pumpExpRequests();
+    }
+
+    function pumpExpRequests() {
+      if (state.exp.pending || !state.exp.queue.length || !state.connected) return;
+      const req = state.exp.queue.shift();
+      const fail = reason => {
+        if (state.exp.pending !== req) return;
+        clearTimeout(req.timer);
+        state.exp.pending = null;
+        expRequestFailed(req, reason);
+        pumpExpRequests();
+      };
+      state.exp.pending = req;
+      req.timer = setTimeout(() => fail('no answer'), 5000);
+      writeC304('Expression assignments ' + (req.verify ? 'check' : 'request') + ' (preset ' + req.preset + ')',
+        buildFrame([0x08, 0x03, 0x18, ...encodeVarint(req.preset - 1)], MSG.RetrieveExpAssignmentsRequest))
+        .then(ok => { if (!ok) fail('write failed'); });
+    }
+
+    function expRequestFailed(req, reason) {
+      log('Expression assignments ' + (req.verify ? 'check' : 'request') + ' for preset ' + req.preset + ': ' + reason);
+      if (req.preset !== state.exp.preset) return;
+      if (req.verify) { setExpStatus('Sent to preset ' + req.preset + ', but the check got no answer.'); return; }
+      if (!state.exp.loaded) {
+        setExpStatus('Preset ' + req.preset + ': the Nano did not send its assignments. Reopen to try again.');
+        renderExpPanel();
+        if (state.mc6.mixSlot >= 0) render();
       }
     }
 
-    function parseExpAssignments(data) {
+    function resetExpRequests() {
+      if (state.exp.pending) clearTimeout(state.exp.pending.timer);
+      state.exp.pending = null;
+      state.exp.queue = [];
+    }
+
+    // Status text of the Expression panel and of the MC6 Pos 1 / Pos 2 sliders.
+    function setExpStatus(text) {
+      state.exp.status = text;
+      $('expStatus').textContent = text;
+      document.querySelectorAll('.mc6-exp-status').forEach(el => { el.textContent = text; });
+    }
+
+    function decodeExpAssignments(data) {
       const fields = framePayloadFields(data);
       const nested = n => fields[n] && fields[n][0] && fields[n][0].wire === 2 ? parseProtoFields(fields[n][0].raw) : null;
       const num = (rec, n) => rec && rec[n] && rec[n][0] ? rec[n][0].value : 0;   // zero values are omitted
+      const ranges = {}, bypass = {};
 
       EXP_RANGES.forEach(r => {
         const rec = nested(r.save - 1);
-        state.exp.ranges[r.key] = rec
+        ranges[r.key] = rec
           ? { on: true, inverted: Boolean(num(rec, 1)), min: rawToPct(num(rec, 2)), max: rawToPct(num(rec, 3)) }
           : defaultExpRange();
       });
@@ -2999,16 +3061,49 @@ function parseSelectedCaptureState(payload) {
           else if (sub(2)) { entry.mode = 'switch'; entry.inverted = Boolean(num(sub(2), 1)); entry.latch = Boolean(num(sub(2), 2)); }
           else if (sub(3)) { entry.mode = 'stop'; entry.delay = num(sub(3), 1); }
         }
-        state.exp.bypass[b.key] = entry;
+        bypass[b.key] = entry;
       });
+      return { ranges, bypass };
+    }
 
-      state.exp.loaded = true;
-      state.exp.status = 'Loaded from preset ' + state.exp.preset + '.';
-      expAssignmentWaiters.slice().forEach(waiter => waiter());
-      if (state.mc6.mixSlot >= 0) render();
-      log('Expression assignments loaded: ' + EXP_RANGES.filter(r => state.exp.ranges[r.key].on).map(r => r.key)
-        .concat(EXP_BYPASS.filter(b => state.exp.bypass[b.key].on).map(b => b.key + ' bypass')).join(', ') || 'none');
-      renderExpPanel();
+    // True when two sets of assignments encode to the same values.
+    function sameExpAssignments(a, b) {
+      const rangeKey = v => v && v.on ? [v.inverted, pctToRaw(v.min), pctToRaw(v.max)].join() : 'off';
+      const bypassKey = v => !v || !v.on ? 'off'
+        : v.mode === 'switch' ? ['switch', v.inverted, v.latch].join()
+        : v.mode === 'stop' ? ['stop', Math.round(v.delay)].join()
+        : ['heelToe', v.inverted, Math.round(v.delay)].join();
+      return EXP_RANGES.every(r => rangeKey(a.ranges[r.key]) === rangeKey(b.ranges[r.key])) &&
+        EXP_BYPASS.every(t => bypassKey(a.bypass[t.key]) === bypassKey(b.bypass[t.key]));
+    }
+
+    function parseExpAssignments(data) {
+      const req = state.exp.pending;
+      if (!req) { log('Expression assignments reply ignored: no request outstanding.'); return; }
+      clearTimeout(req.timer);
+      state.exp.pending = null;
+      const decoded = decodeExpAssignments(data);
+
+      if (req.verify) {
+        const same = sameExpAssignments(decoded, req.verify);
+        log('Expression assignments check for preset ' + req.preset + ': ' + (same ? 'matches' : 'DIFFERENT'));
+        if (req.preset === state.exp.preset && !state.exp.saveTimer) {
+          setExpStatus(same ? 'Saved to preset ' + req.preset + ' ✓' : 'Not confirmed: preset ' + req.preset + ' reports different assignments.');
+        }
+      } else if (req.preset !== state.exp.preset) {
+        log('Expression assignments reply for preset ' + req.preset + ' dropped (now preset ' + state.exp.preset + ').');
+      } else {
+        state.exp.ranges = decoded.ranges;
+        state.exp.bypass = decoded.bypass;
+        state.exp.loaded = true;
+        setExpStatus('Loaded from preset ' + state.exp.preset + '.');
+        expAssignmentWaiters.slice().forEach(waiter => waiter());
+        if (state.mc6.mixSlot >= 0) render();
+        log('Expression assignments loaded: ' + EXP_RANGES.filter(r => state.exp.ranges[r.key].on).map(r => r.key)
+          .concat(EXP_BYPASS.filter(b => state.exp.bypass[b.key].on).map(b => b.key + ' bypass')).join(', ') || 'none');
+        renderExpPanel();
+      }
+      pumpExpRequests();
     }
 
     function expSaveFrame() {
@@ -3033,18 +3128,21 @@ function parseSelectedCaptureState(payload) {
 
     // Debounced: dragging a slider sends one save when it settles.
     // The frame is built when the edit happens, so a preset change before the timer fires cannot redirect it.
+    // After the write the assignments are read back and compared; only then "Saved ✓" is shown.
     function scheduleExpSave() {
-      state.exp.status = 'Saving…';
-      $('expStatus').textContent = state.exp.status;
+      setExpStatus('Saving…');
       const preset = state.exp.preset;
       const frame = expSaveFrame();
+      const expected = structuredClone({ ranges: state.exp.ranges, bypass: state.exp.bypass });
       if (state.exp.saveTimer) clearTimeout(state.exp.saveTimer);
       state.exp.saveTimer = setTimeout(async () => {
         state.exp.saveTimer = null;
-        if (frame.length - 2 > 255) { state.exp.status = 'Too many assignments for one message.'; renderExpPanel(); return; }
-        await writeC304('Save expression assignments (preset ' + preset + ')', frame);
-        state.exp.status = 'Saved to preset ' + preset + '.';
-        $('expStatus').textContent = state.exp.status;
+        if (frame.length - 2 > 255) { setExpStatus('Too many assignments for one message.'); return; }
+        const ok = await writeC304('Save expression assignments (preset ' + preset + ')', frame);
+        if (!ok) { setExpStatus('Not saved: the Bluetooth write to preset ' + preset + ' failed.'); return; }
+        if (state.exp.saveTimer) return;   // a newer edit follows and is checked after its own save
+        setExpStatus('Checking preset ' + preset + '…');
+        setTimeout(() => { state.exp.queue.push({ preset, verify: expected }); pumpExpRequests(); }, 400);
       }, 500);
     }
 
@@ -3416,27 +3514,58 @@ function parseSelectedCaptureState(payload) {
       setTimeout(requestCurrentPresetState, 300);
     }
 
+    // SavePresetRequestMessage { 1: action, 3: presetIndex, 5: name }. "Saved" is only shown when the write went
+    // through and a fresh state read afterwards reports this preset without unsaved changes.
     async function savePreset() {
-      const name = state.presetNames.get(state.selectedPreset) || ('Preset ' + state.selectedPreset);
-      const nameBytes = new TextEncoder().encode(name);
-      const packet = new Uint8Array(12 + nameBytes.length);
-      let i = 0;
-      packet[i++] = nameBytes.length + 10;
-      packet[i++] = 0xC0;
-      packet[i++] = 0x08;
-      packet[i++] = 0x01;
-      packet[i++] = 0x18;
-      packet[i++] = state.selectedPreset - 1;
-      packet[i++] = 0x2A;
-      packet[i++] = nameBytes.length;
-      packet.set(nameBytes, i);
-      i += nameBytes.length;
-      packet[i++] = 0x03;
-      packet[i++] = 0x00;
-      packet[i++] = 0x00;
-      packet[i++] = 0x00;
-      await writeC304('save preset', packet);
-      setTimeout(() => writeC304('post-save refresh', bytesFromHex('0C C0 08 03 18 00 20 01 28 01 01 00 00 00')), 100);
+      if (!state.connected) { showSaveResult('Not connected', 'error', 'Connect to the Nano first.'); return; }
+      if (state.saveBusy) return;
+      state.saveBusy = true;
+      const preset = state.selectedPreset;
+      showSaveResult('Saving…', '', 'Saving preset ' + preset);
+      try {
+        const name = state.presetNames.get(preset) || ('Preset ' + preset);
+        const nameBytes = new TextEncoder().encode(name);
+        const packet = new Uint8Array(12 + nameBytes.length);
+        let i = 0;
+        packet[i++] = nameBytes.length + 10;
+        packet[i++] = 0xC0;
+        packet[i++] = 0x08;
+        packet[i++] = 0x01;
+        packet[i++] = 0x18;
+        packet[i++] = preset - 1;
+        packet[i++] = 0x2A;
+        packet[i++] = nameBytes.length;
+        packet.set(nameBytes, i);
+        i += nameBytes.length;
+        packet[i++] = 0x03;
+        packet[i++] = 0x00;
+        packet[i++] = 0x00;
+        packet[i++] = 0x00;
+        if (!await writeC304('save preset ' + preset, packet)) {
+          showSaveResult('Save failed', 'error', 'The Bluetooth write failed: preset ' + preset + ' was not saved.');
+          return;
+        }
+        await new Promise(r => setTimeout(r, 150));
+        const checked = waitForPresetState(preset, 5000);
+        requestCurrentPresetState();
+        if (!await checked) { showSaveResult('Not confirmed', 'error', 'The Nano did not answer the check after saving preset ' + preset + '.'); return; }
+        if (state.presetDirty) { showSaveResult('Not confirmed', 'error', 'The Nano still reports unsaved changes in preset ' + preset + '.'); return; }
+        showSaveResult('Saved ✓', 'ok', 'Preset ' + preset + ' saved and checked.');
+      } finally {
+        state.saveBusy = false;
+      }
+    }
+
+    // Shows the save result on the Save button for a few seconds (details in its tooltip and in the log).
+    function showSaveResult(text, kind, detail) {
+      const btn = $('saveBtn');
+      btn.textContent = text;
+      btn.title = detail || '';
+      btn.classList.toggle('save-ok', kind === 'ok');
+      btn.classList.toggle('save-error', kind === 'error');
+      if (detail) log('Save: ' + detail);
+      clearTimeout(state.saveResultTimer);
+      if (kind) state.saveResultTimer = setTimeout(() => { if (!state.saveBusy) showSaveResult('Save', '', ''); }, kind === 'error' ? 8000 : 4000);
     }
 
     async function setGateEnabled(enabled) {
@@ -4511,6 +4640,8 @@ function renderGate() {
           opt.value = model.name;
           opt.textContent = model.name;
           opt.selected = model.name === block.model;
+          // No device command for an empty slot is known: "None" only shows a slot the Nano reports as empty.
+          opt.disabled = model.name === 'None' && block.model !== 'None';
           group.appendChild(opt);
         });
 
@@ -4730,7 +4861,7 @@ function renderGate() {
       const hint = document.createElement('div');
       hint.className = 'mc6-exp-hint';
       if (!state.exp.loaded || state.exp.preset !== state.selectedPreset) {
-        hint.textContent = state.connected ? 'Loading expression assignments…' : 'Connect to the Nano to set Pos 1 and Pos 2.';
+        hint.textContent = state.connected ? state.exp.status || 'Loading expression assignments…' : 'Connect to the Nano to set Pos 1 and Pos 2.';
         box.appendChild(hint);
         return box;
       }
@@ -4756,6 +4887,10 @@ function renderGate() {
       hint.textContent = (range.on ? '' : 'Not assigned yet: moving a slider assigns the ' + block.title + ' Amount to the expression pedal. ') +
         'Pos 1 = switch dim, Pos 2 = switch lit' + (mix ? '. Dragging sets ' + mix.name + ' so you hear it.' : '.');
       box.appendChild(hint);
+      const status = document.createElement('div');
+      status.className = 'mc6-exp-hint mc6-exp-status';
+      status.textContent = state.exp.status;
+      box.appendChild(status);
       return box;
     }
 
@@ -4953,7 +5088,7 @@ function renderGate() {
           }
           state.mc6.records[preset] = snapshotCurrentPreset();
           const rec = state.mc6.records[preset];
-          rec.exp = state.mc6.mixSlot >= 0 ? await readExpAssignments(3000) : null;
+          rec.exp = state.mc6.mixSlot >= 0 ? await readExpAssignments(6000) : null;
           log('MC6 export, preset ' + preset + ' ' + rec.name + ': ' + rec.slots.map((sl, k) => FX_BLOCKS_TITLES[k] + '=' + (sl ? sl.model.name + (sl.on ? ' on' : ' off') : 'empty')).join(', '));
         }
         const dump = buildMc6Bank(presets, state.mc6.records);
