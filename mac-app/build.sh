@@ -13,6 +13,13 @@ APP_NAME="Nano Cortex Editor"
 VERSION="$(node -p "require('./package.json').version")"
 OUT="dist/${APP_NAME}-darwin-arm64/${APP_NAME}.app"
 
+# The editor shows its own version (EDITOR_VERSION in index.html); app and editor must agree.
+EDITOR_VERSION="$(sed -n "s/.*const EDITOR_VERSION = '\([^']*\)'.*/\1/p" ../index.html)"
+if [[ "$EDITOR_VERSION" != "$VERSION" ]]; then
+  echo "Version mismatch: index.html has '$EDITOR_VERSION', package.json has '$VERSION'" >&2
+  exit 1
+fi
+
 [[ -d node_modules ]] || npm install
 
 # Bundle the editor (and, for personal builds, the optional pedal pictures).

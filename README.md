@@ -40,6 +40,14 @@ The app is not signed with an Apple Developer ID. On the first start, right-clic
 If macOS says the app is damaged, run `xattr -cr "/Applications/Nano Cortex Editor.app"` once in Terminal.
 macOS asks for Bluetooth access when you connect for the first time.
 
+### With the Nano Cortex Controller
+
+The [Nano Cortex Controller](https://github.com/DrD85/nano-cortex-controller) (an ESP32 touch screen with
+footswitches, firmware 1.2.0 or newer) can pass the editor through to the Nano: switch the controller on, wait until
+it has loaded the presets, then click **Connect** and choose **Nano Cortex Controller** (the Mac app picks it by
+itself). The status shows *Connected via controller*, and editor and controller work at the same time. Without the
+controller, connect to the Nano directly as before.
+
 ## Build the Mac app
 
 Requires [Node.js](https://nodejs.org) on an Apple Silicon Mac.
@@ -52,7 +60,8 @@ cd mac-app
 
 The app is a small [Electron](https://www.electronjs.org) shell around `index.html`
 (Safari/WKWebView has no Web Bluetooth). It connects to the first Bluetooth device whose name contains
-"Nano" or "Cortex".
+"Nano" or "Cortex" – the Nano itself or the Nano Cortex Controller. The version in `mac-app/package.json` must match
+`EDITOR_VERSION` in `index.html` (shown next to the title); `build.sh` checks it.
 
 ## MIDI controller
 

@@ -63,6 +63,13 @@
       letter-spacing: 0.12em;
       vertical-align: middle;
     }
+    .editor-version {
+      margin-left: 8px;
+      color: #8a8a8a;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      vertical-align: middle;
+    }
 
     .status {
       margin-left: auto;
@@ -690,7 +697,7 @@
 </head>
 <body>
   <header>
-    <h1>Nano Cortex Editor <span class="unofficial" title="Community project, not affiliated with or endorsed by Neural DSP">Unofficial</span></h1>
+    <h1>Nano Cortex Editor <span class="unofficial" title="Community project, not affiliated with or endorsed by Neural DSP">Unofficial</span><span id="editorVersion" class="editor-version"></span></h1>
     <div class="status">
       <span id="dot" class="dot"></span><span id="status">Disconnected</span>
       <button id="refreshBtn" class="btn-small">Refresh</button>
@@ -1440,6 +1447,10 @@
 
     const $ = id => document.getElementById(id);
 
+    // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
+    const EDITOR_VERSION = '1.2.0';
+    $('editorVersion').textContent = 'v' + EDITOR_VERSION;
+
     const logLines = [];
 
     function log(message) {
@@ -1566,7 +1577,8 @@
         state.c305.addEventListener('characteristicvaluechanged', onC305);
 
         state.connected = true;
-        setStatus('Connected', true);
+        // "Nano Cortex Controller": the hardware controller passes everything on to the Nano.
+        setStatus(/controller/i.test(device.name || '') ? 'Connected via controller' : 'Connected', true);
         log('C305 notifications enabled. Loading metadata and current preset state...');
       } catch (err) {
         log('Connect failed: ' + err.message);
