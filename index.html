@@ -217,6 +217,16 @@
     .pedal-svg { height: 124px; width: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.55)); }
     .model-select { border-color: color-mix(in srgb, var(--block-color) 42%, #333); margin-bottom: 14px; }
     .divider { height: 1px; background: #2d3033; margin: 12px 0 18px; }
+    .fxp { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: -6px 0 16px; }
+    .fxp button {
+      min-width: 0; padding: 6px; font-size: 11px; letter-spacing: 0.04em; border-radius: 7px;
+      border: 1px solid #34383c; background: #17191b; color: #e6e6e6; cursor: pointer;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fxp button.original { grid-column: 1 / -1; color: var(--muted); letter-spacing: 0.14em; }
+    .fxp button.empty { color: #6f6f6f; border-style: dashed; }
+    .fxp button.active { background: var(--block-color); border-color: var(--block-color); color: #000; }
+    .fxp button:disabled { opacity: 0.35; cursor: default; }
 
     .toggle-switch {
       width: 46px;
@@ -352,34 +362,34 @@
 
     /* Block icons: own line drawings (tools/icons.py), used as CSS masks tinted with --block-color. */
     :root {
-      --ico-overdrive: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12h3l2-6h5l2 6h0l2 6h5l2-6'/></g></svg>");
-      --ico-bass-overdrive: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12c2 0 3-7 6-7h4c3 0 4 14 7 14h3'/><path d='M5 21h14'/></g></svg>");
-      --ico-fuzz: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 17h4V7h6v10h6V7h4'/></g></svg>");
-      --ico-compressor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2v6m-3-3 3 3 3-3'/><path d='M12 22v-6m-3 3 3-3 3 3'/><path d='M3 12h18'/></g></svg>");
-      --ico-equalizer: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 3v18M12 3v18M18 3v18'/><rect x='4' y='13' width='4' height='3' rx='1'/><rect x='10' y='6' width='4' height='3' rx='1'/><rect x='16' y='10' width='4' height='3' rx='1'/></g></svg>");
-      --ico-filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 8h9c3 0 4 2 5 5s2 7 6 7'/><path d='M2 20h20' stroke-dasharray='1 3'/></g></svg>");
-      --ico-wah: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 19h16'/><path d='M5 15l14-7'/><path d='M6 19l-1-4M18 19l1-11'/></g></svg>");
-      --ico-utility: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 7h10M17 7h4M3 17h4M11 17h10'/><circle cx='15' cy='7' r='2'/><circle cx='9' cy='17' r='2'/></g></svg>");
-      --ico-gate: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12c1-5 2-5 3 0s2 5 3 0'/><path d='M8 12h8'/><path d='M16 12c1-5 2-5 3 0s2 5 3 0'/><path d='M11 6v12M13 6v12'/></g></svg>");
-      --ico-doubler: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 10c3-6 6-6 9 0s6 6 9 0'/><path d='M4 15c3-6 6-6 9 0s6 6 9 0'/></g></svg>");
-      --ico-pitch: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 18V5l10-2v13'/><circle cx='6' cy='18' r='3'/><circle cx='16' cy='16' r='3'/></g></svg>");
-      --ico-modulation: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12c2.5-7 5-7 7.5 0s5 7 7.5 0 3.5-5 5-3'/></g></svg>");
-      --ico-delay: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6v12M10 9v6M15 11v2M19.5 11.5v1'/></g></svg>");
-      --ico-reverb: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='5' cy='12' r='1.5'/><path d='M9 8a6 6 0 0 1 0 8M13 5a10 10 0 0 1 0 14M17 2a14 14 0 0 1 0 20'/></g></svg>");
-      --ico-capture: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M5 12c2-4 3-4 4.5 0s2.5 4 4.5 0 3-4 5 0'/></g></svg>");
-      --ico-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='3' width='16' height='18' rx='2'/><circle cx='12' cy='13' r='4.5'/><circle cx='12' cy='13' r='1'/></g></svg>");
-      --ico-amp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='6' width='20' height='12' rx='2'/><path d='M2 11h20'/><circle cx='7' cy='14.5' r='1'/><circle cx='12' cy='14.5' r='1'/><circle cx='17' cy='14.5' r='1'/></g></svg>");
-      --ico-tuner: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2v8a4 4 0 0 0 8 0V2'/><path d='M12 14v8'/></g></svg>");
-      --ico-exp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 18l14-5'/><path d='M5 21v-3M19 21v-8'/><path d='M6 9a9 9 0 0 1 12-4'/><path d='M15 3l3 2-2 3'/></g></svg>");
-      --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
-      --ico-export: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='M7 10l5 5 5-5'/><path d='M4 17v3h16v-3'/></g></svg>");
-      --ico-unknown: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7'/><path d='M12 17h0'/></g></svg>");
-      --ico-cap-amp-head: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='7' width='20' height='10' rx='2'/><path d='M2 12h20'/><circle cx='6' cy='14.5' r='0.8'/><circle cx='10' cy='14.5' r='0.8'/><circle cx='14' cy='14.5' r='0.8'/><circle cx='18' cy='14.5' r='0.8'/></g></svg>");
-      --ico-cap-amp-combo: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 8h18'/><circle cx='12' cy='14.5' r='4'/></g></svg>");
-      --ico-cap-amp-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='2' width='18' height='6' rx='1.5'/><rect x='3' y='10' width='18' height='12' rx='1.5'/><circle cx='8.5' cy='16' r='2.5'/><circle cx='15.5' cy='16' r='2.5'/></g></svg>");
-      --ico-cap-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8' cy='8' r='2.5'/><circle cx='16' cy='8' r='2.5'/><circle cx='8' cy='16' r='2.5'/><circle cx='16' cy='16' r='2.5'/></g></svg>");
-      --ico-cap-pedal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='2' width='14' height='20' rx='2'/><circle cx='9' cy='7' r='1.5'/><circle cx='15' cy='7' r='1.5'/><circle cx='12' cy='17' r='2'/></g></svg>");
-      --ico-cap-overdrive: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='2' width='14' height='20' rx='2'/><path d='M7 12h2l1.5-3h3L15 12h2'/><circle cx='12' cy='17.5' r='1.5'/></g></svg>");
+      --ico-overdrive: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12h3l2-6h5l2 6h0l2 6h5l2-6'/></g></svg>");
+      --ico-bass-overdrive: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12c2 0 3-7 6-7h4c3 0 4 14 7 14h3'/><path d='M5 21h14'/></g></svg>");
+      --ico-fuzz: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 17h4V7h6v10h6V7h4'/></g></svg>");
+      --ico-compressor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2v6m-3-3 3 3 3-3'/><path d='M12 22v-6m-3 3 3-3 3 3'/><path d='M3 12h18'/></g></svg>");
+      --ico-equalizer: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M6 3v18M12 3v18M18 3v18'/><rect x='4' y='13' width='4' height='3' rx='1'/><rect x='10' y='6' width='4' height='3' rx='1'/><rect x='16' y='10' width='4' height='3' rx='1'/></g></svg>");
+      --ico-filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 8h9c3 0 4 2 5 5s2 7 6 7'/><path d='M2 20h20' stroke-dasharray='1 3'/></g></svg>");
+      --ico-wah: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 19h16'/><path d='M5 15l14-7'/><path d='M6 19l-1-4M18 19l1-11'/></g></svg>");
+      --ico-utility: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 7h10M17 7h4M3 17h4M11 17h10'/><circle cx='15' cy='7' r='2'/><circle cx='9' cy='17' r='2'/></g></svg>");
+      --ico-gate: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12c1-5 2-5 3 0s2 5 3 0'/><path d='M8 12h8'/><path d='M16 12c1-5 2-5 3 0s2 5 3 0'/><path d='M11 6v12M13 6v12'/></g></svg>");
+      --ico-doubler: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 10c3-6 6-6 9 0s6 6 9 0'/><path d='M4 15c3-6 6-6 9 0s6 6 9 0'/></g></svg>");
+      --ico-pitch: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 19.5h4.5V15H12v-4.5h4.5V6H21'/></g></svg>");
+      --ico-modulation: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12c2.5-7 5-7 7.5 0s5 7 7.5 0 3.5-5 5-3'/></g></svg>");
+      --ico-delay: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6v12M10 9v6M15 11v2M19.5 11.5v1'/></g></svg>");
+      --ico-reverb: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='5' cy='12' r='1.5'/><path d='M9 8a6 6 0 0 1 0 8M13 5a10 10 0 0 1 0 14M17 2a14 14 0 0 1 0 20'/></g></svg>");
+      --ico-capture: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M5 12c2-4 3-4 4.5 0s2.5 4 4.5 0 3-4 5 0'/></g></svg>");
+      --ico-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='3' width='16' height='18' rx='2'/><circle cx='12' cy='13' r='4.5'/><circle cx='12' cy='13' r='1'/></g></svg>");
+      --ico-amp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='6' width='20' height='12' rx='2'/><path d='M2 11h20'/><circle cx='7' cy='14.5' r='1'/><circle cx='12' cy='14.5' r='1'/><circle cx='17' cy='14.5' r='1'/></g></svg>");
+      --ico-tuner: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2v8a4 4 0 0 0 8 0V2'/><path d='M12 14v8'/></g></svg>");
+      --ico-exp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 18l14-5'/><path d='M5 21v-3M19 21v-8'/><path d='M6 9a9 9 0 0 1 12-4'/><path d='M15 3l3 2-2 3'/></g></svg>");
+      --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
+      --ico-export: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='M7 10l5 5 5-5'/><path d='M4 17v3h16v-3'/></g></svg>");
+      --ico-unknown: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7'/><path d='M12 17h0'/></g></svg>");
+      --ico-cap-amp-head: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='7' width='20' height='10' rx='2'/><path d='M2 12h20'/><circle cx='6' cy='14.5' r='0.8'/><circle cx='10' cy='14.5' r='0.8'/><circle cx='14' cy='14.5' r='0.8'/><circle cx='18' cy='14.5' r='0.8'/></g></svg>");
+      --ico-cap-amp-combo: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 8h18'/><circle cx='12' cy='14.5' r='4'/></g></svg>");
+      --ico-cap-amp-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='2' width='18' height='6' rx='1.5'/><rect x='3' y='10' width='18' height='12' rx='1.5'/><circle cx='8.5' cy='16' r='2.5'/><circle cx='15.5' cy='16' r='2.5'/></g></svg>");
+      --ico-cap-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8' cy='8' r='2.5'/><circle cx='16' cy='8' r='2.5'/><circle cx='8' cy='16' r='2.5'/><circle cx='16' cy='16' r='2.5'/></g></svg>");
+      --ico-cap-pedal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='2' width='14' height='20' rx='2'/><circle cx='9' cy='7' r='1.5'/><circle cx='15' cy='7' r='1.5'/><circle cx='12' cy='17' r='2'/></g></svg>");
+      --ico-cap-overdrive: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='2' width='14' height='20' rx='2'/><path d='M7 12h2l1.5-3h3L15 12h2'/><circle cx='12' cy='17.5' r='1.5'/></g></svg>");
     }
 
     /* Quad Cortex style: category-colored tile with the block icon inside. */
@@ -1448,7 +1458,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.2.0';
+    const EDITOR_VERSION = '1.3.0';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
 
     const logLines = [];
@@ -1529,10 +1539,25 @@
       gattWritePumpRunning = false;
     }
 
+    // One connection at a time: a second click while connecting started a second sync, whose duplicate replies
+    // (the 18 KB preset list) were mixed into the current preset state and left the editor at "loading".
+    let connectBusy = false;
+
     async function connectAll() {
-      await connectNano();
-      if (state.connected) {
-        await syncMetadataAndState();
+      if (connectBusy || state.connected) {
+        log('Connect ignored: ' + (state.connected ? 'already connected.' : 'a connection is being set up.'));
+        return;
+      }
+      connectBusy = true;
+      $('connectBtn').disabled = true;
+      try {
+        await connectNano();
+        if (state.connected) {
+          await syncMetadataAndState();
+        }
+      } finally {
+        connectBusy = false;
+        $('connectBtn').disabled = false;
       }
     }
 
@@ -1604,10 +1629,21 @@
 
       await writeC304('FE metadata request', bytesFromHex('06 C0 08 03 01 00 00 00'));
 
-      setTimeout(() => {
+      // Wait for the whole preset list (18 KB; its last packet is parsed at once), not a fixed time: through the
+      // controller it can take longer than the 2.2 s used before, and a current-state request sent meanwhile got
+      // the rest of the list mixed into the preset state.
+      const started = Date.now();
+      const next = () => {
+        if (!state.connected) return;
+        const quiet = Date.now() - Math.max(started, state.feLastPacketAt || 0);   // no packet for this long
+        if (!state.protocol.feSyncComplete && quiet < 4000) {
+          setTimeout(next, 100);
+          return;
+        }
         renderPresetSelect();
         beginPresetLoad();
-      }, 2200);
+      };
+      setTimeout(next, 100);
     }
 
     // A preset change makes everything we know about the FX chain stale.
@@ -1667,16 +1703,30 @@
       if (handleTypedMessage(data)) return;
 
       if (isFEStreamPacket(data)) {
+        // The last packet of a reply carries 0x80 in its second byte: the reply is parsed at once then (the timers
+        // remain for a lost last packet).
+        const last = (data[1] & 0x80) === 0x80;
         if (state.stateMode === 'library') {
           for (const b of data.slice(2)) state.libraryBytes.push(b);
           if (state.libraryTimer) clearTimeout(state.libraryTimer);
           state.libraryTimer = setTimeout(() => parseLibraryContent(state.libraryBytes), 1500);
         } else if (state.stateMode === 'current') {
           appendCurrentStatePayload(data);
-          scheduleCurrentStateParse();
+          if (last) {
+            if (state.stateTimer) clearTimeout(state.stateTimer);
+            parseBufferedCurrentState();
+          } else {
+            scheduleCurrentStateParse();
+          }
         } else {
           appendFEStreamPayload(data);
-          scheduleFEParse();
+          state.feLastPacketAt = Date.now();
+          if (last) {
+            if (state.feTimer) clearTimeout(state.feTimer);
+            parseBufferedFE();
+          } else {
+            scheduleFEParse();
+          }
         }
         return;
       }
@@ -1694,7 +1744,7 @@
 
     function scheduleCurrentStateParse() {
       if (state.stateTimer) clearTimeout(state.stateTimer);
-      state.stateTimer = setTimeout(parseBufferedCurrentState, 600);
+      state.stateTimer = setTimeout(parseBufferedCurrentState, 2000);   // only if the last packet got lost
     }
 
     function parseBufferedCurrentState() {
@@ -2352,6 +2402,13 @@
 
       const floats = decodeFloat32Array(data.slice(start, end));
       applyFloatValuesToBlock(blockKey, floats);
+      // ORIGINAL of the FX presets: the values as first read for this preset and model.
+      if (block.originalModel !== block.model || block.originalPreset !== state.selectedPreset) {
+        block.originalFloats = floats.slice();
+        block.originalModel = block.model;
+        block.originalPreset = state.selectedPreset;
+        block.fxPresetActive = -1;
+      }
 
       if (state.pendingParamTimer) clearTimeout(state.pendingParamTimer);
       state.pendingParamBlock = null;
@@ -2436,7 +2493,7 @@ function parseSelectedCaptureState(payload) {
 
     function scheduleFEParse() {
       if (state.feTimer) clearTimeout(state.feTimer);
-      state.feTimer = setTimeout(parseBufferedFE, 1500);
+      state.feTimer = setTimeout(parseBufferedFE, 4000);   // only if the last packet got lost
     }
 
     function parseBufferedFE() {
@@ -3732,9 +3789,10 @@ function parseSelectedCaptureState(payload) {
       return clamp((Number(param.value) - meta.min) / (meta.max - meta.min), 0, 1);
     }
 
-    async function setFXParam(blockKey, param, rawValue = null) {
+    async function setFXParam(blockKey, param, rawValue = null, fromPreset = false) {
       const cfg = blockSlotConfig[blockKey];
       if (!cfg) return;
+      if (!fromPreset && state.blocks[blockKey]) state.blocks[blockKey].fxPresetActive = -1;   // changed by hand
 
       if (rawValue !== null && rawValue !== undefined) param.value = rawValue;
 
@@ -4695,6 +4753,8 @@ function renderGate() {
       div.className = 'divider';
       el.appendChild(div);
 
+      if (FX_BLOCK_KEYS.includes(key) && block.model !== 'None') el.appendChild(renderFxPresets(key, block));
+
       const grid = document.createElement('div');
       grid.className = 'param-grid';
 
@@ -4709,6 +4769,90 @@ function renderGate() {
       const mc6Exp = renderMc6ExpControls(key, block, style.color);
       if (mc6Exp) el.appendChild(mc6Exp);
       return el;
+    }
+
+    // FX presets, as on the Nano Cortex Controller: four named settings per effect model, kept in this browser / app
+    // (values 0-1 in parameter order, the same form the controller uses). Click: load (an empty place saves);
+    // right-click or hold: save the current settings under a name (an empty name deletes the place).
+    // ORIGINAL: the settings the effect had when its values were read from the Nano.
+    const FXP_COUNT = 4;
+    const FXP_STORE = 'nanoFxPresets';
+
+    function fxPresetsOf(model) {
+      let all = {};
+      try { all = JSON.parse(localStorage.getItem(FXP_STORE)) || {}; } catch (e) { all = {}; }
+      const list = all[model] || [];
+      return Array.from({ length: FXP_COUNT }, (_, i) => list[i] || null);
+    }
+
+    function storeFxPresets(model, list) {
+      let all = {};
+      try { all = JSON.parse(localStorage.getItem(FXP_STORE)) || {}; } catch (e) { all = {}; }
+      if (list.some(Boolean)) all[model] = list;
+      else delete all[model];
+      try { localStorage.setItem(FXP_STORE, JSON.stringify(all)); } catch (e) { log('FX presets not stored: ' + e.message); }
+    }
+
+    function applyFxPreset(blockKey, floats, active) {
+      const block = state.blocks[blockKey];
+      if (!block || !block.params || !floats) return;
+      floats.forEach((n, i) => { if (block.params[i]) block.params[i].value = normalizedToParamValue(block.params[i], n); });
+      block.fxPresetActive = active;
+      render();
+      block.params.forEach((param, i) => { if (i < floats.length) setFXParam(blockKey, param, null, true); });
+      log(block.title + ': FX preset ' + (active ? fxPresetsOf(block.model)[active - 1].name : 'original') + ' loaded');
+    }
+
+    async function saveFxPreset(blockKey, index) {
+      const block = state.blocks[blockKey];
+      if (!block) return;
+      const list = fxPresetsOf(block.model);
+      const current = list[index];
+      const name = await askText('Save the current ' + block.model + ' settings as FX preset ' + (index + 1) +
+        ' (an empty name deletes it)', current ? current.name : 'Preset ' + (index + 1));
+      if (name === null) return;
+      const trimmed = name.trim().slice(0, 15);
+      list[index] = trimmed ? { name: trimmed, values: block.params.map(param => paramValueToNormalized(param)) } : null;
+      storeFxPresets(block.model, list);
+      block.fxPresetActive = trimmed ? index + 1 : -1;
+      render();
+    }
+
+    function renderFxPresets(blockKey, block) {
+      const box = document.createElement('div');
+      box.className = 'fxp';
+      const original = document.createElement('button');
+      original.className = 'original' + (block.fxPresetActive === 0 ? ' active' : '');
+      original.textContent = 'ORIGINAL';
+      original.title = 'Back to the settings the effect had when they were read from the Nano';
+      original.disabled = !block.originalFloats || block.originalModel !== block.model;
+      original.addEventListener('click', () => applyFxPreset(blockKey, block.originalFloats, 0));
+      box.appendChild(original);
+      fxPresetsOf(block.model).forEach((preset, i) => {
+        const btn = document.createElement('button');
+        btn.className = (preset ? '' : 'empty') + (preset && block.fxPresetActive === i + 1 ? ' active' : '');
+        btn.textContent = preset ? preset.name : '+ Save';
+        btn.title = preset ? 'Load "' + preset.name + '" - right-click or hold to save over it, rename or delete'
+                           : 'Save the current settings here';
+        let held = false, timer = null;
+        btn.addEventListener('pointerdown', () => {
+          held = false;
+          timer = setTimeout(() => { held = true; saveFxPreset(blockKey, i); }, 600);
+        });
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(type => btn.addEventListener(type, () => clearTimeout(timer)));
+        btn.addEventListener('click', () => {
+          if (held) return;
+          if (preset) applyFxPreset(blockKey, preset.values, i + 1);
+          else saveFxPreset(blockKey, i);
+        });
+        btn.addEventListener('contextmenu', e => {
+          e.preventDefault();
+          clearTimeout(timer);
+          saveFxPreset(blockKey, i);
+        });
+        box.appendChild(btn);
+      });
+      return box;
     }
 
     function render() {

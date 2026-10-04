@@ -4,7 +4,7 @@ The editor uses them as CSS masks, so only the shape matters (they are tinted wi
 the block colour). Run `python3 tools/icons.py` to print the CSS variables.
 """
 
-S = 'fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+S = 'fill="none" stroke="#000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"'
 
 ICONS = {
     # Effects
@@ -18,7 +18,7 @@ ICONS = {
     'utility': '<path d="M3 7h10M17 7h4M3 17h4M11 17h10"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
     'gate': '<path d="M2 12c1-5 2-5 3 0s2 5 3 0"/><path d="M8 12h8"/><path d="M16 12c1-5 2-5 3 0s2 5 3 0"/><path d="M11 6v12M13 6v12"/>',
     'doubler': '<path d="M2 10c3-6 6-6 9 0s6 6 9 0"/><path d="M4 15c3-6 6-6 9 0s6 6 9 0"/>',
-    'pitch': '<path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>',
+    'pitch': '<path d="M3 19.5h4.5V15H12v-4.5h4.5V6H21"/>',                                  # steps: transpose
     'modulation': '<path d="M2 12c2.5-7 5-7 7.5 0s5 7 7.5 0 3.5-5 5-3"/>',                    # sine
     'delay': '<path d="M4 6v12M10 9v6M15 11v2M19.5 11.5v1"/>',                                # decaying repeats
     'reverb': '<circle cx="5" cy="12" r="1.5"/><path d="M9 8a6 6 0 0 1 0 8M13 5a10 10 0 0 1 0 14M17 2a14 14 0 0 1 0 20"/>',
