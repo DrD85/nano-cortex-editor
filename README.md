@@ -32,8 +32,7 @@ It runs in Chrome/Edge (Web Bluetooth) or as a Mac app.
 Open `index.html` in **Chrome** or **Edge** on macOS or Windows, click **Connect** and choose your Nano Cortex.
 Safari and Firefox do not support Web Bluetooth.
 
-If GitHub Pages is enabled for this repository, the editor also runs directly from
-`https://<user>.github.io/<repository>/` without downloading anything.
+Or open it directly, without downloading anything: **https://drd85.github.io/nano-cortex-editor/**
 
 ### Mac app
 
@@ -49,6 +48,9 @@ footswitches, firmware 1.2.0 or newer) can pass the editor through to the Nano: 
 it has loaded the presets, then click **Connect** and choose **Nano Cortex Controller** (the Mac app picks it by
 itself). The status shows *Connected via controller*, and editor and controller work at the same time. Without the
 controller, connect to the Nano directly as before.
+
+No board? The controller also runs in the browser:
+[Nano Cortex Controller Web](https://github.com/DrD85/nano-cortex-controller-web).
 
 ## Build the Mac app
 
