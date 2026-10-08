@@ -23,8 +23,10 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 - **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style).
   The capture is shown as an amp: its name on the name plate, Gain, Bass, Mid, Treble and Level (0–10) plus the
   capture **Volume** on the control panel
-- **FX presets** (as on the Nano Cortex Controller): four named settings per effect model above its knobs – click to
-  load, right-click or hold to save, rename or delete; **ORIGINAL** returns to the settings read from the Nano
+- **FX presets**: any number of named settings per effect model. Up to four favourites sit as buttons above the knobs
+  (as many as the Nano Cortex Controller has places) – click to load, right-click or hold to save over them, rename or
+  delete. **All presets** lists every preset of the model: load, star as favourite, rename, overwrite, delete, or save
+  the current settings as a new one. **ORIG** returns to the settings read from the Nano
 - **Preset files**: **Export** saves the current preset as a file (to keep or to share), **Import** – or dropping the
   file on the window – loads one into the current preset; **Save** keeps it. Captures and IRs travel by name: the
   import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
@@ -61,6 +63,7 @@ Download the zip from [Releases](../../releases), unzip it and move **Nano Corte
 The app is not signed with an Apple Developer ID. On the first start, right-click it and choose **Open**.
 If macOS says the app is damaged, run `xattr -cr "/Applications/Nano Cortex Editor.app"` once in Terminal.
 macOS asks for Bluetooth access when you connect for the first time.
+Zoom with **⌘ +**, **⌘ −** and **⌘ 0** (or *View* in the menu bar), as in the browser; the app keeps the zoom.
 
 ### With the Nano Cortex Controller
 

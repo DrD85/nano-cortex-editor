@@ -207,16 +207,6 @@
     .fx-icon-empty::after { display: none; }
     .model-select { border-color: color-mix(in srgb, var(--block-color) 42%, #333); margin-bottom: 14px; }
     .divider { height: 1px; background: #2d3033; margin: 12px 0 18px; }
-    .fxp { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: -6px 0 16px; }
-    .fxp button {
-      min-width: 0; padding: 6px; font-size: 11px; letter-spacing: 0.04em; border-radius: 7px;
-      border: 1px solid #34383c; background: #17191b; color: #e6e6e6; cursor: pointer;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .fxp button.original { grid-column: 1 / -1; color: var(--muted); letter-spacing: 0.14em; }
-    .fxp button.empty { color: #6f6f6f; border-style: dashed; }
-    .fxp button.active { background: var(--block-color); border-color: var(--block-color); color: #000; }
-    .fxp button:disabled { opacity: 0.35; cursor: default; }
 
     .toggle-switch {
       width: 46px;
@@ -897,10 +887,43 @@
     .pedal-thumb.empty { border: 1.5px dashed #3a3f45; border-radius: 9px; height: 58px; }
     .block:not(.active) .pedal-thumb img, .block:not(.active) .pedal-thumb svg { filter: grayscale(.55) brightness(.55); }
     .model-select { margin-bottom: 12px; border-radius: 10px; }
-    .fxp { display: flex; flex-wrap: nowrap; gap: 5px; margin: 0 0 16px; }
-    .fxp button { flex: 1 1 0; padding: 5px 4px; font-size: 10.5px; letter-spacing: .04em; text-transform: none; }
-    .fxp button.original { flex: 0 0 auto; padding: 5px 8px; letter-spacing: .1em; text-transform: uppercase; color: #bfc3c7; }
-    .fxp button.empty { flex: 0 0 24px; padding: 5px 0; color: #5d6267; }
+    /* FX presets: Orig + "All presets", then the favourites in two columns with their full names */
+    .fxp { display: grid; gap: 6px; margin: 0 0 16px; }
+    .fxp button { min-width: 0; padding: 6px 9px; border-radius: 8px; font-size: 12px; font-weight: 600; text-align: left;
+                  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #15171a; border-color: #2c3035; color: #d8dadc; }
+    .fxp-top { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px; }
+    .fxp button.original { text-align: center; padding: 6px 10px; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #bfc3c7; }
+    .fxp-all { display: flex; align-items: center; gap: 7px; color: #c8ccd1; }
+    .fxp-all .ico { width: 14px; height: 14px; opacity: .8; }
+    .fxp-all .cnt { margin-left: auto; color: #8e9297; font-weight: 500; }
+    .fxp-all .chev { width: 11px; height: 11px; transform: rotate(90deg); }
+    .fxp-fav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+    .fxp button.active { background: var(--block-color); border-color: var(--block-color); color: #000; }
+    .fxp button:disabled { opacity: .35; cursor: default; }
+    .fxp button.empty { text-align: center; color: #5d6267; border-style: dashed; background: transparent; }
+    .fxp button.empty.wide { grid-column: 1 / -1; }
+    .fxp-popover { position: fixed; z-index: 45; overflow: auto; padding: 6px; border-radius: 12px; background: #1a1d20; border: 1px solid #33383e;
+                   box-shadow: 0 18px 50px rgba(0, 0, 0, .7); display: grid; gap: 2px; align-content: start; }
+    .fxp-popover button { text-transform: none; letter-spacing: 0; }
+    .fxp-hdr { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; padding: 6px 8px 2px; }
+    .fxp-sep { height: 1px; background: #2c3035; margin: 4px 2px; }
+    .fxp-empty, .fxp-note { padding: 8px; font-size: 12.5px; color: #9aa0a6; }
+    .fxp-note { color: #ffb02e; }
+    .fxp-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) 28px; align-items: center; gap: 2px; border-radius: 8px; }
+    .fxp-row:hover { background: #22262a; }
+    .fxp-row.cur { background: color-mix(in srgb, var(--block-color) 22%, transparent); }
+    .fxp-row button { border: 0; background: transparent; padding: 7px 4px; border-radius: 7px; }
+    .fxp-row .star { color: #5d6267; font-size: 14px; text-align: center; }
+    .fxp-row .star.on { color: var(--block-color); }
+    .fxp-row .nm { text-align: left; font-size: 13px; font-weight: 500; color: #e6e6e6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fxp-row .more { display: grid; place-items: center; color: #8e9297; }
+    .fxp-row .more .ico { width: 16px; height: 16px; }
+    .fxp-row .acts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 2px 6px 8px; }
+    .fxp-row .acts button { background: #2a2e33; padding: 6px 4px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fxp-row .acts button:hover { background: #343a40; }
+    .fxp-row .acts button.danger { background: #5a1d1d; color: #ffb2b2; }
+    .fxp-new { text-align: left; border: 0; background: transparent; padding: 8px; font-size: 13px; color: #c8ccd1; border-radius: 8px; }
+    .fxp-new:hover { background: #22262a; }
 
     @media (max-width: 1250px) {
       .topbar .brand { flex-basis: 100%; }
@@ -5202,89 +5225,275 @@ function renderGate() {
       return el;
     }
 
-    // FX presets, as on the Nano Cortex Controller: four named settings per effect model, kept in this browser / app
-    // (values 0-1 in parameter order, the same form the controller uses). Click: load (an empty place saves);
-    // right-click or hold: save the current settings under a name (an empty name deletes the place).
-    // ORIGINAL: the settings the effect had when its values were read from the Nano.
-    const FXP_COUNT = 4;
-    const FXP_STORE = 'nanoFxPresets';
+    // FX presets: any number of named settings per effect model, kept in this browser / app (values 0-1 in parameter
+    // order, the same form the Nano Cortex Controller uses). Up to four of them are favourites - as many as the
+    // controller has places - and sit as buttons above the knobs: click loads, right-click or hold saves the current
+    // settings over it (an empty name deletes it). "All presets" lists every preset of the model: load, star
+    // (favourite), rename, overwrite, delete, save the current settings as a new one.
+    // ORIG: the settings the effect had when its values were read from the Nano.
+    const FXP_FAVOURITES = 4;
+    const FXP_NAME_MAX = 15;
+    const FXP_STORE = 'nanoFxPresetLib';      // { model: [{ id, name, values, fav }] }
+    const FXP_STORE_V1 = 'nanoFxPresets';     // up to 1.5.1: { model: [4 places, null or { name, values }] }
+
+    const fxpId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+    function fxpLibrary() {
+      try {
+        const lib = JSON.parse(localStorage.getItem(FXP_STORE));
+        if (lib && typeof lib === 'object') return lib;
+      } catch (e) { /* fall through to the old format */ }
+      // First start of this version: the four places per model become favourites.
+      const lib = {};
+      try {
+        const old = JSON.parse(localStorage.getItem(FXP_STORE_V1)) || {};
+        Object.entries(old).forEach(([model, places]) => {
+          const list = (places || []).filter(Boolean).map(p => ({ id: fxpId(), name: p.name, values: p.values, fav: true }));
+          if (list.length) lib[model] = list;
+        });
+      } catch (e) { /* nothing to take over */ }
+      try { localStorage.setItem(FXP_STORE, JSON.stringify(lib)); } catch (e) { /* storage unavailable */ }
+      return lib;
+    }
 
     function fxPresetsOf(model) {
-      let all = {};
-      try { all = JSON.parse(localStorage.getItem(FXP_STORE)) || {}; } catch (e) { all = {}; }
-      const list = all[model] || [];
-      return Array.from({ length: FXP_COUNT }, (_, i) => list[i] || null);
+      return (fxpLibrary()[model] || []).slice();
     }
 
     function storeFxPresets(model, list) {
-      let all = {};
-      try { all = JSON.parse(localStorage.getItem(FXP_STORE)) || {}; } catch (e) { all = {}; }
-      if (list.some(Boolean)) all[model] = list;
-      else delete all[model];
-      try { localStorage.setItem(FXP_STORE, JSON.stringify(all)); } catch (e) { log('FX presets not stored: ' + e.message); }
+      const lib = fxpLibrary();
+      if (list.length) lib[model] = list;
+      else delete lib[model];
+      try { localStorage.setItem(FXP_STORE, JSON.stringify(lib)); } catch (e) { log('FX presets not stored: ' + e.message); }
     }
 
-    function applyFxPreset(blockKey, floats, active) {
+    const fxpFavourites = list => list.filter(p => p.fav).slice(0, FXP_FAVOURITES);
+
+    function applyFxPreset(blockKey, floats, active, name) {
       const block = state.blocks[blockKey];
       if (!block || !block.params || !floats) return;
       floats.forEach((n, i) => { if (block.params[i]) block.params[i].value = normalizedToParamValue(block.params[i], n); });
       block.fxPresetActive = active;
       render();
       block.params.forEach((param, i) => { if (i < floats.length) setFXParam(blockKey, param, null, true); });
-      log(block.title + ': FX preset ' + (active ? fxPresetsOf(block.model)[active - 1].name : 'original') + ' loaded');
+      log(block.title + ': FX preset ' + (active ? name : 'original') + ' loaded');
     }
 
-    async function saveFxPreset(blockKey, index) {
+    const currentFxValues = block => block.params.map(param => paramValueToNormalized(param));
+
+    async function askFxPresetName(message, defaultName) {
+      const name = await askText(message, defaultName);
+      return name === null ? null : name.trim().slice(0, FXP_NAME_MAX);
+    }
+
+    // New preset from the current settings; a favourite while there is room on the buttons.
+    async function addFxPreset(blockKey) {
       const block = state.blocks[blockKey];
-      if (!block) return;
       const list = fxPresetsOf(block.model);
-      const current = list[index];
-      const name = await askText('Save the current ' + block.model + ' settings as FX preset ' + (index + 1) +
-        ' (an empty name deletes it)', current ? current.name : 'Preset ' + (index + 1));
-      if (name === null) return;
-      const trimmed = name.trim().slice(0, 15);
-      list[index] = trimmed ? { name: trimmed, values: block.params.map(param => paramValueToNormalized(param)) } : null;
+      const name = await askFxPresetName('Save the current ' + block.model + ' settings as', 'Preset ' + (list.length + 1));
+      if (!name) return null;
+      const preset = { id: fxpId(), name, values: currentFxValues(block), fav: fxpFavourites(list).length < FXP_FAVOURITES };
+      list.push(preset);
       storeFxPresets(block.model, list);
-      block.fxPresetActive = trimmed ? index + 1 : -1;
+      block.fxPresetActive = preset.id;
+      render();
+      return preset;
+    }
+
+    // Right-click / hold on a favourite: save the current settings over it, rename it, or delete it (empty name).
+    async function saveOverFxPreset(blockKey, id) {
+      const block = state.blocks[blockKey];
+      const list = fxPresetsOf(block.model);
+      const preset = list.find(p => p.id === id);
+      if (!preset) return;
+      const name = await askFxPresetName('Save the current settings as "' + preset.name + '" (an empty name deletes it)', preset.name);
+      if (name === null) return;
+      if (!name) {
+        storeFxPresets(block.model, list.filter(p => p.id !== id));
+        if (block.fxPresetActive === id) block.fxPresetActive = -1;
+      } else {
+        Object.assign(preset, { name, values: currentFxValues(block) });
+        storeFxPresets(block.model, list);
+        block.fxPresetActive = id;
+      }
       render();
     }
 
     function renderFxPresets(blockKey, block) {
       const box = document.createElement('div');
       box.className = 'fxp';
+      const list = fxPresetsOf(block.model);
+      const favourites = fxpFavourites(list);
+
+      const top = document.createElement('div');
+      top.className = 'fxp-top';
       const original = document.createElement('button');
       original.className = 'original' + (block.fxPresetActive === 0 ? ' active' : '');
       original.textContent = 'Orig';
       original.title = 'Back to the settings the effect had when they were read from the Nano';
       original.disabled = !block.originalFloats || block.originalModel !== block.model;
       original.addEventListener('click', () => applyFxPreset(blockKey, block.originalFloats, 0));
-      box.appendChild(original);
-      fxPresetsOf(block.model).forEach((preset, i) => {
+      top.appendChild(original);
+      const all = document.createElement('button');
+      all.className = 'fxp-all';
+      all.title = 'All FX presets of ' + block.model;
+      all.innerHTML = '<span class="ico" style="--icon: var(--ico-library)"></span>All presets<span class="cnt">' + list.length + '</span>' +
+        '<span class="ico chev" style="--icon: var(--ico-right)"></span>';
+      all.addEventListener('click', e => { e.stopPropagation(); toggleFxpList(blockKey); });
+      top.appendChild(all);
+      box.appendChild(top);
+
+      const fav = document.createElement('div');
+      fav.className = 'fxp-fav';
+      favourites.forEach(preset => {
         const btn = document.createElement('button');
-        btn.className = (preset ? '' : 'empty') + (preset && block.fxPresetActive === i + 1 ? ' active' : '');
-        btn.textContent = preset ? preset.name : '+';
-        btn.title = preset ? 'Load "' + preset.name + '" - right-click or hold to save over it, rename or delete'
-                           : 'Save the current settings here';
+        btn.className = block.fxPresetActive === preset.id ? 'active' : '';
+        btn.textContent = preset.name;
+        btn.title = 'Load "' + preset.name + '" - right-click or hold to save over it, rename or delete';
         let held = false, timer = null;
         btn.addEventListener('pointerdown', () => {
           held = false;
-          timer = setTimeout(() => { held = true; saveFxPreset(blockKey, i); }, 600);
+          timer = setTimeout(() => { held = true; saveOverFxPreset(blockKey, preset.id); }, 600);
         });
         ['pointerup', 'pointerleave', 'pointercancel'].forEach(type => btn.addEventListener(type, () => clearTimeout(timer)));
-        btn.addEventListener('click', () => {
-          if (held) return;
-          if (preset) applyFxPreset(blockKey, preset.values, i + 1);
-          else saveFxPreset(blockKey, i);
-        });
+        btn.addEventListener('click', () => { if (!held) applyFxPreset(blockKey, preset.values, preset.id, preset.name); });
         btn.addEventListener('contextmenu', e => {
           e.preventDefault();
           clearTimeout(timer);
-          saveFxPreset(blockKey, i);
+          saveOverFxPreset(blockKey, preset.id);
         });
-        box.appendChild(btn);
+        fav.appendChild(btn);
       });
+      if (favourites.length < FXP_FAVOURITES) {
+        const add = document.createElement('button');
+        add.className = 'empty' + (favourites.length ? '' : ' wide');
+        add.textContent = favourites.length ? '+' : '+ Save current settings';
+        add.title = 'Save the current settings as a new favourite';
+        add.addEventListener('click', () => addFxPreset(blockKey));
+        fav.appendChild(add);
+      }
+      box.appendChild(fav);
       return box;
     }
+
+    // ---- "All presets" list of one effect (a popover under its button) ----
+    const fxpList = { blockKey: null, openRow: null, confirmDelete: null, note: '' };
+
+    function closeFxpList() {
+      const pop = $('fxpPopover');
+      if (pop) pop.remove();
+      fxpList.blockKey = null;
+    }
+
+    function toggleFxpList(blockKey) {
+      if (fxpList.blockKey === blockKey) { closeFxpList(); return; }
+      Object.assign(fxpList, { blockKey, openRow: null, confirmDelete: null, note: '' });
+      renderFxpList();
+    }
+
+    // After a change: rebuild the blocks (favourite buttons, counts) and the list in place.
+    function refreshFxpList() {
+      const key = fxpList.blockKey;
+      render();
+      fxpList.blockKey = key;
+      renderFxpList();
+    }
+
+    function renderFxpList() {
+      const key = fxpList.blockKey;
+      const block = key && state.blocks[key];
+      const anchor = key && document.querySelector('#block-' + key + ' .fxp-all');
+      if (!block || !anchor) { closeFxpList(); return; }
+      let pop = $('fxpPopover');
+      if (!pop) {
+        pop = document.createElement('div');
+        pop.id = 'fxpPopover';
+        pop.className = 'fxp-popover';
+        pop.addEventListener('click', e => e.stopPropagation());
+        document.body.appendChild(pop);
+      }
+      const blockRect = document.getElementById('block-' + key).getBoundingClientRect();
+      const anchorRect = anchor.getBoundingClientRect();
+      pop.style.setProperty('--block-color', getComputedStyle(document.getElementById('block-' + key)).getPropertyValue('--block-color'));
+      pop.style.left = Math.max(8, blockRect.left + 10) + 'px';
+      pop.style.width = Math.max(230, blockRect.width - 20) + 'px';
+      // Below the button, or above it when there is clearly more room there (like a macOS popover).
+      const below = window.innerHeight - anchorRect.bottom - 18, above = anchorRect.top - 18;
+      const up = below < 300 && above > below;
+      pop.style.top = up ? '' : (anchorRect.bottom + 6) + 'px';
+      pop.style.bottom = up ? (window.innerHeight - anchorRect.top + 6) + 'px' : '';
+      pop.style.maxHeight = Math.max(160, up ? above : below) + 'px';
+
+      const list = fxPresetsOf(block.model);
+      const favIds = fxpFavourites(list).map(p => p.id);
+      const row = preset => {
+        const isFav = favIds.includes(preset.id);
+        const open = fxpList.openRow === preset.id;
+        const confirm = fxpList.confirmDelete === preset.id;
+        return '<div class="fxp-row' + (block.fxPresetActive === preset.id ? ' cur' : '') + (open ? ' open' : '') + '" data-id="' + preset.id + '">' +
+          '<button class="star' + (isFav ? ' on' : '') + '" data-act="star" title="' + (isFav ? 'Remove from the buttons' : 'Show as a button (favourite)') + '">' + (isFav ? '★' : '☆') + '</button>' +
+          '<button class="nm" data-act="load" title="Load">' + escapeHTML(preset.name) + '</button>' +
+          '<button class="more" data-act="more" title="Rename, overwrite, delete"><span class="ico" style="--icon: var(--ico-more)"></span></button>' +
+          (open ? '<div class="acts"><button data-act="rename">Rename</button><button data-act="overwrite" title="Save the current settings into this preset">Overwrite</button>' +
+            '<button data-act="delete" class="' + (confirm ? 'danger' : '') + '">' + (confirm ? 'Really delete?' : 'Delete') + '</button></div>' : '') +
+          '</div>';
+      };
+      const favourites = list.filter(p => favIds.includes(p.id));
+      const others = list.filter(p => !favIds.includes(p.id));
+      pop.innerHTML =
+        (list.length ? '' : '<div class="fxp-empty">No FX presets for ' + escapeHTML(block.model) + ' yet.</div>') +
+        (favourites.length ? '<div class="fxp-hdr">Favourites · on the buttons</div>' + favourites.map(row).join('') : '') +
+        (others.length ? (favourites.length ? '<div class="fxp-sep"></div>' : '') + '<div class="fxp-hdr">More presets</div>' + others.map(row).join('') : '') +
+        (fxpList.note ? '<div class="fxp-note">' + escapeHTML(fxpList.note) + '</div>' : '') +
+        '<div class="fxp-sep"></div><button class="fxp-new" data-act="new">+ Save current settings…</button>';
+
+      pop.onclick = async e => {
+        e.stopPropagation();
+        const btn = e.target.closest('[data-act]');
+        if (!btn) return;
+        const act = btn.dataset.act;
+        const rowEl = btn.closest('.fxp-row');
+        const items = fxPresetsOf(block.model);
+        const preset = rowEl && items.find(p => p.id === rowEl.dataset.id);
+        fxpList.note = '';
+        if (act === 'new') { closeFxpList(); await addFxPreset(key); return; }
+        if (!preset) return;
+        if (act === 'load') { closeFxpList(); applyFxPreset(key, preset.values, preset.id, preset.name); return; }
+        if (act === 'more') { fxpList.openRow = fxpList.openRow === preset.id ? null : preset.id; fxpList.confirmDelete = null; renderFxpList(); return; }
+        if (act === 'star') {
+          if (!preset.fav && fxpFavourites(items).length >= FXP_FAVOURITES) fxpList.note = 'Up to ' + FXP_FAVOURITES + ' favourites - remove a star first.';
+          else { preset.fav = !preset.fav; storeFxPresets(block.model, items); }
+          refreshFxpList();
+          return;
+        }
+        if (act === 'rename') {
+          const name = await askFxPresetName('Rename the FX preset', preset.name);
+          if (name) { preset.name = name; storeFxPresets(block.model, items); }
+          refreshFxpList();
+          return;
+        }
+        if (act === 'overwrite') {
+          preset.values = currentFxValues(block);
+          storeFxPresets(block.model, items);
+          block.fxPresetActive = preset.id;
+          fxpList.note = '"' + preset.name + '" now holds the current settings.';
+          refreshFxpList();
+          return;
+        }
+        if (act === 'delete') {
+          if (fxpList.confirmDelete !== preset.id) { fxpList.confirmDelete = preset.id; renderFxpList(); return; }
+          storeFxPresets(block.model, items.filter(p => p.id !== preset.id));
+          if (block.fxPresetActive === preset.id) block.fxPresetActive = -1;
+          fxpList.openRow = fxpList.confirmDelete = null;
+          refreshFxpList();
+        }
+      };
+    }
+
+    document.addEventListener('click', () => { if (fxpList.blockKey) closeFxpList(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && fxpList.blockKey) closeFxpList(); });
+    window.addEventListener('resize', () => { if (fxpList.blockKey) closeFxpList(); });
+    document.addEventListener('scroll', e => { if (fxpList.blockKey && !(e.target.closest && e.target.closest('#fxpPopover'))) closeFxpList(); }, true);
 
     // ---- Preset files: the current preset as a file (to keep or to share), a file into the current preset ----
     // The file holds what the editor can set: name, capture and cab/IR (by name: on import they are found again in the
