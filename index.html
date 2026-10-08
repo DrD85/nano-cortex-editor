@@ -698,11 +698,11 @@
     }
     .ask-message { white-space: pre-line; color: #e2e2e2; font-size: 14px; line-height: 1.45; }
     .slot-panel { width: min(640px, calc(100vw - 32px)); }
-    .slot-list { display: grid; gap: 6px; max-height: 52vh; overflow: auto; padding-right: 4px; }
+    .slot-list { display: grid; grid-auto-rows: max-content; align-content: start; gap: 6px; max-height: 52vh; overflow: auto; padding-right: 4px; }
     .slot-row {
       display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 2px 10px; align-items: center; text-align: left;
       padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #141414; color: #e2e2e2; font: inherit; cursor: pointer;
-      text-transform: none; letter-spacing: normal; font-weight: 500; min-height: 0;
+      text-transform: none; letter-spacing: normal; font-weight: 500; height: auto;
     }
     .slot-row.sel { border-color: #45F862; background: #12261a; }
     .slot-row .no { color: #9a9a9a; font-size: 12px; }
@@ -878,7 +878,7 @@
       <div id="slotList" class="slot-list"></div>
       <div id="slotStatus" class="slot-status"></div>
       <div class="ask-buttons">
-        <button type="button" id="slotScan">Check which presets use them</button>
+        <button type="button" id="slotScan">Check usage (1 min)</button>
         <button type="button" id="slotCancel">Cancel</button>
         <button type="button" id="slotOk" class="primary">Load</button>
       </div>
@@ -1557,7 +1557,8 @@
             log('ERROR: not connected - C304 characteristic not available');
           } else {
             log('TX ' + job.label + ': ' + hex(job.payload));
-            await state.c304.writeValueWithResponse(job.payload);
+            if (state.c304.writeValueWithResponse) await state.c304.writeValueWithResponse(job.payload);
+            else await state.c304.writeValue(job.payload);   // older Web Bluetooth implementations (Bluefy)
             ok = true;
           }
         } catch (err) {
@@ -1611,13 +1612,25 @@
         state.c304 = null;
         state.c305 = null;
 
+        // C304 / C305 are asked for by UUID: browsers report UUIDs in different forms (Bluefy on the iPhone e.g. in
+        // capitals or as "C304"), so comparing the listed UUIDs as text is only the fallback.
         for (const serviceUUID of SERVICE_UUIDS) {
+          if (state.c304 && state.c305) break;
           try {
             const service = await server.getPrimaryService(serviceUUID);
             log('Service accessible: ' + serviceUUID);
+            try {
+              state.c304 = await service.getCharacteristic(C304_UUID);
+              state.c305 = await service.getCharacteristic(C305_UUID);
+              log('Found C304 write and C305 notify characteristics');
+              continue;
+            } catch (err) {
+              state.c304 = state.c305 = null;
+            }
+            const full = uuid => (/^[0-9a-f]{4}$/.test(uuid) ? '0000' + uuid + '-0000-1000-8000-00805f9b34fb' : uuid);
             const characteristics = await service.getCharacteristics();
             for (const ch of characteristics) {
-              const uuid = ch.uuid.toLowerCase();
+              const uuid = full(ch.uuid.toLowerCase());
               log('Characteristic: ' + uuid);
               if (uuid === C304_UUID) { state.c304 = ch; log('Found C304 write characteristic'); }
               if (uuid === C305_UUID) { state.c305 = ch; log('Found C305 notify characteristic'); }
@@ -3583,7 +3596,8 @@ function parseSelectedCaptureState(payload) {
           if (sel) sel.scrollIntoView({ block: 'nearest' });
           $('slotOk').textContent = 'Load into ' + (isCapture ? 'slot ' : 'cab slot ') + selected;
           $('slotOk').disabled = $('slotCancel').disabled = $('slotScan').disabled = busy;
-          $('slotScan').textContent = state.slotUsage ? 'Check again' : 'Check which presets use them (about 1 min)';
+          $('slotScan').textContent = state.slotUsage ? 'Check again' : 'Check usage (1 min)';
+          $('slotScan').title = 'Loads every preset once to see which presets use which slot';
         };
         const finish = value => {
           $('slotOverlay').hidden = true;
@@ -3897,10 +3911,24 @@ function parseSelectedCaptureState(payload) {
 
       const value = enabled ? 0x00 : 0x01;
 
-      await writeC304(
+      const sent = await writeC304(
         cfg.label + ' ' + (enabled ? 'ON' : 'OFF'),
         new Uint8Array([0x0A, 0xC0, 0x08, 0x01, 0x18, cfg.enableSlot, 0x20, value, 0x1F, 0x00, 0x00, 0x00])
       );
+      if (enabled && sent && !state.fileBusy) readAfterEnable(blockKey);   // export / import read and write themselves
+    }
+
+    // An effect that was off could not be read (that crashed the Nano), so its knobs may show defaults or old values.
+    // Once it is on, its values are read - shortly after the Nano has switched it on.
+    const enableReadTimers = {};
+    function readAfterEnable(blockKey) {
+      clearTimeout(enableReadTimers[blockKey]);
+      enableReadTimers[blockKey] = setTimeout(() => {
+        const block = state.blocks[blockKey];
+        if (!state.connected || state.fileBusy || !block || !block.on || block.model === 'None') return;
+        if (state.pendingParamBlock !== blockKey && !state.paramRefreshQueue.includes(blockKey)) state.paramRefreshQueue.push(blockKey);
+        requestNextFXParamRefresh();
+      }, 250);
     }
 
     function float32LE(value) {

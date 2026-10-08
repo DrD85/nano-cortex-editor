@@ -1,7 +1,7 @@
 # Nano Cortex Editor (unofficial)
 
 A desktop editor for the **Neural DSP Nano Cortex** that talks to the pedal over Bluetooth.
-It runs in Chrome/Edge (Web Bluetooth) or as a Mac app.
+It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nano-cortex-editor/**) or as a Mac app.
 
 > **Unofficial community project.** Not affiliated with, endorsed by or supported by Neural DSP.
 > "Nano Cortex", "Quad Cortex" and "Neural DSP" are trademarks of Neural DSP Technologies.
@@ -33,10 +33,18 @@ It runs in Chrome/Edge (Web Bluetooth) or as a Mac app.
 
 ### In the browser
 
-Open `index.html` in **Chrome** or **Edge** on macOS or Windows, click **Connect** and choose your Nano Cortex.
-Safari and Firefox do not support Web Bluetooth.
+Open **https://drd85.github.io/nano-cortex-editor/** (or `index.html` from this repository) in **Chrome** or **Edge**
+on macOS, Windows, ChromeOS or Android, click **Connect** and choose your Nano Cortex.
 
-Or open it directly, without downloading anything: **https://drd85.github.io/nano-cortex-editor/**
+| Browser | |
+|---|---|
+| Chrome, Edge | works |
+| Brave | works after enabling Web Bluetooth: `brave://flags` → **Web Bluetooth API** → *Enabled*, relaunch; if Connect still does nothing, turn the Shields off for the editor page |
+| iPhone / iPad | the **Bluefy** browser (Safari has no Web Bluetooth) |
+| Safari, Firefox | no Web Bluetooth – not possible |
+
+The Nano takes one Bluetooth connection at a time: close the Cortex Cloud app (also on your phone) and switch off a
+Nano Cortex Controller board before connecting directly.
 
 ### Mac app
 
