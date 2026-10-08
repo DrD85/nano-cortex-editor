@@ -12,8 +12,17 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 
 ## Features
 
+- **Signal chain** at the top, as on the Quad Cortex: Gate → Pre FX 1–2 → Capture → Cab → Post FX 1–3, each block in its
+  colour – filled when on, outlined when off, dashed when empty. Click a block to make it light up below,
+  **double-click** to switch it on or off
+- **Compact top bar**: preset arrows, preset list (a dot marks unsaved changes, and **Save** turns green), save and
+  rename, then icons for export, import, tuner, expression, MIDI and MC6 Pro – hover an icon for its name. The
+  **Connect** button shows the connection; when connected it opens refresh, copy log and disconnect (also under **…**).
+  Until the Nano is connected, the editor shows a short connect screen instead of placeholder values
 - **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
-- **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style)
+- **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style).
+  The capture is shown as an amp: its name on the name plate, Gain, Bass, Mid, Treble and Level (0–10) plus the
+  capture **Volume** on the control panel
 - **FX presets** (as on the Nano Cortex Controller): four named settings per effect model above its knobs – click to
   load, right-click or hold to save, rename or delete; **ORIGINAL** returns to the settings read from the Nano
 - **Preset files**: **Export** saves the current preset as a file (to keep or to share), **Import** – or dropping the
@@ -21,12 +30,12 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
   themselves cannot be transferred over Bluetooth.
 - **Captures**: 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
-- **Cab/IR**: slots, level, high/low pass, mic and position; load factory or user IRs from the device library into a slot
+- **Cab/IR**: slots, level and high / low pass as knobs, mic and position (factory cabs); load factory or user IRs from the device library into a slot
 - **Tuner**: note and cents display, reference pitch (400–480 Hz), mute
 - **Expression pedal**: per-preset assignments for Gain, Bass, Mid, Treble, Level, Gate and FX amounts (min/max, invert) and bypass switching (Heel-Toe, Switch, Stop)
 - **MIDI controller with MIDI Learn**: map knobs and buttons of any USB/Bluetooth MIDI controller to amp, FX, gate, capture and cab controls, block on/off, tuner and preset up/down; optional pickup mode (no value jumps) and Program Change → preset
 - **Morningstar MC6 Pro export**: pick up to five presets and create a bank file: page 1 A–E recall the presets, F opens an FX page where A–E switch the five FX slots on/off. The switches are named after the effect type, use the category colours and MC6 Pro icons, and show which effects each preset uses
-- Drawn, brand-free pedal pictures for every effect model (your own pictures in `img/` are used when present)
+- A small pedal picture next to each effect's model choice: a drawn, brand-free pedal for every model (your own pictures in `img/` are used when present)
 - Log export for troubleshooting
 
 ## Use it
@@ -81,13 +90,13 @@ The app is a small [Electron](https://www.electronjs.org) shell around `index.ht
 
 ## MIDI controller
 
-Click **MIDI** → **Start MIDI Learn**, click a knob, slider or switch in the editor and move a control on your
+Click the **MIDI** icon → **Start MIDI Learn**, click a knob, slider or switch in the editor and move a control on your
 MIDI controller. Assigned controls show their CC number; right-click a control to remove its assignment.
 Assignments are stored in the browser/app. MIDI needs Chrome, Edge or the Mac app.
 
 ## Morningstar MC6 Pro
 
-Click **MC6 Pro**, tick up to five presets, check the Nano's MIDI channel (read from the Nano automatically)
+Click the **MC6 Pro** icon (the controller), tick up to five presets, check the Nano's MIDI channel (read from the Nano automatically)
 and press **Create bank file**. To read which FX are on in each preset, the editor loads each selected preset on the
 Nano for a moment and then returns to the current one (save unsaved changes first). Load the file in the Morningstar editor (open a bank → *Load from File*) and save it
 to the controller. Connect the MC6 Pro's USB Host port to the Nano's USB port: the Nano only accepts MIDI via USB.
@@ -130,6 +139,7 @@ The message layouts used here are documented in comments in `index.html`.
 
 Inoffizieller Editor für den Neural DSP Nano Cortex per Bluetooth. Er läuft in Chrome/Edge oder als Mac-App.
 Du kannst Presets wechseln, umbenennen und speichern und Amp, Gate und Effekte live bearbeiten.
+Oben zeigt eine Signal Chain alle Blöcke: Ein Klick lässt den Block unten aufleuchten, ein Doppelklick schaltet ihn an oder aus.
 Captures und Cabs lädst du aus der Library des Geräts. Dazu gibt es einen Tuner, die Zuweisungen
 für das Expression-Pedal und die Steuerung per MIDI-Controller mit MIDI Learn.
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.

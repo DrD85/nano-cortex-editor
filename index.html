@@ -92,17 +92,19 @@
       border-radius: 8px;
       padding: 10px 18px;
       cursor: pointer;
-      font-weight: 650;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.01em;
     }
 
     button:hover { border-color: var(--accent); }
-    button.primary { border-color: #8a8a8a; color: #ffffff; }
+    /* main action of a dialog: filled, light (Neural monochrome) */
+    button.primary { background: #ececec; border-color: #ececec; color: #0d0f11; }
+    button.primary:hover { background: #fff; border-color: #fff; }
+    button.primary:disabled { opacity: .45; cursor: default; }
 
     button.btn-small {
-      padding: 5px 12px;
-      font-size: 11px;
+      padding: 6px 12px;
+      font-size: 12.5px;
       border-radius: 6px;
       margin-left: 4px;
     }
@@ -194,14 +196,6 @@
 
     .block { min-height: 465px; padding: 16px; border-color: color-mix(in srgb, var(--block-color) 55%, var(--border)); }
 
-    .amp-panel {
-      background: linear-gradient(180deg, rgba(23, 25, 27, 0.94), rgba(9, 10, 11, 0.94));
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.015);
-      border-color: color-mix(in srgb, var(--block-color) 55%, var(--border));
-      padding: 16px;
-    }
     .block.active { border-color: var(--block-color); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--block-color) 20%, transparent); }
 
     .block-head { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -211,10 +205,6 @@
     .block:not(.active) .fx-icon { opacity: 0.45; }
     .fx-icon-empty { background: none; border: 1px dashed #4a4a4a; }
     .fx-icon-empty::after { display: none; }
-    .amp-panel h2 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; color: #ececec; text-transform: uppercase; }
-    .pedal-picture { display: flex; justify-content: center; align-items: center; min-height: 128px; margin: 12px 0 4px; }
-    .pedal-picture img { max-width: 100%; max-height: 120px; object-fit: contain; border-radius: 4px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-    .pedal-svg { height: 124px; width: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.55)); }
     .model-select { border-color: color-mix(in srgb, var(--block-color) 42%, #333); margin-bottom: 14px; }
     .divider { height: 1px; background: #2d3033; margin: 12px 0 18px; }
     .fxp { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: -6px 0 16px; }
@@ -232,18 +222,20 @@
       width: 46px;
       height: 24px;
       border-radius: 999px;
-      border: 1px solid color-mix(in srgb, var(--block-color) 65%, #555);
-      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid #3a3f45;
+      background: #1a1d20;
       padding: 2px;
+      transition: background .15s, border-color .15s;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: flex-start;
     }
 
-    .toggle-switch.on { justify-content: flex-end; }
-    .toggle-dot { width: 18px; height: 18px; border-radius: 50%; background: #d8d8d8; box-shadow: 0 0 10px color-mix(in srgb, var(--block-color) 45%, transparent); }
-    .toggle-switch.on .toggle-dot { background: var(--block-color); }
+    /* on: track filled in the block colour, dark knob (iOS style, colours as in the signal chain) */
+    .toggle-switch.on { justify-content: flex-end; background: var(--block-color, #f2f2f2); border-color: var(--block-color, #f2f2f2); }
+    .toggle-dot { width: 18px; height: 18px; border-radius: 50%; background: #7d8287; }
+    .toggle-switch.on .toggle-dot { background: #0d0f11; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); }
 
     .param-grid { display: grid; grid-template-columns: repeat(2, minmax(78px, 1fr)); gap: 14px 12px; align-items: start; }
     .knob-param { display: grid; justify-items: center; gap: 6px; }
@@ -290,14 +282,14 @@
       color: var(--block-color);
       border-color: var(--block-color);
       background: color-mix(in srgb, var(--block-color) 10%, #111315);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     .switch-pill:hover { border-color: var(--block-color); }
 
-    .unsupported { display: none; padding: 12px; border: 1px solid #5a2c2c; background: #1c0f0f; color: #ffb2b2; border-radius: 10px; }
 
 
     .knob-param.param-disabled,
@@ -384,6 +376,19 @@
       --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
       --ico-export: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='M7 10l5 5 5-5'/><path d='M4 17v3h16v-3'/></g></svg>");
       --ico-import: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 15V3'/><path d='M7 8l5-5 5 5'/><path d='M4 17v3h16v-3'/></g></svg>");
+      --ico-save: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M5 3h11l3 3v15H5z'/><path d='M8 3v5h7V3'/><rect x='8' y='13' width='8' height='5' rx='1'/></g></svg>");
+      --ico-rename: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20h4L19 9l-4-4L4 16z'/><path d='M13 7l4 4'/></g></svg>");
+      --ico-left: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M15 5l-7 7 7 7'/></g></svg>");
+      --ico-right: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M9 5l7 7-7 7'/></g></svg>");
+      --ico-more: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='5.5' cy='12' r='1.2'/><circle cx='12' cy='12' r='1.2'/><circle cx='18.5' cy='12' r='1.2'/></g></svg>");
+      --ico-library: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 4h4v16H4zM10 4h4v16h-4z'/><path d='M16 5l3.5-1 3 15.5-3.5 1z'/></g></svg>");
+      --ico-controller: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><circle cx='8' cy='15' r='1.4'/><circle cx='12' cy='15' r='1.4'/><circle cx='16' cy='15' r='1.4'/><path d='M7 9h10'/></g></svg>");
+      --ico-refresh: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M20 12a8 8 0 1 1-2.3-5.7'/><path d='M20 4v5h-5'/></g></svg>");
+      --ico-copy: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='8' y='8' width='12' height='12' rx='2'/><path d='M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2'/></g></svg>");
+      --ico-power: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v8'/><path d='M6.6 6.6a8 8 0 1 0 10.8 0'/></g></svg>");
+      --ico-close: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M6 6l12 12M18 6L6 18'/></g></svg>");
+      --ico-info: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 11v6'/><path d='M12 7.5h0'/></g></svg>");
+      --ico-bluetooth: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M7 7l10 10-5 4V3l5 4L7 17'/></g></svg>");
       --ico-unknown: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7'/><path d='M12 17h0'/></g></svg>");
       --ico-cap-amp-head: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='7' width='20' height='10' rx='2'/><path d='M2 12h20'/><circle cx='6' cy='14.5' r='0.8'/><circle cx='10' cy='14.5' r='0.8'/><circle cx='14' cy='14.5' r='0.8'/><circle cx='18' cy='14.5' r='0.8'/></g></svg>");
       --ico-cap-amp-combo: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 8h18'/><circle cx='12' cy='14.5' r='4'/></g></svg>");
@@ -696,7 +701,8 @@
       display: grid;
       gap: 14px;
     }
-    .ask-message { white-space: pre-line; color: #e2e2e2; font-size: 14px; line-height: 1.45; }
+    .ask-message { white-space: pre-line; color: #f2f2f2; font-size: 15px; font-weight: 650; line-height: 1.4; }
+    #slotMessage { white-space: normal; }
     .slot-panel { width: min(640px, calc(100vw - 32px)); }
     .slot-list { display: grid; grid-auto-rows: max-content; align-content: start; gap: 6px; max-height: 52vh; overflow: auto; padding-right: 4px; }
     .slot-row {
@@ -717,141 +723,315 @@
       .top-row { grid-template-columns: 1fr; }
       .chain { grid-template-columns: repeat(5, 230px); }
     }
+
+    /* ===================== Layout 1.5: top bar with icons, signal chain, vintage amp and cabinet ===================== */
+    .ico { display: inline-block; width: 20px; height: 20px; flex: none; background: currentColor;
+           -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+    .icon-btn { width: 40px; height: 40px; padding: 0; display: inline-grid; place-items: center; border-radius: 10px;
+                letter-spacing: 0; color: #d6d6d6; flex: none; }
+    .icon-btn:hover { color: #fff; }
+    .icon-btn.small { width: 32px; height: 32px; border-radius: 8px; }
+    .icon-btn.small .ico { width: 16px; height: 16px; }
+    .icon-btn:disabled { opacity: .35; cursor: default; }
+
+    header.topbar { height: auto; min-height: 66px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 12px 24px; }
+    .topbar .brand { display: flex; align-items: baseline; gap: 0; flex: 1 1 0; min-width: 230px; }
+    .topbar .preset-bar { display: flex; align-items: center; gap: 8px; grid-template-columns: none; flex: 0 1 auto; }
+    .topbar .preset-field { position: relative; width: clamp(240px, 26vw, 380px); }
+    .topbar #presetSelect { height: 44px; padding: 0 34px 0 14px; font-size: 16px; font-weight: 650; border-radius: 11px; background: #121416; }
+    .dirty-dot { position: absolute; right: 30px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%;
+                 background: #ffb02e; box-shadow: 0 0 8px #ffb02e; pointer-events: none; }
+    .dirty-dot[hidden] { display: none; }
+    .save-btn { width: auto; min-width: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 11px; }
+    .save-btn.dirty { background: linear-gradient(#4be664, #2fb648); color: #06150a; border-color: #2fb648; }
+    .save-btn.dirty:hover { color: #000; border-color: #8cf59b; }
+    .save-btn .btn-label { font-size: 11px; letter-spacing: .08em; }
+    .save-btn .btn-label:empty { display: none; }
+    .save-btn.save-ok { background: #0e1f12; color: #45F862; }
+    .save-btn.save-error { background: #2a1010; color: #ff8c8c; border-color: #e07070; }
+    .topbar .tools { display: flex; align-items: center; gap: 8px; flex: 1 1 0; justify-content: flex-end; }
+    .tool-sep { width: 1px; height: 26px; background: #2b2f33; margin: 0 4px; }
+    .conn-btn { height: 40px; display: inline-flex; align-items: center; gap: 9px; padding: 0 14px; border-radius: 10px;
+                font-size: 12px; letter-spacing: .06em; text-transform: none; max-width: 240px; }
+    .conn-btn #status { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conn-btn.connected { background: #0e1f12; border-color: #1d4d27; color: #c8f0cf; }
+    .more { position: relative; }
+    .more-menu { position: absolute; right: 0; top: 46px; z-index: 30; display: grid; gap: 4px; min-width: 230px; padding: 6px;
+                 background: #121416; border: 1px solid #2e3236; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.6); }
+    .more-menu[hidden] { display: none; }
+    .more-menu button { display: flex; align-items: center; gap: 10px; text-align: left; border: 0; background: transparent; font-size: 13px; padding: 9px 12px; border-radius: 8px; }
+    .more-menu .ico { width: 16px; height: 16px; opacity: .8; }
+    .more-menu button:hover { background: #1d2024; }
+
+    main { padding: 18px 24px 24px; gap: 16px; }
+
+    /* signal chain, Neural style: filled = on, outline = off, dashed = empty */
+    .signal-chain { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 6px;
+                    padding: 16px 20px 12px; border: 1px solid var(--border); border-radius: 14px; overflow-x: auto;
+                    background: linear-gradient(180deg, rgba(20, 22, 24, .95), rgba(10, 11, 12, .95)); }
+    .sc-node { position: relative; z-index: 1; display: grid; justify-items: center; gap: 6px; flex: 0 0 88px; cursor: pointer; user-select: none; }
+    .sc-node.wide { flex: 0 1 170px; min-width: 128px; }
+    .signal-chain::before { content: ""; position: absolute; top: 45px; left: 42px; right: 42px; height: 2px; background: #2c3136; }
+    .sc-tile { width: 60px; height: 60px; border-radius: 14px; display: grid; place-items: center; position: relative;
+               background: #15181b; border: 1.5px solid #3a3f45; color: #9aa0a6; transition: transform .12s, box-shadow .12s; }
+    .sc-node:hover .sc-tile { transform: translateY(-2px); }
+    .sc-tile .ico { width: 28px; height: 28px; }
+    .sc-node.wide .sc-tile { width: 100%; justify-content: start; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; padding: 0 12px; }
+    .sc-node.wide .sc-tile .nm { font-size: 12px; font-weight: 650; line-height: 1.2; text-align: left; overflow: hidden;
+               display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; letter-spacing: .01em; }
+    .sc-tile.on { background: var(--c); border-color: var(--c); color: var(--ink, #0b0b0b); box-shadow: 0 0 16px color-mix(in srgb, var(--c) 40%, transparent); }
+    .sc-tile.off { border-color: color-mix(in srgb, var(--c) 70%, #000); color: color-mix(in srgb, var(--c) 80%, #000); }
+    .sc-tile.empty { border-style: dashed; color: #4a4f55; }
+    .sc-tile.io { width: 38px; height: 38px; margin-top: 11px; border-radius: 50%; font-size: 10px; font-weight: 750; letter-spacing: .08em; color: #8e9297; }
+    .sc-node.io { flex: 0 0 44px; cursor: default; }
+    .sc-lbl { font-size: 10px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+    .sc-sub { font-size: 11.5px; line-height: 1.25; color: #c9cdd1; max-width: 100%; min-height: 2.5em; text-align: center; overflow: hidden;
+              display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+    /* a block lights up in its colour when its tile in the signal chain is clicked */
+    .flash { animation: flash 1.2s ease-out; }
+    @keyframes flash {
+      0%, 25% { box-shadow: 0 0 0 2px var(--flash, #fff), 0 0 36px 4px color-mix(in srgb, var(--flash, #fff) 60%, transparent),
+                            inset 0 0 28px color-mix(in srgb, var(--flash, #fff) 28%, transparent); }
+      100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, inset 0 0 0 transparent; }
+    }
+
+    /* top row: capture + amp, cab, gate */
+    .top-row { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.15fr) 178px; gap: 16px; }
+    .top-card { padding: 14px 16px 16px; border-radius: 14px; }
+    .top-card .block-head { margin-bottom: 10px; min-height: 32px; }   /* same height with and without the library button */
+    .head-actions { display: flex; align-items: center; gap: 8px; }
+    #captureSelect, #irSelect { border-radius: 10px; }
+
+    /* Capture: dark amp front - grille with the capture name as name plate, control panel with cream knobs and jewel light */
+    .amp-face { position: relative; margin-top: 12px; padding: 14px; border-radius: 14px; border: 1px solid #2a2e33;
+      background: linear-gradient(#1c1e21, #141618); box-shadow: inset 0 0 0 6px #121315, inset 0 0 0 7px #2a2e33; }
+    .amp-grille { height: 68px; border-radius: 8px; display: grid; place-items: center;
+      background: repeating-linear-gradient(45deg, #1f2226 0 2px, #17191c 2px 5px), #17191c; }
+    .amp-badge { max-width: 86%; padding: 5px 14px; border-radius: 6px; background: linear-gradient(#e9e3d3, #b9b1a0); color: #1b1b1b;
+      font: italic 700 13px/1.1 Georgia, "Times New Roman", serif; letter-spacing: .02em; box-shadow: 0 2px 6px rgba(0,0,0,.6);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .amp-badge small { font: 700 9px/1 Inter, system-ui, sans-serif; letter-spacing: .14em; color: #5d574b; margin-left: 8px; font-style: normal; vertical-align: 1px; }
+    .amp-panel { margin-top: 10px; border-radius: 8px; padding: 8px 10px; display: grid; grid-template-columns: 22px minmax(0, 1fr) 20px; align-items: center; gap: 8px;
+      background: linear-gradient(#34383d, #22252a 45%, #1b1d21); border-top: 1px solid #4a4f56; }
+    .amp-jacks { display: grid; justify-items: center; }
+    .amp-jacks i { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(#000 35%, #8b9097 40%, #3a3e43 70%); }
+    .amp-jewel { width: 12px; height: 12px; border-radius: 50%; justify-self: end; background: radial-gradient(#ffb3a3, #e0301b 55%, #6e140b); box-shadow: 0 0 10px #ff3b1f; }
+    .amp-face.off .amp-jewel { background: radial-gradient(#6b4a45, #3e1510 55%, #1f0805); box-shadow: none; }
+    .amp-face.off .amp-badge { opacity: .5; }
+    .amp-knobs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; align-items: start; }
+    :is(.amp-knobs, .cab-controls) .knob-param { gap: 2px; }
+    :is(.amp-knobs, .cab-controls) .knob-param .knob { order: 1; }
+    :is(.amp-knobs, .cab-controls) .knob-param .param-name { order: 2; color: #c8ccd1; font-size: 9.5px; letter-spacing: .14em; min-height: 12px; margin-top: 2px; }
+    :is(.amp-knobs, .cab-controls) .knob-param .value-text { order: 3; color: #9aa0a6; font-size: 11px; padding: 0 4px; }
+    /* value ring around a cream cap with a dark pointer */
+    :is(.amp-knobs, .cab-controls) .knob { width: 40px; height: 40px; border: 0; box-shadow: none;
+      background: conic-gradient(from 220deg, #e5e5e5 0 var(--pct), #2b2f34 var(--pct) 73%, transparent 73% 100%); }
+    .amp-knobs .knob.volume { background: conic-gradient(from 220deg, #9aa0a6 0 var(--pct), #2b2f34 var(--pct) 73%, transparent 73% 100%); }
+    :is(.amp-knobs, .cab-controls) .knob::before { content: ""; position: absolute; inset: 6px; border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #f3efe4, #c9c2b2 55%, #8d8676); box-shadow: 0 2px 4px rgba(0,0,0,.7); }
+    :is(.amp-knobs, .cab-controls) .knob::after { z-index: 1; top: 8px; height: 11px; width: 2px; background: #1b1b1b; transform-origin: 50% 12px; }
+    .amp-face.off .amp-knobs { opacity: .45; pointer-events: none; }
+
+    /* Cab: dark speaker cabinet, the cab settings in front of the speaker */
+    .cabinet { position: relative; margin-top: 12px; min-height: 196px; padding: 22px; border-radius: 14px; overflow: hidden; border: 1px solid #2a2e33;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      background: linear-gradient(#1c1e21, #141618); box-shadow: inset 0 0 0 6px #121315, inset 0 0 0 7px #2a2e33; }
+    .cab-grille { position: absolute; inset: 14px; border-radius: 8px; background: repeating-linear-gradient(45deg, #1f2226 0 2px, #17191c 2px 5px); }
+    .cab-cone { position: absolute; left: 50%; top: 42%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; opacity: .8;
+      background: radial-gradient(circle, #2b2f34 0 14%, #15171a 15% 46%, #23262b 47% 49%, #121416 50% 70%, #2a2e33 71% 72%, transparent 73%); }
+    .cabinet.off .cab-cone { opacity: .35; }
+    .cabinet .cab-controls { position: relative; grid-template-columns: repeat(2, minmax(0, 1.15fr)) repeat(3, minmax(0, 1fr)) !important; gap: 8px; align-items: center;
+      padding: 8px 10px; border-radius: 8px; background: linear-gradient(#34383d, #22252a 45%, #1b1d21); border-top: 1px solid #4a4f56; }
+    .cab-controls .placeholder-param { background: rgba(10, 11, 13, .55); border: 1px solid rgba(255,255,255,.06); border-radius: 9px; padding: 7px 6px 6px; gap: 4px; }
+    .cab-note { grid-column: span 2; color: #8e9297; font-size: 11.5px; line-height: 1.35; text-align: center; padding: 0 4px; }
+    .cabinet.off .cab-controls { opacity: .45; pointer-events: none; }
+    .cab-controls .param-name { font-size: 9.5px; color: var(--muted); }
+    .cab-controls select { font-size: 11px; padding: 4px; }
+    .cab-controls .value-text { font-size: 11.5px; text-align: center; color: #e6e6e6; }
+
+    /* start screen while not connected */
+    main { position: relative; }
+    main.offline > *:not(.connect-hero) { opacity: .2; filter: grayscale(1); pointer-events: none; user-select: none; }
+    .connect-hero { position: absolute; inset: 0; z-index: 5; display: grid; justify-items: center; align-content: start; padding: 110px 16px 0; }
+    .connect-hero[hidden] { display: none; }
+    .hero-card { width: min(440px, 100%); text-align: center; padding: 30px 28px 26px; border-radius: 18px; background: rgba(18, 20, 22, .94);
+                 border: 1px solid #2c3035; box-shadow: 0 24px 70px rgba(0, 0, 0, .6); backdrop-filter: blur(14px); }
+    .hero-icon { width: 56px; height: 56px; margin: 0 auto; border-radius: 15px; display: grid; place-items: center; background: #f2f2f2; color: #0d0f11; }
+    .hero-icon .ico { width: 30px; height: 30px; }
+    .hero-card h2 { margin: 16px 0 8px; font-size: 21px; font-weight: 700; letter-spacing: 0; text-transform: none; color: #f2f2f2; }
+    .hero-card p { margin: 0 0 22px; color: #9aa0a6; font-size: 13.5px; line-height: 1.55; }
+    .hero-connect { min-width: 150px; padding: 11px 26px; border-radius: 11px; font-size: 14px; background: #45F862; border-color: #45F862; color: #06150a; }
+    .hero-connect:hover { background: #6dfa84; border-color: #6dfa84; }
+    .hero-connect:disabled { background: #1d4d27; border-color: #1d4d27; color: #c8f0cf; cursor: default; }
+
+    /* dialogs (Apple sheet style): title left, round close button right; Cancel next to the main action */
+    .dlg-title { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: 0; text-transform: none; color: #f2f2f2; }
+    .dlg-sub { margin-top: 6px; color: #9aa0a6; font-size: 13px; font-weight: 400; line-height: 1.45; }
+    .dlg-close { width: 32px; height: 32px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: #1d2024; border-color: #2c3035; color: #c8ccd1; }
+    .dlg-close:hover { background: #2a2e33; border-color: #3a3f45; color: #fff; }
+    .dlg-close .ico { width: 16px; height: 16px; }
+    .tuner-head .fx-icon { width: 30px; height: 30px; }
+    .ask-panel, .lib-panel, .tuner-panel { border-radius: 16px; background: #121416; border-color: #2a2e33; box-shadow: 0 24px 70px rgba(0, 0, 0, .65); }
+    .ask-overlay, .lib-overlay, .tuner-overlay { background: rgba(0, 0, 0, .62); backdrop-filter: blur(6px); }
+    .ask-buttons button.push-left { margin-right: auto; }
+    .dlg-info { color: #9aa0a6; font-size: 13px; line-height: 1.5; }
+    .dlg-info summary { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; color: #c8ccd1; }
+    .dlg-info summary::-webkit-details-marker { display: none; }
+    .dlg-info summary .ico { width: 16px; height: 16px; color: #8e9297; }
+    .dlg-info[open] summary .ico { color: #f2f2f2; }
+    .dlg-info p { margin: 8px 0 0 24px; }
+
+    .gate-card { display: flex; flex-direction: column; }
+    .gate-card .block-head { gap: 8px; }
+    .gate-card #gateParams { flex: 1; display: grid; place-items: center; margin-top: 4px; }
+
+    /* effect blocks: pedal silhouette (or faded photo) in the background */
+    .chain { gap: 14px; }
+    .block { position: relative; overflow: hidden; min-height: 0; padding: 14px 16px 18px; border-radius: 14px; }
+    /* small pedal picture left of the model choice */
+    .model-row { display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 10px; margin-bottom: 14px; }
+    .model-row .model-select { margin-bottom: 0; }
+    .pedal-thumb { width: 46px; height: 62px; overflow: visible; }
+    .pedal-thumb img, .pedal-thumb svg { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
+    .pedal-thumb svg text { display: none; }
+    .pedal-thumb.empty { border: 1.5px dashed #3a3f45; border-radius: 9px; height: 58px; }
+    .block:not(.active) .pedal-thumb img, .block:not(.active) .pedal-thumb svg { filter: grayscale(.55) brightness(.55); }
+    .model-select { margin-bottom: 12px; border-radius: 10px; }
+    .fxp { display: flex; flex-wrap: nowrap; gap: 5px; margin: 0 0 16px; }
+    .fxp button { flex: 1 1 0; padding: 5px 4px; font-size: 10.5px; letter-spacing: .04em; text-transform: none; }
+    .fxp button.original { flex: 0 0 auto; padding: 5px 8px; letter-spacing: .1em; text-transform: uppercase; color: #bfc3c7; }
+    .fxp button.empty { flex: 0 0 24px; padding: 5px 0; color: #5d6267; }
+
+    @media (max-width: 1250px) {
+      .topbar .brand { flex-basis: 100%; }
+      .topbar .tools { flex: 1 1 auto; }
+      .top-row { grid-template-columns: 1fr 1fr; }
+      .gate-card { grid-column: 1 / -1; }
+      .chain .block-title { gap: 8px; }
+      .chain .block-title h2 { letter-spacing: .1em; white-space: nowrap; }
+    }
+    @media (max-width: 860px) {
+      .top-row { grid-template-columns: 1fr; }
+      .cabinet .cab-controls { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    }
+    @media (max-width: 560px) {
+      .amp-knobs { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 8px; }
+    }
+    /* phone (e.g. Bluefy on the iPhone): nothing wider than the screen; the chain and the FX row scroll by themselves */
+    main { grid-template-columns: minmax(0, 1fr); }
+    @media (max-width: 600px) {
+      main { padding: 16px; }
+      header.topbar { padding: 12px 16px; }
+      .topbar .brand { min-width: 0; }
+      .topbar .preset-bar { flex: 1 1 100%; min-width: 0; }
+      .topbar .preset-field { flex: 1 1 auto; width: auto; min-width: 0; }
+      .topbar .tools { flex: 1 1 100%; flex-wrap: wrap; justify-content: flex-start; }
+      .tool-sep { display: none; }
+      .conn-btn { margin-left: auto; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Nano Cortex Editor <span class="unofficial" title="Community project, not affiliated with or endorsed by Neural DSP">Unofficial</span><span id="editorVersion" class="editor-version"></span></h1>
-    <div class="status">
-      <span id="dot" class="dot"></span><span id="status">Disconnected</span>
-      <button id="refreshBtn" class="btn-small">Refresh</button>
-      <button id="disconnectBtn" class="btn-small btn-disconnect">Disconnect</button>
-      <button id="copyLogBtn" class="btn-small">Log kopieren</button>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Nano Cortex Editor</h1><span class="unofficial" title="Community project, not affiliated with or endorsed by Neural DSP">Unofficial</span><span id="editorVersion" class="editor-version"></span>
+    </div>
+    <div class="preset-bar">
+      <button id="presetPrev" class="icon-btn" data-midi-id="preset::prev" data-midi-target='{"kind":"preset","key":"prev"}' title="Previous preset" aria-label="Previous preset"><span class="ico" style="--icon: var(--ico-left)"></span></button>
+      <div class="preset-field"><select id="presetSelect" aria-label="Preset"></select><span id="dirtyDot" class="dirty-dot" title="Unsaved changes" hidden></span></div>
+      <button id="presetNext" class="icon-btn" data-midi-id="preset::next" data-midi-target='{"kind":"preset","key":"next"}' title="Next preset" aria-label="Next preset"><span class="ico" style="--icon: var(--ico-right)"></span></button>
+      <button id="saveBtn" class="icon-btn save-btn" title="Save the preset on the Nano" aria-label="Save"><span class="ico" style="--icon: var(--ico-save)"></span><span id="saveLabel" class="btn-label"></span></button>
+      <button id="renameBtn" class="icon-btn" title="Rename the preset" aria-label="Rename"><span class="ico" style="--icon: var(--ico-rename)"></span></button>
+    </div>
+    <div class="tools">
+      <button id="exportBtn" class="icon-btn" title="Export: save the current preset as a file (to keep or to share)" aria-label="Export"><span class="ico" style="--icon: var(--ico-export)"></span></button>
+      <button id="importBtn" class="icon-btn" title="Import: load a preset file into the current preset (or drop the file on the window)" aria-label="Import"><span class="ico" style="--icon: var(--ico-import)"></span></button>
+      <input id="importFile" type="file" accept=".json,application/json" hidden>
+      <span class="tool-sep"></span>
+      <button id="tunerBtn" class="icon-btn" data-midi-id="tuner::" data-midi-target='{"kind":"tuner"}' title="Tuner" aria-label="Tuner"><span class="ico" style="--icon: var(--ico-tuner)"></span></button>
+      <button id="expBtn" class="icon-btn" title="Expression pedal assignments" aria-label="Expression"><span class="ico" style="--icon: var(--ico-exp)"></span></button>
+      <button id="midiBtn" class="icon-btn" title="MIDI controller and MIDI Learn" aria-label="MIDI"><span class="ico" style="--icon: var(--ico-midi)"></span></button>
+      <button id="mc6Btn" class="icon-btn" title="Morningstar MC6 Pro export" aria-label="MC6 Pro export"><span class="ico" style="--icon: var(--ico-controller)"></span></button>
+      <span class="tool-sep"></span>
+      <button id="connectBtn" class="conn-btn" title="Connect to the Nano Cortex"><span id="dot" class="dot"></span><span id="status">Connect</span></button>
+      <div class="more">
+        <button id="moreBtn" class="icon-btn" title="More" aria-label="More"><span class="ico" style="--icon: var(--ico-more)"></span></button>
+        <div id="moreMenu" class="more-menu" hidden>
+          <button id="refreshBtn"><span class="ico" style="--icon: var(--ico-refresh)"></span>Refresh from the Nano</button>
+          <button id="copyLogBtn"><span class="ico" style="--icon: var(--ico-copy)"></span><span id="copyLogLabel">Copy log</span></button>
+          <button id="disconnectBtn" class="btn-disconnect"><span class="ico" style="--icon: var(--ico-power)"></span>Disconnect</button>
+        </div>
+      </div>
     </div>
   </header>
 
   <main>
-    <div id="unsupported" class="unsupported">Web Bluetooth is not available in this browser. Use Chrome or Edge on desktop.</div>
+    <div id="connectHero" class="connect-hero" hidden>
+      <div class="hero-card">
+        <div class="hero-icon"><span class="ico" style="--icon: var(--ico-bluetooth)"></span></div>
+        <h2 id="heroTitle">Connect your Nano Cortex</h2>
+        <p id="heroText">Switch the Nano on and close the Cortex Cloud app (also on your phone) – the Nano takes one Bluetooth
+          connection at a time. A Nano Cortex Controller board can pass the editor through as well.</p>
+        <button id="heroConnect" class="hero-connect">Connect</button>
+      </div>
+    </div>
 
-    <section class="toolbar">
-      <div class="toolbar-actions">
-        <button id="connectBtn" class="primary">Connect</button>
-        <button id="saveBtn" class="primary">Save</button>
-        <button id="renameBtn">Rename</button>
-        <button id="exportBtn" class="tuner-btn midi-btn" title="Save the current preset as a file (to keep or to share)"><span class="fx-icon" style="--icon: var(--ico-export)"></span>Export</button>
-        <button id="importBtn" class="tuner-btn midi-btn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="fx-icon" style="--icon: var(--ico-import)"></span>Import</button>
-        <input id="importFile" type="file" accept=".json,application/json" hidden>
-        <button id="mc6Btn" class="tuner-btn midi-btn" title="Export a bank for the Morningstar MC6 Pro"><span class="fx-icon" style="--icon: var(--ico-export)"></span>MC6 Pro</button>
-        <button id="midiBtn" class="tuner-btn midi-btn"><span class="fx-icon" style="--icon: var(--ico-midi)"></span>MIDI</button>
-        <button id="expBtn" class="tuner-btn exp-btn"><span class="fx-icon" style="--icon: var(--ico-exp)"></span>Expression</button>
-        <button id="tunerBtn" class="tuner-btn" data-midi-id="tuner::" data-midi-target='{"kind":"tuner"}'><span class="fx-icon" style="--icon: var(--ico-tuner)"></span>Tuner</button>
-      </div>
-      <div class="preset-bar">
-        <button id="presetPrev" data-midi-id="preset::prev" data-midi-target='{"kind":"preset","key":"prev"}' class="preset-step" title="Previous preset" aria-label="Previous preset">&#8249;</button>
-        <div class="preset-field"><label for="presetSelect">Preset</label><select id="presetSelect"></select></div>
-        <button id="presetNext" data-midi-id="preset::next" data-midi-target='{"kind":"preset","key":"next"}' class="preset-step" title="Next preset" aria-label="Next preset">&#8250;</button>
-      </div>
-    </section>
+    <section id="signalChain" class="signal-chain" aria-label="Signal chain" title="Click: highlight the block - double-click: switch it on / off"></section>
 
     <section class="top-row">
+      <div class="top-card capture-card" id="captureCard" style="--block-color: var(--white);">
+        <div class="block-head">
+          <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-capture)"></span><h2>Capture</h2></div>
+          <div class="head-actions">
+            <button id="libraryBtn" class="icon-btn small" title="Browse the capture library" aria-label="Library"><span class="ico" style="--icon: var(--ico-library)"></span></button>
+            <div id="captureToggle" class="toggle-switch on" data-midi-id="toggle::capture" data-midi-target='{"kind":"toggle","target":"capture"}'>
+              <div class="toggle-dot"></div>
+            </div>
+          </div>
+        </div>
+        <select id="captureSelect"></select>
+        <div id="currentCaptureText" class="current-item" hidden></div>
+        <div id="ampFace" class="amp-face">
+          <div class="amp-grille"><span id="ampBadge" class="amp-badge">Capture</span></div>
+          <div class="amp-panel">
+            <span class="amp-jacks" title="Input"><i></i></span>
+            <div id="ampKnobs" class="amp-knobs"></div>
+            <span id="ampJewel" class="amp-jewel" title="Capture on"></span>
+          </div>
+        </div>
+        <div hidden>
+          <input id="captureVolumeSlider" type="range" min="-24" max="12" step="0.1" value="0">
+          <div id="captureVolumeValue">0.0 dB</div>
+        </div>
+        <div id="captureExtraParams" class="mini-param-grid"></div>
+      </div>
 
-    <div class="top-card" style="--block-color: var(--white);">
-      <div class="block-head">
-        <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-capture)"></span><h2>Capture</h2></div>
-        <div class="head-actions">
-          <button id="libraryBtn" class="btn-small" title="Browse the capture library">Library</button>
-          <div id="captureToggle" class="toggle-switch on" data-midi-id="toggle::capture" data-midi-target='{"kind":"toggle","target":"capture"}'>
+      <div class="top-card cab-card" id="cabCard" style="--block-color: var(--white);">
+        <div class="block-head">
+          <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-cab)"></span><h2>Cab / IR</h2></div>
+          <div id="cabIRToggle" class="toggle-switch on" data-midi-id="toggle::cab" data-midi-target='{"kind":"toggle","target":"cab"}'>
             <div class="toggle-dot"></div>
           </div>
         </div>
-      </div>
-
-      <select id="captureSelect"></select>
-
-      <div id="currentCaptureText" class="current-item">
-        Current: —
-      </div>
-
-      <div style="margin-top:12px;">
-        <label style="
-          display:block;
-          font-size:11px;
-          letter-spacing:0.12em;
-          text-transform:uppercase;
-          color:#bdbdbd;
-          margin-bottom:6px;
-        ">
-          Capture Volume
-        </label>
-
-        <input
-          id="captureVolumeSlider"
-          data-midi-id="captureVolume::"
-          data-midi-target='{"kind":"captureVolume"}'
-          type="range"
-          min="-24"
-          max="12"
-          step="0.1"
-          value="0"
-          style="width:100%;"
-        >
-
-        <div
-          id="captureVolumeValue"
-          style="
-            margin-top:4px;
-            font-size:12px;
-            color:#d0d0d0;
-            text-align:right;
-          "
-        >
-          0.0 dB
+        <select id="irSelect"></select>
+        <div id="currentIRText" class="current-item" hidden></div>
+        <div id="cabinet" class="cabinet">
+          <div class="cab-grille"></div><span class="cab-cone"></span>
+          <div id="irExtraParams" class="mini-param-grid cab-controls"></div>
         </div>
       </div>
 
-      <div id="captureExtraParams" class="mini-param-grid"></div>
-    </div>
-
-  <div class="top-card" style="--block-color: var(--white);">
-    <div class="block-head">
-      <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-cab)"></span><h2>Cab / IR</h2></div>
-      <div id="cabIRToggle" class="toggle-switch on" data-midi-id="toggle::cab" data-midi-target='{"kind":"toggle","target":"cab"}'>
-        <div class="toggle-dot"></div>
-      </div>
-    </div>
-
-    <select id="irSelect"></select>
-
-    <div id="currentIRText" class="current-item">
-      Current: —
-    </div>
-
-    <div id="irExtraParams" class="mini-param-grid"></div>
-  </div>
-
-  <div class="top-card" style="--block-color: var(--white);">
-    <div class="gate-layout">
-
-      <div>
-        <div class="block-title" style="margin-bottom:10px"><span class="fx-icon" style="--icon: var(--ico-gate)"></span><h2>Gate</h2></div>
-        <div id="gateToggle" class="toggle-switch" data-midi-id="toggle::gate" data-midi-target='{"kind":"toggle","target":"gate"}'>
-          <div class="toggle-dot"></div>
+      <div class="top-card gate-card" id="gateCard" style="--block-color: var(--white);">
+        <div class="block-head">
+          <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-gate)"></span><h2>Gate</h2></div>
+          <div id="gateToggle" class="toggle-switch" data-midi-id="toggle::gate" data-midi-target='{"kind":"toggle","target":"gate"}'>
+            <div class="toggle-dot"></div>
+          </div>
         </div>
+        <div id="gateParams"></div>
       </div>
-
-      <div id="gateParams"></div>
-
-    </div>
-  </div>
-
-</section>
-
-    <section class="amp-panel" style="--block-color: var(--white);">
-      <div class="block-title" style="margin-bottom:14px"><span class="fx-icon" style="--icon: var(--ico-amp)"></span><h2>Amp</h2></div>
-      <div id="ampKnobs" style="display:grid; grid-template-columns: repeat(5, minmax(90px, 1fr)); gap: 14px;"></div>
     </section>
 
-    <div class="chain-title">FX Blocks</div>
     <section class="chain" id="chain"></section>
 
     <footer class="beta-footer">
@@ -878,7 +1058,7 @@
       <div id="slotList" class="slot-list"></div>
       <div id="slotStatus" class="slot-status"></div>
       <div class="ask-buttons">
-        <button type="button" id="slotScan">Check usage (1 min)</button>
+        <button type="button" id="slotScan" class="push-left">Check usage (1 min)</button>
         <button type="button" id="slotCancel">Cancel</button>
         <button type="button" id="slotOk" class="primary">Load</button>
       </div>
@@ -888,10 +1068,13 @@
   <div id="mc6Overlay" class="lib-overlay" hidden>
     <div class="lib-panel mc6-panel" role="dialog" aria-label="Morningstar MC6 Pro export">
       <div class="tuner-head">
-        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-export)"></span><h2 style="margin:0;font-size:13px;letter-spacing:.14em;color:#ececec;text-transform:uppercase;">Morningstar MC6 Pro Export</h2></div>
-        <button id="mc6Close" class="btn-small">Close</button>
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-export)"></span><h2 class="dlg-title">Morningstar MC6 Pro Export</h2></div>
+        <button id="mc6Close" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
       </div>
-      <div class="exp-status">Page 1: A–E = your presets, F = FX page. Page 2: A–E = the five FX slots (on/off), F = back. An expression switch moves the Amount of its FX (the AMOUNT knob) between the Min and Max set under Expression in each preset. To read which FX are on, the export loads each selected preset on the Nano for a moment and then returns to the current one. Connect the MC6 Pro to the Nano via USB (MC6 Pro USB Host port).</div>
+      <details class="dlg-info">
+        <summary><span class="ico" style="--icon: var(--ico-info)"></span>Creates a bank file for the MC6 Pro: your presets on page 1, their five FX slots on page 2.</summary>
+        <p>Page 1: A–E = your presets, F = FX page. Page 2: A–E = the five FX slots (on/off), F = back. An expression switch moves the Amount of its FX (the AMOUNT knob) between the Min and Max set under Expression in each preset. To read which FX are on, the export loads each selected preset on the Nano for a moment and then returns to the current one. Connect the MC6 Pro to the Nano via USB (MC6 Pro USB Host port).</p>
+      </details>
       <div class="midi-options">
         <label>Nano MIDI channel <select id="mc6Channel"></select></label>
         <label>Bank name <input id="mc6BankName" class="lib-search" style="width:180px;padding:7px 10px;font-size:13px" maxlength="16"></label>
@@ -917,8 +1100,8 @@
   <div id="midiOverlay" class="lib-overlay" hidden>
     <div class="lib-panel exp-panel" role="dialog" aria-label="MIDI controller">
       <div class="tuner-head">
-        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-midi)"></span><h2 style="margin:0;font-size:13px;letter-spacing:.14em;color:#ececec;text-transform:uppercase;">MIDI Controller</h2></div>
-        <button id="midiClose" class="btn-small">Close</button>
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-midi)"></span><h2 class="dlg-title">MIDI Controller</h2></div>
+        <button id="midiClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
       </div>
       <div class="lib-filters">
         <div id="midiStatus" class="exp-status"></div>
@@ -943,8 +1126,8 @@
   <div id="expOverlay" class="lib-overlay" hidden>
     <div class="lib-panel exp-panel" role="dialog" aria-label="Expression pedal">
       <div class="tuner-head">
-        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-exp)"></span><h2 id="expTitle" style="margin:0;font-size:13px;letter-spacing:.14em;color:#ececec;text-transform:uppercase;">Expression Pedal</h2></div>
-        <button id="expClose" class="btn-small">Close</button>
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-exp)"></span><h2 id="expTitle" class="dlg-title">Expression Pedal</h2></div>
+        <button id="expClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
       </div>
       <div class="exp-status" id="expHint">Changes are saved directly into this preset on the Nano.</div>
       <div id="expList" class="exp-list"></div>
@@ -955,8 +1138,8 @@
   <div id="libraryOverlay" class="lib-overlay" hidden>
     <div class="lib-panel" role="dialog" aria-label="Capture library">
       <div class="tuner-head">
-        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-capture)"></span><h2 style="margin:0;font-size:13px;letter-spacing:.14em;color:#ececec;text-transform:uppercase;">Capture Library</h2></div>
-        <button id="libraryClose" class="btn-small">Close</button>
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-capture)"></span><h2 class="dlg-title">Capture Library</h2></div>
+        <button id="libraryClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
       </div>
       <input id="librarySearch" class="lib-search" type="search" placeholder="Search name, tag, author …" autocomplete="off">
       <div class="lib-filters">
@@ -973,8 +1156,8 @@
   <div id="tunerOverlay" class="tuner-overlay" hidden>
     <div class="tuner-panel" role="dialog" aria-label="Tuner">
       <div class="tuner-head">
-        <div class="block-title" style="--block-color: #45F862;"><span class="fx-icon" style="--icon: var(--ico-tuner)"></span><h2 style="margin:0;font-size:13px;letter-spacing:.14em;color:#ececec;text-transform:uppercase;">Tuner</h2></div>
-        <button id="tunerClose" class="btn-small">Close</button>
+        <div class="block-title" style="--block-color: #45F862;"><span class="fx-icon" style="--icon: var(--ico-tuner)"></span><h2 class="dlg-title">Tuner</h2></div>
+        <button id="tunerClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
       </div>
       <div id="tunerNote" class="tuner-note">–</div>
       <div>
@@ -1488,7 +1671,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.4.0';
+    const EDITOR_VERSION = '1.5.1';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
 
     const logLines = [];
@@ -1504,21 +1687,33 @@
       const text = logLines.join(String.fromCharCode(10));
       try {
         await navigator.clipboard.writeText(text);
-        $('copyLogBtn').textContent = 'Kopiert (' + logLines.length + ' Zeilen)';
+        $('copyLogLabel').textContent = 'Copied (' + logLines.length + ' lines)';
       } catch (err) {
         const blob = new Blob([text], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = 'nano-log.txt';
         a.click();
-        $('copyLogBtn').textContent = 'Log gespeichert';
+        $('copyLogLabel').textContent = 'Log saved';
       }
-      setTimeout(() => { $('copyLogBtn').textContent = 'Log kopieren'; }, 2000);
+      setTimeout(() => { $('copyLogLabel').textContent = 'Copy log'; }, 2000);
     }
 
     function hex(bytes) { return Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' '); }
     function printableASCII(bytes) { return Array.from(bytes).map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.').join(''); }
-    function setStatus(text, connected = false) { $('status').textContent = text; $('dot').classList.toggle('connected', connected); }
+    function setStatus(text, connected = false) {
+      $('status').textContent = text === 'Disconnected' ? 'Connect' : text;
+      $('dot').classList.toggle('connected', connected);
+      $('connectBtn').classList.toggle('connected', connected);
+      $('connectBtn').title = connected ? text + ' - click for refresh / disconnect' : 'Connect to the Nano Cortex';
+      // Not connected: the editor is dimmed behind a connect card (no made-up values); while connecting it shows the step.
+      $('connectHero').hidden = connected;
+      document.querySelector('main').classList.toggle('offline', !connected);
+      if (navigator.bluetooth) {
+        $('heroConnect').textContent = text === 'Disconnected' ? 'Connect' : text;
+        $('heroConnect').disabled = text !== 'Disconnected';
+      }
+    }
     function bytesFromHex(s) { return new Uint8Array(s.replaceAll(' ', '').match(/.{1,2}/g).map(h => parseInt(h, 16))); }
 
     // BLE writes run strictly one at a time. Writes with a coalesceKey (knob/slider
@@ -3605,9 +3800,9 @@ function parseSelectedCaptureState(payload) {
           resolve(value);
         };
 
-        $('slotMessage').textContent = 'Load "' + itemName + '" into which ' + (isCapture ? 'capture' : 'cab') + ' slot?' + NL +
-          'Presets that use the slot keep their ' + (isCapture ? 'capture' : 'IR') + ' - it then comes from the library. ' +
-          'A free slot keeps the slots of your other presets as they are.';
+        $('slotMessage').innerHTML = '<div class="dlg-title">Load “' + escapeHTML(itemName) + '”</div>' +
+          '<div class="dlg-sub">Choose the ' + (isCapture ? 'capture' : 'cab') + ' slot. Presets that use the slot keep their ' +
+          (isCapture ? 'capture' : 'IR') + ' – it then comes from the library. A free slot keeps the slots of your other presets as they are.</div>';
         $('slotStatus').textContent = state.slotUsage ? 'Which presets use which slot: checked in this session.' : '';
         $('slotOk').onclick = () => finish(selected);
         $('slotCancel').onclick = () => finish(null);
@@ -3780,8 +3975,8 @@ function parseSelectedCaptureState(payload) {
     // Shows the save result on the Save button for a few seconds (details in its tooltip and in the log).
     function showSaveResult(text, kind, detail) {
       const btn = $('saveBtn');
-      btn.textContent = text;
-      btn.title = detail || '';
+      $('saveLabel').textContent = text === 'Save' ? '' : text;
+      btn.title = detail || 'Save the preset on the Nano';
       btn.classList.toggle('save-ok', kind === 'ok');
       btn.classList.toggle('save-error', kind === 'error');
       if (detail) log('Save: ' + detail);
@@ -3834,6 +4029,8 @@ function parseSelectedCaptureState(payload) {
 
       slider.value = Number(db).toFixed(1);
       value.textContent = Number(db).toFixed(1) + ' dB';
+      const knob = $('captureVolumeKnob');
+      if (knob) updateKnobVisual(knob, $('captureVolumeKnobValue'), (Number(db) + 24) / 36, (Number(db) > 0 ? '+' : '') + Number(db).toFixed(1) + ' dB');
     }
 
     async function setCaptureVolumeDb(db) {
@@ -4114,6 +4311,8 @@ function parseSelectedCaptureState(payload) {
     }
 
     function renderPresetSelect() {
+      $('dirtyDot').hidden = !(state.connected && state.presetDirty);
+      $('saveBtn').classList.toggle('dirty', Boolean(state.connected && state.presetDirty));
       const select = $('presetSelect');
       select.innerHTML = '';
       for (let i = 1; i <= 64; i++) {
@@ -4289,11 +4488,10 @@ function parseSelectedCaptureState(payload) {
     ir.style.opacity = state.cabIR.on ? '1' : '0.35';
 
     const captureVolSlider = $('captureVolumeSlider');
-    if (captureVolSlider) {
-      captureVolSlider.disabled = !state.capture.on;
-      const captureVolWrap = captureVolSlider.closest('.placeholder-param') || captureVolSlider.parentElement;
-      if (captureVolWrap) captureVolWrap.style.opacity = state.capture.on ? '1' : '0.35';
-    }
+    if (captureVolSlider) captureVolSlider.disabled = !state.capture.on;
+    updateAmpFace();
+    $('cabinet').classList.toggle('off', !state.cabIR.on);
+    renderSignalChain();
     }
     
     function renderCaptureIRExtraParams() {
@@ -4332,35 +4530,89 @@ function parseSelectedCaptureState(payload) {
       const on = state.cabIR.on;
 
       box.innerHTML = '';
-      box.style.gridTemplateColumns = 'repeat(5, minmax(70px, 1fr))';
+      box.style.gridTemplateColumns = '';
 
-      box.appendChild(renderSmallSelect('Mic', 'cabMicSelect', [
-        'Condenser 184',
-        'Condenser 414',
-        'Dynamic 421',
-        'Dynamic 57',
-        'Ribbon 160'
-      ], isFactory && on, state.cabIR.mic, value => {
-        setCabIRMicPosition(value, state.cabIR.position);
-      }));
+      // Mic and position exist only for the factory cabs; for own IRs a note takes their place.
+      if (isFactory) {
+        box.appendChild(renderSmallSelect('Mic', 'cabMicSelect', [
+          'Condenser 184',
+          'Condenser 414',
+          'Dynamic 421',
+          'Dynamic 57',
+          'Ribbon 160'
+        ], on, state.cabIR.mic, value => {
+          setCabIRMicPosition(value, state.cabIR.position);
+        }));
 
-      box.appendChild(renderSmallSelect('Position', 'cabPositionSelect', [
-        '1', '2', '3', '4', '5', '6'
-      ], isFactory && on, String(state.cabIR.position || 1), value => {
-        setCabIRMicPosition(state.cabIR.mic, Number(value));
-      }));
+        box.appendChild(renderSmallSelect('Position', 'cabPositionSelect', [
+          '1', '2', '3', '4', '5', '6'
+        ], on, String(state.cabIR.position || 1), value => {
+          setCabIRMicPosition(state.cabIR.mic, Number(value));
+        }));
+      } else {
+        const note = document.createElement('div');
+        note.className = 'cab-note';
+        note.textContent = 'Mic and position: factory cabs only';
+        box.appendChild(note);
+      }
 
-      box.appendChild(renderVerticalSlider('Level', 'cabLevelSlider', -96, 12, 0.1, 'dB', state.cabIR.levelDb, value => {
-        setCabIRLevelDb(value);
-      }, on));
+      box.appendChild(renderCabKnob('Level', 'level', state.cabIR.levelDb, setCabIRLevelDb));
+      box.appendChild(renderCabKnob('High Pass', 'highPass', state.cabIR.highPassHz, setCabIRHighPassHz));
+      box.appendChild(renderCabKnob('Low Pass', 'lowPass', state.cabIR.lowPassHz, setCabIRLowPassHz));
+    }
 
-      box.appendChild(renderVerticalSlider('High Pass', 'cabHighPassSlider', 20, 800, 1, 'Hz', state.cabIR.highPassHz, value => {
-        setCabIRHighPassHz(value);
-      }, on));
+    const CAB_RANGES = { level: [-96, 12, 0.1], highPass: [20, 800, 1], lowPass: [1000, 20000, 1] };
 
-      box.appendChild(renderVerticalSlider('Low Pass', 'cabLowPassSlider', 1000, 20000, 1, 'Hz', state.cabIR.lowPassHz, value => {
-        setCabIRLowPassHz(value);
-      }, on));
+    function formatCabValue(key, value) {
+      if (key === 'level') return (value > 0 ? '+' : '') + Number(value).toFixed(1) + ' dB';
+      return value >= 1000 ? (value / 1000).toFixed(1) + ' kHz' : Math.round(value) + ' Hz';
+    }
+
+    // Cab level / high pass / low pass as cream knobs like on the amp: drag, scroll, or click the value to type it.
+    function renderCabKnob(label, key, value, onChange) {
+      const [min, max, step] = CAB_RANGES[key];
+      const p = document.createElement('div');
+      p.className = 'knob-param';
+      p.innerHTML = '<div class="param-name">' + label + '</div>';
+      const knobEl = document.createElement('div');
+      knobEl.className = 'knob';
+      knobEl.id = 'cab-' + key;
+      tagMidi(knobEl, { kind: 'cab', key });
+      knobEl.title = 'Drag for coarse adjustment, scroll for fine adjustment';
+      const valueEl = document.createElement('div');
+      valueEl.className = 'value-text';
+      p.appendChild(knobEl);
+      p.appendChild(valueEl);
+
+      let current = Number(value);
+      const show = () => updateKnobVisual(knobEl, valueEl, (current - min) / (max - min), formatCabValue(key, current));
+      const apply = next => {
+        const v = roundToStep(clamp(next, min, max), step);
+        if (v === current) return;
+        current = v;
+        show();
+        onChange(v);
+      };
+      const fine = (max - min) / 200;
+      knobEl.addEventListener('wheel', e => { e.preventDefault(); apply(current + (e.deltaY < 0 ? fine : -fine)); }, { passive: false });
+      knobEl.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        const startY = e.clientY, start = current;
+        const onMove = m => apply(start + ((startY - m.clientY) / 95) * (max - min));
+        const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
+      });
+      valueEl.addEventListener('click', async () => {
+        const unit = key === 'level' ? 'dB' : 'Hz';
+        const entered = await askText(label + ' in ' + unit + ' (' + min + ' to ' + max + ')', String(current));
+        if (entered === null) return;
+        const number = Number(String(entered).replace(',', '.').replace(/k(hz)?$/i, '000'));
+        if (!Number.isNaN(number)) apply(number);
+      });
+      show();
+      return p;
     }
 
     function renderSmallSelect(label, id, options, enabled, selectedValue, onChange) {
@@ -4397,54 +4649,6 @@ function parseSelectedCaptureState(payload) {
       return wrap;
     }
 
-    function renderVerticalSlider(label, id, min, max, step, unit, value, onChange, enabled) {
-      const wrap = document.createElement('div');
-      wrap.className = 'placeholder-param';
-      wrap.style.opacity = enabled === false ? '0.35' : '1';
-      wrap.style.pointerEvents = enabled === false ? 'none' : 'auto';
-
-      const name = document.createElement('div');
-      name.className = 'param-name';
-      name.textContent = label;
-
-      const slider = document.createElement('input');
-      slider.id = id;
-      const cabKey = { cabLevelSlider: 'level', cabHighPassSlider: 'highPass', cabLowPassSlider: 'lowPass' }[id];
-      if (cabKey) tagMidi(slider, { kind: 'cab', key: cabKey });
-      slider.type = 'range';
-      slider.min = min;
-      slider.max = max;
-      slider.step = step;
-      slider.value = value;
-      slider.disabled = enabled === false;
-      slider.style.width = '90px';
-
-      const valueText = document.createElement('div');
-      valueText.className = 'value-text';
-      valueText.textContent = formatCabIRSliderValue(value, unit, step);
-
-      slider.addEventListener('input', () => {
-        valueText.textContent = formatCabIRSliderValue(slider.value, unit, step);
-        if (enabled === false || !onChange) return;
-        onChange(Number(slider.value));
-      });
-
-      slider.addEventListener('change', () => {
-        if (enabled === false || !onChange) return;
-        onChange(Number(slider.value));
-      });
-
-      wrap.appendChild(name);
-      wrap.appendChild(slider);
-      wrap.appendChild(valueText);
-      return wrap;
-    }
-
-    function formatCabIRSliderValue(value, unit, step) {
-      const decimals = decimalsFromStep(step || 1);
-      return Number(value).toFixed(decimals) + ' ' + unit;
-    }
-
 function renderGate() {
       const gate = $('gateToggle');
       gate.classList.toggle('on', state.gate.on);
@@ -4457,6 +4661,7 @@ function renderGate() {
       const box = $('gateParams');
       box.innerHTML = '';
       box.appendChild(renderParam('gate', state.gate.params[0], 'var(--white)', true, state.gate));
+      renderSignalChain();
     }
 
     function renderParam(blockKey, param, color, canSend, block = null) {
@@ -4622,6 +4827,64 @@ function renderGate() {
       if (!box) return;
       box.innerHTML = '';
       AMP_KNOBS.forEach(k => box.appendChild(renderAmpKnob(k.key, k.label)));
+      box.appendChild(renderCaptureVolumeKnob());
+      updateAmpFace();
+    }
+
+    const ampText = raw => (clamp(raw, 0, 255) / 25.5).toFixed(1);   // 0-10, as on an amp
+
+    // The vintage amp: name plate = capture, jewel light = capture on.
+    function updateAmpFace() {
+      const face = $('ampFace');
+      if (!face) return;
+      face.classList.toggle('off', !state.capture.on);
+      const name = state.currentCapture.name || 'Capture';
+      $('ampBadge').innerHTML = state.capture.on
+        ? escapeHTML(name) + (state.currentCapture.inBank ? '' : '<small>LIBRARY</small>')
+        : 'Bypassed';
+      $('ampBadge').title = state.capture.on ? name : 'Capture bypassed';
+      $('ampJewel').title = state.capture.on ? 'Capture on' : 'Capture bypassed';
+    }
+
+    // Capture volume (-24 to +12 dB) as the master knob of the amp; the hidden slider stays the value store.
+    function renderCaptureVolumeKnob() {
+      const p = document.createElement('div');
+      p.className = 'knob-param';
+      p.innerHTML = '<div class="param-name">Volume</div>';
+      const knobEl = document.createElement('div');
+      knobEl.className = 'knob volume';
+      knobEl.id = 'captureVolumeKnob';
+      tagMidi(knobEl, { kind: 'captureVolume' });
+      knobEl.title = 'Capture volume - drag or scroll';
+      const value = document.createElement('div');
+      value.className = 'value-text';
+      value.id = 'captureVolumeKnobValue';
+      p.appendChild(knobEl);
+      p.appendChild(value);
+      const db = () => Number($('captureVolumeSlider').value);
+      const apply = next => {
+        const v = Math.round(clamp(next, -24, 12) * 10) / 10;
+        if (v === db()) return;
+        setCaptureVolumeUI(v);
+        setCaptureVolumeDb(v);
+      };
+      knobEl.addEventListener('wheel', e => { e.preventDefault(); apply(db() + (e.deltaY < 0 ? 0.5 : -0.5)); }, { passive: false });
+      knobEl.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        const startY = e.clientY, start = db();
+        const onMove = m => apply(start + ((startY - m.clientY) / 95) * 36);
+        const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
+      });
+      value.addEventListener('click', async () => {
+        const entered = await askText('Capture volume in dB (-24 to +12)', db().toFixed(1));
+        if (entered === null || Number.isNaN(Number(entered))) return;
+        apply(Number(entered));
+      });
+      updateKnobVisual(knobEl, value, (db() + 24) / 36, (db() > 0 ? '+' : '') + db().toFixed(1) + ' dB');
+      return p;
     }
 
     function renderAmpKnob(key, label) {
@@ -4648,20 +4911,20 @@ function renderGate() {
 
       const value = document.createElement('div');
       value.className = 'value-text';
-      value.textContent = Math.round((raw / 255) * 100) + '%';
+      value.textContent = ampText(raw);
       value.addEventListener('click', async () => {
-        const entered = await askText('Enter value for ' + label + ' (0 to 100%)', String(Math.round((state.amp[key] / 255) * 100)));
+        const entered = await askText('Enter value for ' + label + ' (0 to 10)', ampText(state.amp[key]));
         if (entered === null) return;
-        const pctValue = clamp(Number(entered), 0, 100);
-        if (Number.isNaN(pctValue)) return;
-        applyRaw((pctValue / 100) * 255);
+        const amount = clamp(Number(String(entered).replace(',', '.')), 0, 10);
+        if (Number.isNaN(amount)) return;
+        applyRaw(amount * 25.5);
       });
 
       const applyRaw = newRaw => {
         const next = clamp(Math.round(newRaw), 0, 255);
         if (next === state.amp[key]) return;
         state.amp[key] = next;
-        updateKnobVisual(knobEl, value, next / 255, Math.round((next / 255) * 100) + '%');
+        updateKnobVisual(knobEl, value, next / 255, ampText(next));
         setAmpKnob(key, next);
       };
 
@@ -4838,6 +5101,7 @@ function renderGate() {
       const style = fxStyle(block.models.find(m => m.name === block.model));
       const el = document.createElement('div');
       el.className = 'block ' + (block.on ? 'active' : '');
+      el.id = 'block-' + key;
       el.style.setProperty('--block-color', style.color);
       el.style.setProperty('--icon-ink', iconInk(style.color));
 
@@ -4896,31 +5160,30 @@ function renderGate() {
         if (selected && selected.id) setFXModel(key, e.target.value);
       });
 
-      el.appendChild(select);
-
-      
-      // Pedal picture: your own image from img/ if available, otherwise a drawn, brand-free pedal.
+      // Small pedal picture left of the model choice: your own image from img/ if available, otherwise a drawn, brand-free pedal.
+      const modelRow = document.createElement('div');
+      modelRow.className = 'model-row';
+      const thumb = document.createElement('div');
+      thumb.className = 'pedal-thumb' + (block.model === 'None' ? ' empty' : '');
       if (block.model !== 'None') {
-        const imgWrap = document.createElement('div');
-        imgWrap.className = 'pedal-picture';
-        const showGraphic = () => { imgWrap.innerHTML = pedalGraphicSVG(key, block, style); };
+        thumb.title = block.model;
+        const showGraphic = () => { thumb.innerHTML = pedalGraphicSVG(key, block, style); };
         const picture = typeof MODEL_IMAGES !== 'undefined' && MODEL_IMAGES[block.model];
         if (picture) {
           const img = document.createElement('img');
           img.src = picture;
           img.alt = block.model;
           img.onerror = showGraphic;
-          imgWrap.appendChild(img);
+          thumb.appendChild(img);
         } else {
           showGraphic();
         }
-        el.appendChild(imgWrap);
       }
+      modelRow.appendChild(thumb);
+      modelRow.appendChild(select);
+      el.appendChild(modelRow);
 
-      const div = document.createElement('div');
-      div.className = 'divider';
-      el.appendChild(div);
-
+      
       if (FX_BLOCK_KEYS.includes(key) && block.model !== 'None') el.appendChild(renderFxPresets(key, block));
 
       const grid = document.createElement('div');
@@ -4991,7 +5254,7 @@ function renderGate() {
       box.className = 'fxp';
       const original = document.createElement('button');
       original.className = 'original' + (block.fxPresetActive === 0 ? ' active' : '');
-      original.textContent = 'ORIGINAL';
+      original.textContent = 'Orig';
       original.title = 'Back to the settings the effect had when they were read from the Nano';
       original.disabled = !block.originalFloats || block.originalModel !== block.model;
       original.addEventListener('click', () => applyFxPreset(blockKey, block.originalFloats, 0));
@@ -4999,7 +5262,7 @@ function renderGate() {
       fxPresetsOf(block.model).forEach((preset, i) => {
         const btn = document.createElement('button');
         btn.className = (preset ? '' : 'empty') + (preset && block.fxPresetActive === i + 1 ? ' active' : '');
-        btn.textContent = preset ? preset.name : '+ Save';
+        btn.textContent = preset ? preset.name : '+';
         btn.title = preset ? 'Load "' + preset.name + '" - right-click or hold to save over it, rename or delete'
                            : 'Save the current settings here';
         let held = false, timer = null;
@@ -5342,6 +5605,67 @@ function renderGate() {
       $('importFile').click();
     }
 
+    // ---- Signal chain overview (Neural style) ----
+    // Filled tile = on, outline = off, dashed = empty slot. Click: the block lights up in its colour (the page does not
+    // scroll, so a double-click stays on the tile); double-click: switch it on / off.
+    function renderSignalChain() {
+      const box = $('signalChain');
+      if (!box) return;
+      const slotLabel = slot => (slot ? Math.floor((slot - 1) / 5) + 1 + '-' + ((slot - 1) % 5 + 1) : '');
+      const fx = key => {
+        const block = state.blocks[key];
+        const model = block.models.find(m => m.name === block.model);
+        const style = fxStyle(model);
+        return { key, label: block.title, sub: block.model === 'None' ? 'empty' : block.model, icon: style.icon, color: style.color,
+          state: block.model === 'None' ? 'empty' : block.on ? 'on' : 'off', target: 'block-' + key,
+          toggle: () => { const t = document.querySelector('#block-' + key + ' > .block-head .toggle-switch'); if (t) t.click(); } };
+      };
+      const nodes = [
+        { io: 'IN' },
+        { key: 'gate', label: 'Gate', sub: state.gate.params[0] ? Math.round(state.gate.params[0].value) + ' %' : '', icon: 'gate', color: '#F2F2F2',
+          state: state.gate.on ? 'on' : 'off', target: 'gateCard', toggle: () => $('gateToggle').click() },
+        fx('pre1'), fx('pre2'),
+        { key: 'capture', wide: true, label: 'Capture' + (state.capture.on && state.capture.activeSlot ? ' · ' + slotLabel(state.capture.activeSlot) : ''),
+          name: state.capture.on ? state.currentCapture.name || 'Capture' : 'Bypassed', icon: 'capture', color: '#F2F2F2',
+          state: state.capture.on ? 'on' : 'off', target: 'captureCard', toggle: () => $('captureToggle').click() },
+        { key: 'cab', wide: true, label: 'Cab' + (state.cabIR.on && state.cabIR.stateSlot ? ' · ' + state.cabIR.stateSlot : ''),
+          name: state.cabIR.on ? state.currentIR.shortName || 'Cab / IR' : 'Bypassed', icon: 'cab', color: '#F2F2F2',
+          state: state.cabIR.on ? 'on' : 'off', target: 'cabCard', toggle: () => $('cabIRToggle').click() },
+        fx('post1'), fx('post2'), fx('post3'),
+        { io: 'OUT' }
+      ];
+      box.innerHTML = '';
+      nodes.forEach(n => {
+        const node = document.createElement('div');
+        if (n.io) {
+          node.className = 'sc-node io';
+          node.innerHTML = '<div class="sc-tile io">' + n.io + '</div>';
+          box.appendChild(node);
+          return;
+        }
+        node.className = 'sc-node' + (n.wide ? ' wide' : '');
+        const icon = n.icon ? '<span class="ico" style="--icon: var(--ico-' + n.icon + ')"></span>' : '';
+        node.innerHTML = '<div class="sc-tile ' + n.state + '" style="--c:' + n.color + ';--ink:' + iconInk(n.color) + '">' + icon +
+          (n.wide ? '<span class="nm">' + escapeHTML(n.name) + '</span>' : '') + '</div>' +
+          '<span class="sc-lbl">' + escapeHTML(n.label) + '</span>' + (n.wide ? '' : '<span class="sc-sub">' + escapeHTML(n.sub || '') + '</span>');
+        node.title = n.label + (n.wide ? ': ' + n.name : n.sub ? ': ' + n.sub : '') + ' - double-click: on / off';
+        node.addEventListener('click', () => {
+          const target = $(n.target);
+          if (!target) return;
+          target.style.setProperty('--flash', n.color);
+          target.classList.remove('flash');
+          void target.offsetWidth;
+          target.classList.add('flash');
+        });
+        node.addEventListener('dblclick', e => {
+          e.preventDefault();
+          if (n.state === 'empty') return;
+          n.toggle();
+        });
+        box.appendChild(node);
+      });
+    }
+
     function render() {
       renderPresetSelect();
       renderCaptureIR();
@@ -5350,6 +5674,7 @@ function renderGate() {
       const chain = $('chain');
       chain.innerHTML = '';
       Object.entries(state.blocks).forEach(([key, block]) => chain.appendChild(renderBlock(key, block)));
+      renderSignalChain();
     }
 
     function disconnect() {
@@ -5360,7 +5685,15 @@ function renderGate() {
       }
     }
 
-    $('connectBtn').addEventListener('click', connectAll);
+    $('connectBtn').addEventListener('click', () => { if (state.connected) toggleMoreMenu(); else connectAll(); });
+    function toggleMoreMenu(open) {
+      const menu = $('moreMenu');
+      menu.hidden = open === undefined ? !menu.hidden : !open;
+    }
+    $('moreBtn').addEventListener('click', e => { e.stopPropagation(); toggleMoreMenu(); });
+    $('connectBtn').addEventListener('click', e => e.stopPropagation());
+    $('moreMenu').addEventListener('click', e => { if (e.target.closest('button')) toggleMoreMenu(false); });
+    document.addEventListener('click', e => { if (!$('moreMenu').hidden && !e.target.closest('.more')) toggleMoreMenu(false); });
     $('refreshBtn').addEventListener('click', refreshLists);
     $('disconnectBtn').addEventListener('click', disconnect);
     $('saveBtn').addEventListener('click', savePreset);
@@ -5982,7 +6315,7 @@ function renderGate() {
         const raw = Math.round(v * 255);
         if (raw === state.amp[t.key]) return;
         state.amp[t.key] = raw;
-        if (el && valueEl) updateKnobVisual(el, valueEl, raw / 255, Math.round(raw / 255 * 100) + '%');
+        if (el && valueEl) updateKnobVisual(el, valueEl, raw / 255, ampText(raw));
         setAmpKnob(t.key, raw);
         return;
       }
@@ -6010,14 +6343,11 @@ function renderGate() {
       }
 
       if (t.kind === 'cab') {
-        const range = { level: [-96, 12, 0.1, 'dB', setCabIRLevelDb], highPass: [20, 800, 1, 'Hz', setCabIRHighPassHz], lowPass: [1000, 20000, 1, 'Hz', setCabIRLowPassHz] }[t.key];
-        const value = roundToStep(range[0] + v * (range[1] - range[0]), range[2]);
-        if (el) {
-          el.value = value;
-          const text = el.parentElement.querySelector('.value-text');
-          if (text) text.textContent = formatCabIRSliderValue(value, range[3], range[2]);
-        }
-        range[4](value);
+        const [min, max, step] = CAB_RANGES[t.key];
+        const value = roundToStep(min + v * (max - min), step);
+        const text = el && el.parentElement.querySelector('.value-text');
+        if (el && text) updateKnobVisual(el, text, (value - min) / (max - min), formatCabValue(t.key, value));
+        ({ level: setCabIRLevelDb, highPass: setCabIRHighPassHz, lowPass: setCabIRLowPassHz })[t.key](value);
       }
     }
 
@@ -6174,7 +6504,13 @@ function renderGate() {
     loadMidiSettings();
     if (Object.keys(state.midi.map).length || state.midi.pcToPreset) initMidi();
 
-    if (!navigator.bluetooth) $('unsupported').style.display = 'block';
+    if (!navigator.bluetooth) {
+      $('heroTitle').textContent = 'No Bluetooth in this browser';
+      $('heroText').textContent = 'Open the editor in Chrome or Edge on the computer, or in the Bluefy browser on the iPhone / iPad. Safari and Firefox have no Web Bluetooth.';
+      $('heroConnect').hidden = true;
+    }
+    $('heroConnect').addEventListener('click', () => $('connectBtn').click());
+    setStatus('Disconnected');
 
     render();
     log('Prototype loaded.');
