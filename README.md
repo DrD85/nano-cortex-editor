@@ -1,7 +1,7 @@
 # Nano Cortex Editor (unofficial)
 
 A desktop editor for the **Neural DSP Nano Cortex** that talks to the pedal over Bluetooth.
-It runs in Chrome/Edge (Web Bluetooth) or as a Mac app.
+It runs in Chrome/Edge (Web Bluetooth) or as a Mac app. Make sure the Nano Cortex has Nano Cortex in its name to avoid connection issues!
 
 > **Unofficial community project.** Not affiliated with, endorsed by or supported by Neural DSP.
 > "Nano Cortex", "Quad Cortex" and "Neural DSP" are trademarks of Neural DSP Technologies.
