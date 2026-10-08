@@ -66,6 +66,10 @@ function createWindow() {
     minHeight: 640,
     title: 'Nano Cortex Editor',
     backgroundColor: '#000000',
+    // No title bar: the window buttons sit in the editor's top bar (the page leaves room for them and lets the
+    // bar move the window), centred on its first row.
+    titleBarStyle: 'hiddenInset',
+    trafficLightPosition: { x: 20, y: 27 },
     webPreferences: {
       contextIsolation: true,
       sandbox: true
@@ -108,6 +112,12 @@ function createWindow() {
     const saved = Number(readSettings().zoom);
     if (ZOOM_STEPS.includes(saved)) win.webContents.setZoomFactor(saved);
   });
+
+  // In full screen the window buttons are hidden, so the top bar needs no room for them.
+  const markFullScreen = on => win.webContents.executeJavaScript(
+    "document.documentElement.classList.toggle('fullscreen', " + on + ')').catch(() => {});
+  win.on('enter-full-screen', () => markFullScreen(true));
+  win.on('leave-full-screen', () => markFullScreen(false));
 
   // Open external links in the default browser instead of a new app window.
   win.webContents.setWindowOpenHandler(({ url }) => {

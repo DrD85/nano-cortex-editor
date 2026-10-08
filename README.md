@@ -31,12 +31,19 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   file on the window – loads one into the current preset; **Save** keeps it. Captures and IRs travel by name: the
   import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
   themselves cannot be transferred over Bluetooth.
-- **Captures**: 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
-- **Cab/IR**: slots, level and high / low pass as knobs, mic and position (factory cabs); load factory or user IRs from the device library into a slot
+- **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
+- **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs the mic (five drawn mic types) and its
+  position 1–6 on a drawn speaker – click a mic or a position; load factory or user IRs from the device library into a slot
+- **Keyboard shortcuts**: ⌘S save, ← → previous / next preset, ⌘E export, ⌘I import, T tuner, ? for the overview
+  (Ctrl instead of ⌘ on Windows)
 - **Tuner**: note and cents display, reference pitch (400–480 Hz), mute
 - **Expression pedal**: per-preset assignments for Gain, Bass, Mid, Treble, Level, Gate and FX amounts (min/max, invert) and bypass switching (Heel-Toe, Switch, Stop)
 - **MIDI controller with MIDI Learn**: map knobs and buttons of any USB/Bluetooth MIDI controller to amp, FX, gate, capture and cab controls, block on/off, tuner and preset up/down; optional pickup mode (no value jumps) and Program Change → preset
 - **Morningstar MC6 Pro export**: pick up to five presets and create a bank file: page 1 A–E recall the presets, F opens an FX page where A–E switch the five FX slots on/off. The switches are named after the effect type, use the category colours and MC6 Pro icons, and show which effects each preset uses
+- **Effect info**: the **i** in each effect block (or a click on its pedal picture) shows what the model does, a few
+  tips for its controls and – where Neural DSP names it – the original it is based on (e.g. Green 808 → Ibanez TS808).
+  The "based on" names follow Neural DSP's device list; they are trademarks of their owners and only identify the
+  originals
 - A small pedal picture next to each effect's model choice: a drawn, brand-free pedal for every model (your own pictures in `img/` are used when present)
 - Log export for troubleshooting
 
@@ -64,6 +71,7 @@ The app is not signed with an Apple Developer ID. On the first start, right-clic
 If macOS says the app is damaged, run `xattr -cr "/Applications/Nano Cortex Editor.app"` once in Terminal.
 macOS asks for Bluetooth access when you connect for the first time.
 Zoom with **⌘ +**, **⌘ −** and **⌘ 0** (or *View* in the menu bar), as in the browser; the app keeps the zoom.
+The window has no title bar: its buttons sit in the editor's top bar, which also moves the window.
 
 ### With the Nano Cortex Controller
 
@@ -129,6 +137,8 @@ The message layouts used here are documented in comments in `index.html`.
 
 ## Credits
 
+- [IBM Plex Sans](https://github.com/IBM/plex) by IBM (SIL Open Font License 1.1, `fonts/OFL-IBM-Plex-Sans.txt`) –
+  the typeface of the editor (Latin subset, embedded unchanged in `index.html`)
 - [rixrix/deskop-nano-cortex](https://github.com/rixrix/deskop-nano-cortex) (Apache-2.0): its protocol
   notes helped with the state dump layout and the preset-change acknowledgement.
 

@@ -45,6 +45,13 @@ ICONS = {
     'close': '<path d="M6 6l12 12M18 6L6 18"/>',
     'info': '<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5h0"/>',
     'bluetooth': '<path d="M7 7l10 10-5 4V3l5 4L7 17"/>',
+    # Cab microphones (own drawings of the mic types, side view)
+    'mic-57': '<path d="M9 2.5h6l-.6 6.5h-4.8z"/><path d="M9.3 5.5h5.4"/><path d="M10.2 9l.8 12.5h2l.8-12.5"/>',
+    'mic-421': '<rect x="6.5" y="2.5" width="11" height="8" rx="2"/><path d="M9.5 5v3M12 5v3M14.5 5v3"/><path d="M10 10.5l.5 11h3l.5-11"/>',
+    'mic-184': '<rect x="10" y="2.5" width="4" height="19" rx="1.6"/><path d="M10 6.5h4"/>',
+    'mic-414': '<rect x="7.5" y="2.5" width="9" height="10.5" rx="2.5"/><path d="M7.5 7.75h9"/><path d="M10.5 13v8.5h3V13"/>',
+    'mic-160': '<path d="M9.5 2.5h5v8a2.5 2.5 0 0 1-5 0z"/><path d="M9.5 5.5h5"/><path d="M11 13v8.5h2V13"/>',
+    'keyboard': '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h0M10 10h0M14 10h0M18 10h0M6 14h0M18 14h0M9 14h6"/>',
     'unknown': '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 17h0"/>',
     # Capture types
     'cap-amp-head': '<rect x="2" y="7" width="20" height="10" rx="2"/><path d="M2 12h20"/><circle cx="6" cy="14.5" r="0.8"/><circle cx="10" cy="14.5" r="0.8"/><circle cx="14" cy="14.5" r="0.8"/><circle cx="18" cy="14.5" r="0.8"/>',

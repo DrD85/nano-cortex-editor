@@ -26,6 +26,9 @@ fi
 rm -rf app
 mkdir -p app
 cp ../index.html app/index.html
+# Licence of the embedded IBM Plex Sans font (SIL OFL 1.1) goes with the app
+mkdir -p app/fonts
+cp ../fonts/OFL-IBM-Plex-Sans.txt app/fonts/
 if [[ "$PUBLIC" == false && -d ../img ]]; then
   cp -R ../img app/img
   # Optional personal icon set: ../img/icons.css overrides the drawn --ico-* icons.
