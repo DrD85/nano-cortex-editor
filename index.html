@@ -116,12 +116,12 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: minmax(0, auto) minmax(340px, 1fr);   /* the buttons wrap before the preset gets narrow */
       gap: 18px;
       align-items: center;
     }
 
-    .toolbar-actions { display: flex; gap: 12px; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
     .preset-bar { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 10px; }
     .preset-field { position: relative; min-width: 0; }
@@ -383,6 +383,7 @@
       --ico-exp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 18l14-5'/><path d='M5 21v-3M19 21v-8'/><path d='M6 9a9 9 0 0 1 12-4'/><path d='M15 3l3 2-2 3'/></g></svg>");
       --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
       --ico-export: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='M7 10l5 5 5-5'/><path d='M4 17v3h16v-3'/></g></svg>");
+      --ico-import: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 15V3'/><path d='M7 8l5-5 5 5'/><path d='M4 17v3h16v-3'/></g></svg>");
       --ico-unknown: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7'/><path d='M12 17h0'/></g></svg>");
       --ico-cap-amp-head: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='7' width='20' height='10' rx='2'/><path d='M2 12h20'/><circle cx='6' cy='14.5' r='0.8'/><circle cx='10' cy='14.5' r='0.8'/><circle cx='14' cy='14.5' r='0.8'/><circle cx='18' cy='14.5' r='0.8'/></g></svg>");
       --ico-cap-amp-combo: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 8h18'/><circle cx='12' cy='14.5' r='4'/></g></svg>");
@@ -696,6 +697,19 @@
       gap: 14px;
     }
     .ask-message { white-space: pre-line; color: #e2e2e2; font-size: 14px; line-height: 1.45; }
+    .slot-panel { width: min(640px, calc(100vw - 32px)); }
+    .slot-list { display: grid; gap: 6px; max-height: 52vh; overflow: auto; padding-right: 4px; }
+    .slot-row {
+      display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 2px 10px; align-items: center; text-align: left;
+      padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #141414; color: #e2e2e2; font: inherit; cursor: pointer;
+      text-transform: none; letter-spacing: normal; font-weight: 500; min-height: 0;
+    }
+    .slot-row.sel { border-color: #45F862; background: #12261a; }
+    .slot-row .no { color: #9a9a9a; font-size: 12px; }
+    .slot-row .use { grid-column: 2; font-size: 12px; color: #9a9a9a; }
+    .slot-row .use.free { color: #45F862; }
+    .slot-row .use.busy { color: #ffb02e; }
+    .slot-status { color: #9a9a9a; font-size: 12px; }
     .ask-buttons { display: flex; justify-content: flex-end; gap: 10px; }
 
     @media (max-width: 1050px) {
@@ -724,6 +738,9 @@
         <button id="connectBtn" class="primary">Connect</button>
         <button id="saveBtn" class="primary">Save</button>
         <button id="renameBtn">Rename</button>
+        <button id="exportBtn" class="tuner-btn midi-btn" title="Save the current preset as a file (to keep or to share)"><span class="fx-icon" style="--icon: var(--ico-export)"></span>Export</button>
+        <button id="importBtn" class="tuner-btn midi-btn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="fx-icon" style="--icon: var(--ico-import)"></span>Import</button>
+        <input id="importFile" type="file" accept=".json,application/json" hidden>
         <button id="mc6Btn" class="tuner-btn midi-btn" title="Export a bank for the Morningstar MC6 Pro"><span class="fx-icon" style="--icon: var(--ico-export)"></span>MC6 Pro</button>
         <button id="midiBtn" class="tuner-btn midi-btn"><span class="fx-icon" style="--icon: var(--ico-midi)"></span>MIDI</button>
         <button id="expBtn" class="tuner-btn exp-btn"><span class="fx-icon" style="--icon: var(--ico-exp)"></span>Expression</button>
@@ -853,6 +870,19 @@
         <button type="submit" class="primary">OK</button>
       </div>
     </form>
+  </div>
+
+  <div id="slotOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel slot-panel" role="dialog" aria-modal="true">
+      <div id="slotMessage" class="ask-message"></div>
+      <div id="slotList" class="slot-list"></div>
+      <div id="slotStatus" class="slot-status"></div>
+      <div class="ask-buttons">
+        <button type="button" id="slotScan">Check which presets use them</button>
+        <button type="button" id="slotCancel">Cancel</button>
+        <button type="button" id="slotOk" class="primary">Load</button>
+      </div>
+    </div>
   </div>
 
   <div id="mc6Overlay" class="lib-overlay" hidden>
@@ -1458,7 +1488,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.3.0';
+    const EDITOR_VERSION = '1.4.0';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
 
     const logLines = [];
@@ -1766,6 +1796,7 @@
       }
 
       state.cabIR.on = Boolean(fields[12] && fields[12][0]);
+      state.cabIR.stateSlot = fields[12] && fields[12][0] ? fields[12][0].value : 0;   // cab slot 1-5, 0 = bypass
 
       state.amp.gain = fields[3] && fields[3][0] ? fields[3][0].value : 0;
       state.amp.level = fields[4] && fields[4][0] ? fields[4][0].value : 0;
@@ -2327,6 +2358,7 @@
 
     // Only active blocks are read: querying bypassed blocks crashed the Nano.
     function queueFXParamRefreshes() {
+      if (state.fileBusy) return;   // a preset export / import reads and writes the effects itself
       cancelFXParamRefresh();
       state.paramRefreshQueue = FX_BLOCK_KEYS.filter(key => {
         const block = state.blocks[key];
@@ -2412,6 +2444,9 @@
 
       if (state.pendingParamTimer) clearTimeout(state.pendingParamTimer);
       state.pendingParamBlock = null;
+      for (let i = fxValueWaiters.length - 1; i >= 0; i--) {
+        if (fxValueWaiters[i].key === blockKey) fxValueWaiters.splice(i, 1)[0].resolve(true);
+      }
 
       log(block.title + ' params loaded: ' + floats.map(x => x.toFixed(3)).join(', '));
       render();
@@ -2860,13 +2895,19 @@ function parseSelectedCaptureState(payload) {
       const entered = await askText('New name for preset ' + preset, current);
       if (entered === null) return;
 
-      const name = entered.trim();
-      if (name.length < 4) { window.alert('Preset name must have at least 4 characters.'); return; }
+      const error = await renamePresetTo(preset, entered);
+      if (error) window.alert(error);
+    }
+
+    // Renames a preset. Returns null, or why it was not renamed.
+    async function renamePresetTo(preset, entered) {
+      const name = String(entered).trim();
+      if (name.length < 4) return 'Preset name must have at least 4 characters.';
       const taken = Array.from(state.presetNames.entries()).some(([i, n]) => i !== preset && String(n).trim().toLowerCase() === name.toLowerCase());
-      if (taken) { window.alert('This preset name already exists.'); return; }
+      if (taken) return 'This preset name already exists.';
 
       const nameBytes = Array.from(new TextEncoder().encode(name));
-      if (nameBytes.length > 64) { window.alert('Preset name is too long.'); return; }
+      if (nameBytes.length > 64) return 'Preset name is too long.';
 
       // RenamePresetRequestMessage { 1: action=UPDATE, 3: presetIndex, 4: presetNewName }
       const sent = await writeC304('Rename preset ' + preset + ' to "' + name + '"', buildFrame([
@@ -2874,10 +2915,11 @@ function parseSelectedCaptureState(payload) {
         0x18, ...encodeVarint(preset - 1),
         0x22, nameBytes.length, ...nameBytes
       ], MSG.RenamePresetRequest));
-      if (!sent) { window.alert('Rename failed: the Bluetooth write did not go through.'); return; }
+      if (!sent) return 'Rename failed: the Bluetooth write did not go through.';
 
       state.presetNames.set(preset, name);
       renderPresetSelect();
+      return null;
     }
 
     // ---- Capture library (RetrieveLibraryContent 76/77, SetCaptureSlotContent 80/81) ----
@@ -2956,25 +2998,13 @@ function parseSelectedCaptureState(payload) {
       if (!$('libraryOverlay').hidden) renderLibraryBrowser();
     }
 
+    // Loads a library capture into a slot the user chooses (with the presets that use each slot) and uses that slot in
+    // the current preset. Resolves with the slot, or null.
     async function loadLibraryCapture(kind, index) {
       const item = (kind === 'factory' ? state.library.factory : state.library.user).find(x => x.index === index);
-      const slot = state.capture.activeSlot;
-
-      if (!item) { renderCaptureIR(); return; }
-      if (!state.capture.on || !slot) {
-        window.alert('Bitte zuerst die Capture einschalten. Die Library-Capture wird in den aktiven Capture-Platz geladen.');
-        renderCaptureIR();
-        return;
-      }
-
-      const bank = Math.floor((slot - 1) / 5) + 1;
-      const position = ((slot - 1) % 5) + 1;
-      const previous = state.captureNames.get(slot) || ('Platz ' + slot);
-      const ok = window.confirm(
-        '"' + item.name + '" in Capture-Platz ' + slot + ' (Bank ' + bank + ', Position ' + position + ') laden?' +
-        String.fromCharCode(10, 10) + 'Dort liegt bisher "' + previous + '". Diese Capture bleibt in der Library erhalten.'
-      );
-      if (!ok) { renderCaptureIR(); return; }
+      if (!item) { renderCaptureIR(); return null; }
+      const slot = await chooseSlot('capture', item.name);
+      if (!slot) { renderCaptureIR(); return null; }
 
       // SetCaptureSlotContentRequestMessage { 3: captureSlot (0-24),
       //   4: factory id { 1: index, 2: name } | 5: user id { 1: index, 2: name } }
@@ -2985,10 +3015,16 @@ function parseSelectedCaptureState(payload) {
         kind === 'factory' ? 0x22 : 0x2A, ...encodeVarint(identifier.length), ...identifier
       ], MSG.SetCaptureSlotContentRequest);
 
-      if (frame.length - 2 > 255) { window.alert('Capture name is too long.'); renderCaptureIR(); return; }
+      if (frame.length - 2 > 255) { window.alert('Capture name is too long.'); renderCaptureIR(); return null; }
 
       state.pendingSlotAssignment = { slot, name: item.name };
       await writeC304('Load library capture "' + item.name + '" into slot ' + slot, frame);
+      if (!await waitUntil(() => sameName(state.captureNames.get(slot), item.name), 6000)) return null;
+      if (!state.capture.on || state.capture.activeSlot !== slot) {
+        await wait(400);   // the confirmatory state read of the loaded slot
+        await setCapture(slot);
+      }
+      return slot;
     }
 
     // SetCaptureSlotContentResponseMessage { 3: status (1 = success), 4: message }
@@ -3448,19 +3484,13 @@ function parseSelectedCaptureState(payload) {
 
     // SetCabinetSlotContentRequestMessage { 3: cabinetSlot (0-4),
     //   4: factory IR { 1: index, 2: name } | 5: user IR { 1: index, 2: name } } -> response 79
+    // Loads a library IR into a cab slot the user chooses; the reply selects that slot. Resolves with the slot, or null.
     async function loadLibraryCab(kind, index) {
       const item = state.library[kind].find(x => x.index === index);
-      if (!item) { renderCaptureIR(); return; }
+      if (!item) { renderCaptureIR(); return null; }
 
-      const fallback = state.cabIR.selectedSlot >= 1 && state.cabIR.selectedSlot <= 5 ? state.cabIR.selectedSlot : 1;
-      const entered = await askText(
-        '"' + item.name + '" in welchen Cab-Platz laden? (1-5)' + String.fromCharCode(10) +
-        Array.from({ length: 5 }, (_, i) => (i + 1) + ': ' + (state.irNames.get(i + 1) || 'IR ' + (i + 1))).join(String.fromCharCode(10)) +
-        String.fromCharCode(10, 10) + 'Die bisherige Cab bleibt in der Library erhalten.',
-        String(fallback)
-      );
-      const slot = Number(entered);
-      if (entered === null || !Number.isInteger(slot) || slot < 1 || slot > 5) { renderCaptureIR(); return; }
+      const slot = await chooseSlot('cab', item.name);
+      if (!slot) { renderCaptureIR(); return null; }
 
       const nameBytes = Array.from(new TextEncoder().encode(item.name));
       const identifier = [0x08, ...encodeVarint(item.index), 0x12, ...encodeVarint(nameBytes.length), ...nameBytes];
@@ -3469,10 +3499,118 @@ function parseSelectedCaptureState(payload) {
         kind === 'irFactory' ? 0x22 : 0x2A, ...encodeVarint(identifier.length), ...identifier
       ], MSG.SetCabinetSlotContentRequest);
 
-      if (frame.length - 2 > 255) { window.alert('Cab name is too long.'); renderCaptureIR(); return; }
+      if (frame.length - 2 > 255) { window.alert('Cab name is too long.'); renderCaptureIR(); return null; }
 
       state.pendingCabAssignment = { slot, name: item.name };
       await writeC304('Load library cab "' + item.name + '" into cab slot ' + slot, frame);
+      return await waitUntil(() => sameName(state.irNames.get(slot), item.name), 6000) ? slot : null;
+    }
+
+    // ---- Slot choice for library captures and IRs ----
+    // Loading into one of the 25 capture / 5 cab slots replaces only the slot: presets that used it keep their capture
+    // or IR, which then comes from the library (the Nano shows it as such; tested on hardware). The dialog lists the
+    // slots with their content and - after a check that loads every preset once - which presets use each slot, and
+    // suggests a slot that no preset uses, so the slots others use for quick access stay as they are.
+    const PRESET_COUNT = 64;
+    state.slotUsage = null;   // { capture: { slot: [presets] }, cab: { slot: [presets] } }
+
+    async function scanSlotUsage(progress) {
+      if (!state.connected) return false;
+      if (state.presetDirty && !window.confirm('Preset ' + state.selectedPreset + ' has unsaved changes. The check loads every ' +
+          'preset on the Nano once, which discards them. Continue?')) return false;
+      const original = state.selectedPreset;
+      const usage = { capture: {}, cab: {} };
+      const total = Math.max(state.presetNames.size, PRESET_COUNT);
+      try {
+        for (let preset = 1; preset <= total; preset++) {
+          progress('Reading preset ' + preset + ' of ' + total + '…');
+          if (preset !== state.selectedPreset) {
+            const loaded = waitForPresetState(preset, 6000);
+            await selectPreset(preset);
+            if (!await loaded) { progress('Preset ' + preset + ' did not answer - the check stopped.'); return false; }
+            await wait(150);
+          }
+          const capture = state.capture.on ? state.capture.activeSlot : null;
+          const cab = state.cabIR.on ? state.cabIR.stateSlot : null;
+          if (capture) (usage.capture[capture] = usage.capture[capture] || []).push(preset);
+          if (cab) (usage.cab[cab] = usage.cab[cab] || []).push(preset);
+        }
+        state.slotUsage = usage;
+        log('Slot usage: captures ' + JSON.stringify(usage.capture) + ', cabs ' + JSON.stringify(usage.cab));
+        return true;
+      } finally {
+        if (state.connected && state.selectedPreset !== original) {
+          const back = waitForPresetState(original, 6000);
+          await selectPreset(original);
+          await back;
+        }
+      }
+    }
+
+    // Resolves with the chosen slot (1-25 / 1-5), or null when cancelled.
+    function chooseSlot(kind, itemName) {
+      return new Promise(resolve => {
+        const isCapture = kind === 'capture';
+        const count = isCapture ? 25 : 5;
+        const names = isCapture ? state.captureNames : state.irNames;
+        const current = isCapture ? (state.capture.on ? state.capture.activeSlot : null) : (state.cabIR.on ? state.cabIR.stateSlot : null);
+        const users = slot => (state.slotUsage ? state.slotUsage[kind][slot] || [] : null);
+        const suggest = () => {
+          if (state.slotUsage) for (let slot = 1; slot <= count; slot++) if (!users(slot).length) return slot;
+          return current || 1;
+        };
+        let selected = suggest(), busy = false;
+
+        const render = () => {
+          const list = $('slotList');
+          list.innerHTML = '';
+          for (let slot = 1; slot <= count; slot++) {
+            const row = document.createElement('button');
+            row.type = 'button';
+            row.className = 'slot-row' + (slot === selected ? ' sel' : '');
+            const used = users(slot);
+            const where = isCapture ? 'Bank ' + (Math.floor((slot - 1) / 5) + 1) + ' · ' + ((slot - 1) % 5 + 1) : 'Cab ' + slot;
+            row.innerHTML = '<span class="no">' + where + '</span><span>' + escapeHTML(names.get(slot) || '—') +
+              (slot === current ? ' <span class="no">· this preset</span>' : '') + '</span>' +
+              (used ? '<span class="use ' + (used.length ? 'busy' : 'free') + '">' + (used.length
+                ? 'used by ' + used.length + ' preset' + (used.length > 1 ? 's' : '') + ': ' + used.slice(0, 10).join(', ') + (used.length > 10 ? ' …' : '') + ' (they keep it, from the library)' 
+                : 'free - no preset uses it') + '</span>' : '');
+            row.addEventListener('click', () => { if (!busy) { selected = slot; render(); } });
+            row.addEventListener('dblclick', () => { if (!busy) finish(slot); });
+            list.appendChild(row);
+          }
+          const sel = list.querySelector('.slot-row.sel');
+          if (sel) sel.scrollIntoView({ block: 'nearest' });
+          $('slotOk').textContent = 'Load into ' + (isCapture ? 'slot ' : 'cab slot ') + selected;
+          $('slotOk').disabled = $('slotCancel').disabled = $('slotScan').disabled = busy;
+          $('slotScan').textContent = state.slotUsage ? 'Check again' : 'Check which presets use them (about 1 min)';
+        };
+        const finish = value => {
+          $('slotOverlay').hidden = true;
+          $('slotOk').onclick = $('slotCancel').onclick = $('slotScan').onclick = null;
+          resolve(value);
+        };
+
+        $('slotMessage').textContent = 'Load "' + itemName + '" into which ' + (isCapture ? 'capture' : 'cab') + ' slot?' + NL +
+          'Presets that use the slot keep their ' + (isCapture ? 'capture' : 'IR') + ' - it then comes from the library. ' +
+          'A free slot keeps the slots of your other presets as they are.';
+        $('slotStatus').textContent = state.slotUsage ? 'Which presets use which slot: checked in this session.' : '';
+        $('slotOk').onclick = () => finish(selected);
+        $('slotCancel').onclick = () => finish(null);
+        $('slotScan').onclick = async () => {
+          busy = true;
+          render();
+          const ok = await scanSlotUsage(text => { $('slotStatus').textContent = text; });
+          busy = false;
+          if (ok) {
+            selected = suggest();
+            $('slotStatus').textContent = users(selected).length ? 'Every slot is used by at least one preset.' : 'Suggested: a slot no preset uses.';
+          }
+          render();
+        };
+        $('slotOverlay').hidden = false;
+        render();
+      });
     }
 
     function handleCabinetSlotContentResponse(data) {
@@ -3714,7 +3852,8 @@ function parseSelectedCaptureState(payload) {
       await writeC304('Gate reduction ' + pct + '%', payload, 'gate-reduction');
     }
 
-    async function setFXModel(blockKey, modelName) {
+    // readBack: read the new model's values afterwards - only if the effect is on (reading one that is off crashed the Nano).
+    async function setFXModel(blockKey, modelName, readBack = true) {
       const cfg = blockSlotConfig[blockKey];
       const block = state.blocks[blockKey];
       const model = block ? block.models.find(m => m.name === modelName) : null;
@@ -3740,6 +3879,7 @@ function parseSelectedCaptureState(payload) {
 
       await writeC304(cfg.label + ' model select ' + model.name, payload);
 
+      if (!readBack || !block.on) return;
       setTimeout(() => {
         state.paramRefreshQueue = [blockKey];
         state.pendingParamBlock = null;
@@ -4855,6 +4995,325 @@ function renderGate() {
       return box;
     }
 
+    // ---- Preset files: the current preset as a file (to keep or to share), a file into the current preset ----
+    // The file holds what the editor can set: name, capture and cab/IR (by name: on import they are found again in the
+    // slots or loaded from the library), amp, capture volume, gate, cab settings, the five FX slots with all values and
+    // the expression assignments. An import edits the current preset like turning the knobs by hand: Save keeps it.
+    const PRESET_FILE_FORMAT = 'nano-cortex-preset';
+    const PRESET_FILE_VERSION = 1;
+    const AMP_KEYS = ['gain', 'bass', 'mid', 'treble', 'level'];
+    const NL = String.fromCharCode(10);
+    const fxValueWaiters = [];   // { key, resolve } - resolved by handleFXParamRefreshResponse
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function waitUntil(test, timeoutMs) {
+      const end = Date.now() + timeoutMs;
+      while (!test()) {
+        if (Date.now() > end) return false;
+        await wait(100);
+      }
+      return true;
+    }
+
+    function sameName(a, b) {
+      const x = String(a || '').trim().toLowerCase();
+      return x !== '' && x === String(b || '').trim().toLowerCase();
+    }
+
+    // The values of an effect are known when they were read from the Nano (or imported) for this preset and model.
+    function fxValuesKnown(block) {
+      return block.model === 'None' ||
+        (block.originalModel === block.model && block.originalPreset === state.selectedPreset) ||
+        (block.importedModel === block.model && block.importedPreset === state.selectedPreset);
+    }
+
+    // Reads the values of one effect. Only an effect that is on may be read (reading one that is off crashed the
+    // Nano), so one that is off is switched on for the moment of reading.
+    async function readFxValues(blockKey) {
+      const block = state.blocks[blockKey];
+      const wasOff = !block.on;
+      if (wasOff) {
+        await setFXBlockEnabled(blockKey, true);
+        await wait(300);
+      }
+      const read = new Promise(resolve => {
+        const waiter = { key: blockKey, resolve };
+        fxValueWaiters.push(waiter);
+        setTimeout(() => {
+          const i = fxValueWaiters.indexOf(waiter);
+          if (i >= 0) { fxValueWaiters.splice(i, 1); resolve(false); }
+        }, 3000);
+      });
+      state.paramRefreshQueue.push(blockKey);
+      requestNextFXParamRefresh();
+      const ok = await read;
+      if (wasOff) await setFXBlockEnabled(blockKey, false);
+      return ok;
+    }
+
+    function presetFileData() {
+      const preset = state.selectedPreset;
+      const round = (value, decimals) => Number(Number(value).toFixed(decimals));
+      const fx = {};
+      FX_BLOCK_KEYS.forEach(key => {
+        const block = state.blocks[key];
+        const entry = { model: block.model, on: block.model !== 'None' && Boolean(block.on) };
+        if (block.model !== 'None' && fxValuesKnown(block)) {
+          entry.values = block.params.map(param => round(paramValueToNormalized(param), 5));   // 0-1, by parameter
+          entry.display = Object.fromEntries(block.params.map(param => [param.name, paramDisplayValue(param)]));
+        }
+        fx[key] = entry;
+      });
+      const data = {
+        format: PRESET_FILE_FORMAT,
+        version: PRESET_FILE_VERSION,
+        editor: EDITOR_VERSION,
+        exported: new Date().toISOString(),
+        name: state.presetNames.get(preset) || 'Preset ' + preset,
+        capture: { on: Boolean(state.capture.on), name: state.currentCapture.name || '', volumeDb: round(state.captureVolumeDb || 0, 1) },
+        cab: { on: Boolean(state.cabIR.on), name: state.currentIR.shortName || '', fullName: state.currentIR.fullName || '' },
+        amp: Object.fromEntries(AMP_KEYS.map(key => [key, state.amp[key]])),   // 0-255 as the Nano sends them
+        gate: { on: Boolean(state.gate.on), reduction: state.gate.params[0] ? state.gate.params[0].value : 50 },
+        fx
+      };
+      if (state.cabIR.paramsLoaded) {
+        Object.assign(data.cab, {
+          levelDb: round(state.cabIR.levelDb, 1),
+          highPassHz: Math.round(state.cabIR.highPassHz),
+          lowPassHz: Math.round(state.cabIR.lowPassHz)
+        });
+      }
+      if (state.cabIR.on && isFactoryCabIR()) Object.assign(data.cab, { mic: state.cabIR.mic, position: state.cabIR.position });
+      if (state.exp.loaded && state.exp.preset === preset) data.expression = structuredClone({ ranges: state.exp.ranges, bypass: state.exp.bypass });
+      return data;
+    }
+
+    async function exportPresetFile() {
+      if (!state.connected) { window.alert('Connect to the Nano first.'); return; }
+      if (state.fileBusy) return;
+      state.fileBusy = true;
+      $('exportBtn').disabled = true;
+      try {
+        cancelFXParamRefresh();
+        const unread = FX_BLOCK_KEYS.filter(key => !fxValuesKnown(state.blocks[key]));
+        const off = unread.filter(key => !state.blocks[key].on);
+        let toRead = unread.filter(key => state.blocks[key].on);
+        if (off.length) {
+          const names = off.map(key => state.blocks[key].title + ' (' + state.blocks[key].model + ')').join(', ');
+          if (window.confirm('Switched off: ' + names + '.' + NL + NL +
+              'The Nano gives the settings of an effect only while it is on. Switch ' + (off.length > 1 ? 'them' : 'it') +
+              ' on for a moment to read ' + (off.length > 1 ? 'them' : 'it') + '? You may hear it, and the preset then shows unsaved changes.' + NL + NL +
+              'Cancel: export without ' + (off.length > 1 ? 'their' : 'its') + ' settings (default values on import).')) {
+            toRead = toRead.concat(off);
+          }
+        }
+        for (const key of toRead) {
+          if (!await readFxValues(key)) log('Preset export: the values of ' + state.blocks[key].title + ' did not come');
+        }
+        if (!(state.exp.loaded && state.exp.preset === state.selectedPreset)) await readExpAssignments(6000);
+
+        const data = presetFileData();
+        const fileName = (String(data.name).replace(/[\\/:*?"<>|]+/g, '_').trim() || 'Preset') + '.nano-preset.json';
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        log('Preset ' + state.selectedPreset + ' "' + data.name + '" exported as ' + fileName);
+
+        const missing = FX_BLOCK_KEYS.filter(key => data.fx[key].model !== 'None' && !data.fx[key].values);
+        if (missing.length) {
+          window.alert('Exported without the settings of ' + missing.map(key => state.blocks[key].title).join(', ') +
+            ' - an import uses their default values there.');
+        }
+      } finally {
+        state.fileBusy = false;
+        $('exportBtn').disabled = false;
+        render();
+      }
+    }
+
+    // A capture or IR from the library of the Nano (it is loaded once, as for the Library browser).
+    async function findInLibrary(kinds, names) {
+      if (!state.library.loaded) {
+        requestLibraryContent();
+        await waitUntil(() => state.library.loaded, 10000);
+      }
+      for (const kind of kinds) {
+        const item = (state.library[kind] || []).find(x => names.some(name => sameName(x.name, name)));
+        if (item) return { kind, index: item.index };
+      }
+      return null;
+    }
+
+    async function importCapture(c, notes) {
+      if (!c) return;
+      if (c.on === false) {
+        if (state.capture.on) await selectCaptureSlot(0);
+        return;
+      }
+      if (!c.name || (state.capture.on && sameName(state.currentCapture.name, c.name))) return;
+      for (let slot = 1; slot <= 25; slot++) {
+        if (sameName(state.captureNames.get(slot), c.name)) {
+          await setCapture(slot);
+          await wait(800);
+          return;
+        }
+      }
+      const item = await findInLibrary(['factory', 'user'], [c.name]);
+      if (!item) {
+        notes.push('Capture "' + c.name + '" is not on this Nano (neither in a slot nor in the library) - the current capture stays.');
+        return;
+      }
+      // asks for the slot (with the presets that use each slot) and uses it in this preset
+      if (await loadLibraryCapture(item.kind, item.index)) await wait(800);
+      else notes.push('Capture "' + c.name + '" was not loaded - the current capture stays.');
+    }
+
+    async function importCab(c, notes) {
+      if (!c) return;
+      if (c.on === false) {
+        if (state.cabIR.on) await selectCabIRSlot(0);
+        return;
+      }
+      const names = [c.name, c.fullName].filter(Boolean);
+      const slotWith = () => [1, 2, 3, 4, 5].find(i => names.some(name => sameName(state.irNames.get(i), name))) || null;
+      const isCurrent = state.cabIR.on && names.some(name => sameName(state.currentIR.shortName, name) || sameName(state.currentIR.fullName, name));
+      if (names.length && !isCurrent) {
+        const slot = slotWith();
+        if (slot) {
+          await selectCabIRSlot(slot);
+          await wait(1800);   // its settings are read meanwhile
+        } else {
+          const item = await findInLibrary(['irFactory', 'irUser'], names);
+          if (!item) notes.push('Cab/IR "' + (c.name || c.fullName) + '" is not on this Nano - the current cab stays.');
+          else if (await loadLibraryCab(item.kind, item.index)) await wait(1800);   // asks for the cab slot; the reply selects it
+          else notes.push('Cab/IR "' + (c.name || c.fullName) + '" was not loaded - the current cab stays.');
+        }
+      }
+      if (Number.isFinite(Number(c.levelDb))) await setCabIRLevelDb(Number(c.levelDb));
+      if (Number.isFinite(Number(c.highPassHz))) await setCabIRHighPassHz(Number(c.highPassHz));
+      if (Number.isFinite(Number(c.lowPassHz))) await setCabIRLowPassHz(Number(c.lowPassHz));
+      if (c.mic && isFactoryCabIR()) {
+        state.cabIR.mic = c.mic;
+        if (Number.isFinite(Number(c.position))) state.cabIR.position = Number(c.position);
+        await setCabIRMicPosition(state.cabIR.mic, state.cabIR.position);
+      }
+    }
+
+    async function importFx(key, f, preset, notes) {
+      if (!f || !f.model) return;
+      const block = state.blocks[key];
+      if (f.model === 'None') {
+        if (block.model !== 'None') {   // there is no known command for an empty slot
+          await setFXBlockEnabled(key, false);
+          block.on = false;
+          notes.push(block.title + ' is empty in the file - "' + block.model + '" is switched off instead (an empty slot cannot be set).');
+        }
+        return;
+      }
+      if (!block.models.some(m => m.name === f.model)) {
+        notes.push(block.title + ': unknown effect "' + f.model + '" - left as it is.');
+        return;
+      }
+      if (block.model !== f.model) {
+        await setFXModel(key, f.model, false);   // no read-back: the effect may be off
+        await wait(250);
+      }
+      if (Array.isArray(f.values)) {
+        f.values.forEach((n, i) => { if (block.params[i]) block.params[i].value = normalizedToParamValue(block.params[i], n); });
+        for (const param of block.params.slice(0, f.values.length)) await setFXParam(key, param, null, true);
+        block.importedModel = f.model;
+        block.importedPreset = preset;
+        block.fxPresetActive = -1;
+      } else {
+        notes.push(block.title + ' (' + f.model + '): the file has no settings for it - default values.');
+      }
+      if (typeof f.on === 'boolean') {
+        await setFXBlockEnabled(key, f.on);
+        block.on = f.on;
+      }
+    }
+
+    function importExpression(e, preset) {
+      state.exp.preset = preset;
+      state.exp.ranges = Object.fromEntries(EXP_RANGES.map(r => [r.key, Object.assign(defaultExpRange(), e.ranges[r.key] || {})]));
+      state.exp.bypass = Object.fromEntries(EXP_BYPASS.map(b => [b.key, Object.assign(defaultExpBypass(), e.bypass[b.key] || {})]));
+      state.exp.loaded = true;
+      scheduleExpSave();   // stored at once and checked, as in the Expression panel
+      renderExpPanel();
+    }
+
+    async function importPresetFile(file) {
+      if (!state.connected) { window.alert('Connect to the Nano first.'); return; }
+      if (state.fileBusy) return;
+      let data = null;
+      try { data = JSON.parse(await file.text()); } catch (e) { data = null; }
+      if (!data || data.format !== PRESET_FILE_FORMAT) { window.alert('"' + file.name + '" is not a Nano Cortex preset file.'); return; }
+
+      const preset = state.selectedPreset;
+      const current = state.presetNames.get(preset) || 'Preset ' + preset;
+      if (!window.confirm('Load "' + data.name + '" into preset ' + preset + ' ("' + current + '")?' + NL + NL +
+          'Its settings replace the current ones. Nothing is stored until you press Save - only the expression ' +
+          'assignments are stored at once, as in the Expression panel.')) return;
+
+      state.fileBusy = true;
+      $('importBtn').disabled = true;
+      const notes = [];
+      if (data.version > PRESET_FILE_VERSION) notes.push('The file comes from a newer editor - settings this version does not know are skipped.');
+      try {
+        cancelFXParamRefresh();
+        await importCapture(data.capture, notes);
+        await importCab(data.cab, notes);
+        for (const key of AMP_KEYS) {
+          const value = data.amp ? Number(data.amp[key]) : NaN;
+          if (!Number.isFinite(value)) continue;
+          state.amp[key] = clamp(Math.round(value), 0, 255);
+          await setAmpKnob(key, state.amp[key]);
+        }
+        if (data.capture && Number.isFinite(Number(data.capture.volumeDb))) {
+          const db = clamp(Number(data.capture.volumeDb), -24, 12);
+          state.captureVolumeDb = db;
+          setCaptureVolumeUI(db);
+          await setCaptureVolumeDb(db);
+        }
+        if (data.gate) {
+          if (Number.isFinite(Number(data.gate.reduction)) && state.gate.params[0]) {
+            state.gate.params[0].value = clamp(Math.round(Number(data.gate.reduction)), 0, 100);
+            await setGateReduction(state.gate.params[0].value);
+          }
+          if (typeof data.gate.on === 'boolean') {
+            state.gate.on = data.gate.on;
+            await setGateEnabled(data.gate.on);
+          }
+        }
+        for (const key of FX_BLOCK_KEYS) await importFx(key, data.fx && data.fx[key], preset, notes);
+        if (data.expression && data.expression.ranges && data.expression.bypass) importExpression(data.expression, preset);
+        render();
+        if (data.name && !sameName(data.name, current) &&
+            window.confirm('Also rename preset ' + preset + ' to "' + data.name + '"? (The name is stored at once.)')) {
+          const error = await renamePresetTo(preset, data.name);
+          if (error) notes.push('Name not taken over: ' + error);
+        }
+      } finally {
+        state.fileBusy = false;
+        $('importBtn').disabled = false;
+      }
+      await wait(300);
+      requestCurrentPresetState();   // the Nano's view of the preset; it also reads the effects that are on
+      log('Preset file "' + data.name + '" imported into preset ' + preset + (notes.length ? ': ' + notes.join(' ') : ''));
+      window.alert('"' + data.name + '" imported into preset ' + preset + '.' + NL + NL +
+        (notes.length ? notes.join(NL) + NL + NL : '') + 'Press Save to keep it.');
+    }
+
+    function pickPresetFile() {
+      if (!state.connected) { window.alert('Connect to the Nano first.'); return; }
+      $('importFile').value = '';
+      $('importFile').click();
+    }
+
     function render() {
       renderPresetSelect();
       renderCaptureIR();
@@ -4877,6 +5336,20 @@ function renderGate() {
     $('refreshBtn').addEventListener('click', refreshLists);
     $('disconnectBtn').addEventListener('click', disconnect);
     $('saveBtn').addEventListener('click', savePreset);
+    $('exportBtn').addEventListener('click', exportPresetFile);
+    $('importBtn').addEventListener('click', pickPresetFile);
+    $('importFile').addEventListener('change', e => { if (e.target.files[0]) importPresetFile(e.target.files[0]); });
+    // A preset file dropped on the window is imported.
+    document.addEventListener('dragover', e => {
+      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) e.preventDefault();
+    });
+    document.addEventListener('drop', e => {
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!file) return;
+      e.preventDefault();
+      if (/\.json$/i.test(file.name)) importPresetFile(file);
+      else window.alert('Drop a preset file (.nano-preset.json) to import it.');
+    });
     $('renameBtn').addEventListener('click', renamePreset);
     $('tunerBtn').addEventListener('click', () => openTuner(false));
     $('libraryBtn').addEventListener('click', openLibraryBrowser);

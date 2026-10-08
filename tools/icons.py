@@ -30,6 +30,7 @@ ICONS = {
     'exp': '<path d="M3 21h18"/><path d="M5 18l14-5"/><path d="M5 21v-3M19 21v-8"/><path d="M6 9a9 9 0 0 1 12-4"/><path d="M15 3l3 2-2 3"/>',
     'midi': '<circle cx="12" cy="12" r="9"/><path d="M10 3.5h4"/><circle cx="7" cy="12" r="0.6"/><circle cx="17" cy="12" r="0.6"/><circle cx="8.5" cy="8.5" r="0.6"/><circle cx="15.5" cy="8.5" r="0.6"/><circle cx="12" cy="16.5" r="0.6"/>',
     'export': '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/>',
+    'import': '<path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M4 17v3h16v-3"/>',
     'unknown': '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 17h0"/>',
     # Capture types
     'cap-amp-head': '<rect x="2" y="7" width="20" height="10" rx="2"/><path d="M2 12h20"/><circle cx="6" cy="14.5" r="0.8"/><circle cx="10" cy="14.5" r="0.8"/><circle cx="14" cy="14.5" r="0.8"/><circle cx="18" cy="14.5" r="0.8"/>',

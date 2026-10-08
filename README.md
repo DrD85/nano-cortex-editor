@@ -16,7 +16,11 @@ It runs in Chrome/Edge (Web Bluetooth) or as a Mac app.
 - **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style)
 - **FX presets** (as on the Nano Cortex Controller): four named settings per effect model above its knobs – click to
   load, right-click or hold to save, rename or delete; **ORIGINAL** returns to the settings read from the Nano
-- **Captures**: 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot
+- **Preset files**: **Export** saves the current preset as a file (to keep or to share), **Import** – or dropping the
+  file on the window – loads one into the current preset; **Save** keeps it. Captures and IRs travel by name: the
+  import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
+  themselves cannot be transferred over Bluetooth.
+- **Captures**: 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
 - **Cab/IR**: slots, level, high/low pass, mic and position; load factory or user IRs from the device library into a slot
 - **Tuner**: note and cents display, reference pitch (400–480 Hz), mute
 - **Expression pedal**: per-preset assignments for Gain, Bass, Mid, Treble, Level, Gate and FX amounts (min/max, invert) and bypass switching (Heel-Toe, Switch, Stop)
