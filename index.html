@@ -1162,6 +1162,10 @@
     .al-head h3 { margin: 0; font-size: 15px; font-weight: 650; color: #f2f2f2; }
     .al-link { padding: 0; border: 0; background: none; color: #8e9297; font-size: 12px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
     .al-link:hover { color: #fff; }
+    .al-mark { display: flex; align-items: baseline; gap: 10px; color: #9aa0a6; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+    .al-mark.on { color: #45F862; }
+    .al-mark:empty { display: none; }
+    .al-mark .al-link { font-size: 12px; }
     .al-kinds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
     .al-kind { display: grid; gap: 6px; padding: 10px 10px 9px; border: 1px solid #2c3035; border-radius: 11px; background: #17191c; cursor: pointer; text-align: left; }
     .al-kind:hover { border-color: #4a4f55; }
@@ -1365,6 +1369,7 @@
         <div class="lv-hint">Choose the kind of sound, press Start and play for a few seconds. Level goes to 10 – the Nano's full output, which
           the signal on USB follows – and only the capture volume is set, so that the preset lands on its target: a clean sound lowest, a solo
           on top, with room to full scale for all of them.</div>
+        <div id="alMark" class="al-mark"></div>
         <div id="alKinds" class="al-kinds"></div>
         <div class="al-progress"><i id="alBar"></i></div>
         <div id="alStatus" class="al-status"></div>
@@ -2457,6 +2462,7 @@
       applyFXModelsFromCurrentState(fields);
       applyFXEnabledStatesFromCurrentState(fields);
 
+      levelMarkCheck();
       render();
       presetStateWaiters.slice().forEach(waiter => waiter());
 
@@ -3490,6 +3496,7 @@ function parseSelectedCaptureState(payload) {
       ], MSG.RenamePresetRequest));
       if (!sent) return 'Rename failed: the Bluetooth write did not go through.';
 
+      if (levelStore.marks[preset]) { levelStore.marks[preset].name = name; saveLevelStore(); }   // the levelled mark goes with the name
       state.presetNames.set(preset, name);
       renderPresetSelect();
       return null;
@@ -4331,6 +4338,8 @@ function parseSelectedCaptureState(payload) {
         requestCurrentPresetState();
         if (!await checked) { showSaveResult('Not confirmed', 'error', 'The Nano did not answer the check after saving preset ' + preset + '.'); return; }
         if (state.presetDirty) { showSaveResult('Not confirmed', 'error', 'The Nano still reports unsaved changes in preset ' + preset + '.'); return; }
+        levelMarkCheck();   // a levelled mark of this preset counts from now on
+        renderPresetSelect();
         showSaveResult('Saved ✓', 'ok', 'Preset ' + preset + ' saved and checked.');
       } finally {
         state.saveBusy = false;
@@ -4718,11 +4727,14 @@ function parseSelectedCaptureState(payload) {
         const option = document.createElement('option');
         option.value = i;
         const slots = state.connected ? FS_SLOTS.filter(slot => state.presetSlots[slot.key] === i - 1).map(slot => slot.label) : [];
+        const mark = state.connected ? levelMark(i) : null;   // levelled with Auto level: kind and loudness
         option.textContent = i + '  ·  ' + (state.presetNames.get(i) || ('Preset ' + i)) +
-          (i === state.selectedPreset && state.presetDirty ? ' *' : '') + (slots.length ? '   [' + slots.join(' ') + ']' : '');
+          (i === state.selectedPreset && state.presetDirty ? ' *' : '') + (mark ? '   ' + levelMarkText(mark) : '') +
+          (slots.length ? '   [' + slots.join(' ') + ']' : '');
         if (i === state.selectedPreset) option.selected = true;
         select.appendChild(option);
       }
+      if (state.connected && !$('levelOverlay').hidden && !autoLevel.running && !autoLevel.preparing) renderAutoLevel();
     }
 
     function renderCaptureIR() {
@@ -6467,7 +6479,7 @@ function renderGate() {
     // - Mac app: a small helper reads the input with Core Audio (window.nanoMeter, see mac-app/meter.js) - any pair.
     // - Browser: getUserMedia. Chromium opens an input with more than two channels as stereo, so on a Mac only 1/2
     //   arrive (the Nano's DI); where a browser passes on more, the pair can be chosen as well.
-    const LEVEL_STORE = 'nanoCortexLevel';   // { input: label of the audio input, pairs: { label: first channel }, kind, targets }
+    const LEVEL_STORE = 'nanoCortexLevel';   // { input: label of the audio input, pairs: { label: first channel }, kind, targets, marks }
     const AL_KINDS = [
       { key: 'clean', label: 'Clean', lufs: -20 },
       { key: 'drive', label: 'Drive', lufs: -19 },
@@ -6480,11 +6492,12 @@ function renderGate() {
     const METER_FLOOR_DB = -60;
     const NANO_AUDIO = /nano\s*cortex|neural\s*dsp/i;
 
-    const levelStore = { input: '', pairs: {}, kind: 'clean', targets: Object.fromEntries(AL_KINDS.map(k => [k.key, k.lufs])) };
+    const levelStore = { input: '', pairs: {}, kind: 'clean', targets: Object.fromEntries(AL_KINDS.map(k => [k.key, k.lufs])), marks: {} };
     try {
       const saved = JSON.parse(localStorage.getItem(LEVEL_STORE) || '{}');
       if (typeof saved.input === 'string') levelStore.input = saved.input;
       if (saved.pairs && typeof saved.pairs === 'object') levelStore.pairs = saved.pairs;
+      if (saved.marks && typeof saved.marks === 'object') levelStore.marks = saved.marks;
       if (AL_KINDS.some(k => k.key === saved.kind)) levelStore.kind = saved.kind;
       AL_KINDS.forEach(k => { if (saved.targets && Number.isFinite(saved.targets[k.key])) levelStore.targets[k.key] = saved.targets[k.key]; });
     } catch (e) { /* storage unavailable */ }
@@ -6825,6 +6838,24 @@ function renderGate() {
         input.disabled = al.running;
       });
       const kind = AL_KINDS.find(k => k.key === levelStore.kind);
+      // what is remembered for the loaded preset
+      const mark = state.connected ? levelMark(state.selectedPreset) : null;
+      const line = $('alMark');
+      line.classList.toggle('on', Boolean(mark && Math.abs(mark.lufs - levelStore.targets[mark.kind]) <= MARK_TOLERANCE));
+      const markOff = mark ? mark.lufs - levelStore.targets[mark.kind] : 0;
+      line.textContent = !state.connected ? '' : !mark ? 'Preset ' + state.selectedPreset + ' is not levelled yet.'
+        : 'Preset ' + state.selectedPreset + ': ' + AL_KINDS.find(k => k.key === mark.kind).label + ', ' + dbText(mark.lufs) + ' LUFS' +
+          (Math.abs(markOff) <= MARK_TOLERANCE ? ' ✓' : ' (' + dbText(markOff, true) + ' LU from its target)') + ' · ' + new Date(mark.at).toLocaleDateString() +
+          (mark.saved ? '' : ' · press Save to keep it');
+      if (mark && !al.running && !al.preparing) {
+        const forget = document.createElement('button');
+        forget.type = 'button';
+        forget.className = 'al-link';
+        forget.textContent = 'Forget';
+        forget.title = 'Remove this note (the preset itself stays as it is)';
+        forget.addEventListener('click', () => { levelMarkDrop(state.selectedPreset); renderPresetSelect(); });
+        line.appendChild(forget);
+      }
       $('alStatus').classList.toggle('error', al.error);
       $('alStatus').textContent = al.text || 'Play the way you would in the song – chords for a rhythm sound, a lead line for a solo sound.';
       if (al.last && !al.running && !al.error && al.last.offerTarget) {
@@ -6848,6 +6879,8 @@ function renderGate() {
     }
 
     async function openLevel() {
+      const levelled = state.connected ? levelMark(state.selectedPreset) : null;
+      if (levelled && !autoLevel.running) levelStore.kind = levelled.kind;   // the kind this preset was levelled as
       $('levelOverlay').hidden = false;
       renderLevel();
       meterDraw();
@@ -6872,6 +6905,50 @@ function renderGate() {
     // a preset is, which is the only thing Auto level changes besides.
     const LEVEL_FULL = 255;
     const LEVEL_NEAR_FULL = 250;   // from 9.8 on it is set to 10 without asking: no jump to speak of
+
+    // ---- Levelled marks ----
+    // What Auto level last measured for a preset: marks[preset number] = { kind, lufs (after the run), raw (the capture
+    // volume the Nano had then), name, saved, at }. A mark stands for the preset as it is stored on the Nano: it shows
+    // in the preset list once the preset was saved like that, and it goes when the stored preset turns out different.
+    const MARK_TOLERANCE = 0.5;   // LU around the target that still count as on target
+    const captureRawNow = () => captureDbToRaw(Number(state.captureVolumeDb) || 0);
+
+    // The mark of a preset while it still stands for it: for the loaded preset compared with what the Nano has now,
+    // for the others only once it was saved.
+    function levelMark(preset) {
+      const mark = levelStore.marks[preset];
+      if (!mark || !AL_KINDS.some(k => k.key === mark.kind) || mark.name !== (state.presetNames.get(preset) || '')) return null;
+      if (preset === state.selectedPreset) return mark.raw === captureRawNow() && state.amp.level === LEVEL_FULL ? mark : null;
+      return mark.saved ? mark : null;
+    }
+
+    // "✓ Drive −19.0" on target, "Drive −21.3 (−2.3)" beside it
+    function levelMarkText(mark) {
+      const label = AL_KINDS.find(k => k.key === mark.kind).label;
+      const off = mark.lufs - levelStore.targets[mark.kind];
+      return Math.abs(off) <= MARK_TOLERANCE ? '✓ ' + label + ' ' + dbText(mark.lufs) : label + ' ' + dbText(mark.lufs) + ' (' + dbText(off, true) + ')';
+    }
+
+    function levelMarkSet(preset, kind, lufs, saved) {
+      levelStore.marks[preset] = { kind, lufs: Math.round(lufs * 10) / 10, raw: captureRawNow(), name: state.presetNames.get(preset) || '', saved, at: Date.now() };
+      saveLevelStore();
+    }
+
+    function levelMarkDrop(preset) {
+      if (!levelStore.marks[preset]) return;
+      delete levelStore.marks[preset];
+      saveLevelStore();
+    }
+
+    // After the Nano's state was read or the preset was saved: without unsaved changes the Nano's values are the stored
+    // preset. A mark that fits them is confirmed, one that does not is gone.
+    function levelMarkCheck() {
+      const preset = state.selectedPreset;
+      const mark = levelStore.marks[preset];
+      if (!mark || state.presetDirty) return;
+      if (mark.raw !== captureRawNow() || state.amp.level !== LEVEL_FULL || mark.name !== (state.presetNames.get(preset) || '')) levelMarkDrop(preset);
+      else if (!mark.saved) { mark.saved = true; saveLevelStore(); }
+    }
 
     function autoLevelCancel(text, error = false) {
       const al = autoLevel;
@@ -6914,7 +6991,7 @@ function renderGate() {
         if ($('levelOverlay').hidden) { al.text = ''; return; }
         const preset = state.selectedPreset;
         const level = state.amp.level;
-        before = { preset, db: Number(state.captureVolumeDb) || 0, level };
+        before = { preset, db: Number(state.captureVolumeDb) || 0, level, mark: levelStore.marks[preset] || null };
         if (level < LEVEL_NEAR_FULL && al.levelAsk !== preset) {   // a jump in loudness: only after a second press
           al.levelAsk = preset;
           autoLevelCancel('Level is at ' + ampText(level) + ' in this preset. The signal on USB follows Level, so Auto level measures with Level at 10 ' +
@@ -6968,10 +7045,13 @@ function renderGate() {
       const levelNote = levelRaised ? ' Level was at ' + ampText(al.before.level) + ' and stays at 10 now.' : '';
       al.last = { loud, peakDb, kind: al.kind, offerTarget: !al.apply };
       if (levelRaised) al.undo = al.before;
+      // the mark of this preset: what it measures now (nothing unsaved and nothing changed: it is the stored preset)
+      const mark = lufsNow => { if (al.before && Number.isFinite(lufsNow)) levelMarkSet(al.preset, al.kind, lufsNow, !levelRaised && !state.presetDirty); };
       if (!al.apply) {
         al.text = measured + ' The ' + kind.label + ' target is ' + dbText(target) + ' LUFS (' + dbText(target - loud, true) + ' dB from here).' + levelNote;
+        mark(loud);
         renderLevel();
-        renderAb();
+        renderPresetSelect();
         return;
       }
       let change = target - loud;
@@ -6987,19 +7067,21 @@ function renderGate() {
       if (Math.abs(after - before) < 0.05) {
         al.text = measured + NL + (limit ? 'Capture volume unchanged at ' + dbText(before, true) + ' dB.' + limit
           : 'That is the ' + kind.label + ' target (' + dbText(target) + ' LUFS) – nothing to change.') + levelNote;
+        mark(loud);
         renderLevel();
-        renderAb();
+        renderPresetSelect();
         return;
       }
       al.undo = al.before || { preset: state.selectedPreset, db: before, level: LEVEL_FULL };
       setCaptureVolumeUI(after);
       await setCaptureVolumeDb(after);
+      if (al.before) levelMarkSet(al.preset, al.kind, loud + after - before, false);   // counts once the preset is saved
       al.text = measured + NL + 'Capture volume ' + dbText(before, true) + ' → ' + dbText(after, true) + ' dB (' + dbText(after - before, true) + ' dB) for the ' +
         kind.label + ' target of ' + dbText(target) + ' LUFS.' + limit + levelNote + (state.capture.on ? '' : ' The capture is off in this preset – its volume may do nothing.') +
         NL + 'Press Start again to check it, and Save to keep it.';
       log('Auto level (' + kind.label + '): ' + al.text.split(NL).join(' '));
       renderLevel();
-      renderAb();
+      renderPresetSelect();
     }
 
     // Back to the capture volume and the Level from before the last run
@@ -7007,10 +7089,12 @@ function renderGate() {
       const al = autoLevel;
       if (!al.undo) return;
       if (!state.connected || al.undo.preset !== state.selectedPreset) { al.undo = null; renderLevel(); return; }
-      const { db, level } = al.undo;
+      const { db, level, preset, mark } = al.undo;
       al.undo = null;
       setCaptureVolumeUI(db);
       await setCaptureVolumeDb(db);
+      if (mark) levelStore.marks[preset] = mark; else delete levelStore.marks[preset];
+      saveLevelStore();
       const levelBack = level < LEVEL_FULL;
       if (levelBack) {
         state.amp.level = level;
@@ -7021,7 +7105,7 @@ function renderGate() {
       al.error = false;
       al.last = null;
       renderLevel();
-      renderAb();
+      renderPresetSelect();
     }
 
     // The measured loudness becomes the target of its kind; the other kinds keep their distance to it.

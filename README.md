@@ -136,6 +136,10 @@ recorded or sent anywhere.
   the preset from the Nano and measures with Level at 10, the full output, and leaves it there – the capture volume
   alone sets how loud a preset is, and all presets compare. If Level is lower, the first press says so and the second
   sets it: that gets louder, so turn your monitors down first. Auto level changes nothing else.
+- **Levelled presets**: the editor remembers for each preset what it was levelled as and how loud it measured. The
+  preset list shows it behind the name – `✓ Drive −19.0` on target, `Drive −21.3 (−2.3)` beside it – once the preset
+  is saved. The note goes when the saved preset no longer fits it (another capture volume, Level off 10) or with
+  **Forget** in the dialog. It is kept in this browser or app, not on the Nano.
 - **Targets**: Clean −20, Drive −19, Solo −16 and Fuzz −19 LUFS are a starting point. They can be typed in; with
   **Only measure** on a preset you like and *Take … as the target* all four move by the same amount.
 
