@@ -41,6 +41,11 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   Level at 10 (full output), the capture volume is set so that the preset lands on the loudness of its kind (clean
   lowest, solo about 3 dB above drive) and its peaks stay below full scale. The four targets can be changed;
   **Only measure** reads a preset you like and can take it as the target
+- **Jam tracks**: a player along the bottom of the window (the note symbol). Choose the folder with your backing
+  tracks once: every track is measured and played at one loudness just below your presets, so you can play along
+  without touching a volume – the files stay as they are. A track that still sits differently against the guitar
+  gets its own correction by ear, which is remembered. Previous, play / pause and next can be assigned with MIDI
+  Learn, and the footswitches of the Nano Cortex Controller work them in its looper mode
 - **Preset files**: **Export** saves the current preset as a file (to keep or to share), **Import** – or dropping the
   file on the window – loads one into the current preset; **Save** keeps it. Captures and IRs travel by name: the
   import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
@@ -48,7 +53,7 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 - **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
 - **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs the mic (five drawn mic types) and its
   position 1–6 on a drawn speaker – click a mic or a position; load factory or user IRs from the device library into a slot
-- **Keyboard shortcuts**: ⌘S save, ← → previous / next preset, ⌘E export, ⌘I import, T tuner, A for A/B, ? for the overview
+- **Keyboard shortcuts**: ⌘S save, ← → previous / next preset, ⌘E export, ⌘I import, T tuner, A for A/B, Space for the jam tracks, ? for the overview
   (Ctrl instead of ⌘ on Windows)
 - **Tuner**: note and cents display, reference pitch (400–480 Hz), mute
 - **Expression pedal**: per-preset assignments for Gain, Bass, Mid, Treble, Level, Gate and FX amounts (min/max, invert) and bypass switching (Heel-Toe, Switch, Stop)
@@ -149,6 +154,41 @@ the page only gets channels 1/2 – on the Nano the dry signal, which the captur
 says so and Auto level stays off there. Measuring another interface that records the Nano's outputs works in the
 browser as well.
 
+## Jam tracks
+
+![Jam tracks](docs/jam-tracks.png)
+
+Click the note symbol in the top bar: a player appears along the bottom of the window and stays there while you
+edit. The folder symbol chooses the folder with your backing tracks – once per start of the editor. It plays mp3,
+m4a (AAC), wav, flac and ogg; the Mac app also plays **Apple Lossless** (m4a), AIFF and CAF, which it has macOS read
+(a browser cannot, and says so in the track list). Protected files from a music subscription cannot be played.
+
+- **One level for all tracks:** each track is measured once (integrated loudness, ITU-R BS.1770, the same scale as
+  the output meter) and then played with the gain that brings it to the level shown in the player. That level is
+  counted from the **Drive** target of Auto level, 2 LU below it to begin with (−21 LUFS); **−** and **+** of
+  *LUFS · all* move all tracks together. The files are not changed, and the measurements are remembered.
+- **The bass counts less:** of two tracks at the same LUFS, the one with less bass has more of its sound where the
+  guitar plays, and seems louder against it. The tracks are therefore matched on their loudness without the bass
+  (below about 200 Hz: −3 dB at 200 Hz, −12 dB at 100 Hz). A usual full mix keeps its level; a track with little
+  bass plays up to 1.4 dB quieter, one with much bass up to 3 dB louder, and the track list says so from half a dB
+  on (*little bass −0.8*).
+- **One track by ear:** what is left – a quiet verse and a loud chorus, a dense arrangement – is yours to set.
+  **−** and **+** of *dB · track* correct the track that is loaded, in steps of 0.5 dB; the editor remembers it for
+  that file (by folder and file name, also after a new bounce), and the track list shows it as *by ear*. A click on
+  the number clears it.
+- **Through the Nano:** set the track list's *Output* to the Nano (or the Mac's sound output), so the tracks come out
+  of the Nano together with your guitar. With the Nano connected, its *USB playback volume* is read and made up for,
+  so that setting does not move the balance. A track whose peaks would clip is played as loud as they allow.
+- **Controls:** previous, play / pause (also the space bar), next, a click into the progress bar, repeat one track,
+  and the track list. The player keeps playing when it is hidden.
+- **With your feet:** connect the editor through the [Nano Cortex Controller](https://github.com/DrD85/nano-cortex-controller)
+  (from 1.9.0) and switch the controller to its looper mode (hold footswitch 1): footswitch **2** plays and pauses,
+  **7** goes to the previous and **8** to the next track. *MIDI → Start MIDI Learn* assigns other footswitches – or
+  any MIDI controller – to the three buttons.
+
+How loud a track sits against the guitar in the Nano's output depends on the Nano's own mixing, which the editor
+cannot measure: if all tracks are too loud or too quiet, set the level once with **−** / **+** of *LUFS · all*.
+
 ## MIDI controller
 
 Click the **MIDI** icon → **Start MIDI Learn**, click a knob, slider or switch in the editor and move a control on your
@@ -208,5 +248,7 @@ für das Expression-Pedal und die Steuerung per MIDI-Controller mit MIDI Learn.
 Mit **A | B** vergleichst du den gemerkten Stand mit deinen Änderungen. Ist der Nano zusätzlich per USB-C verbunden,
 zeigt die Mac-App seinen Ausgangspegel (USB-Kanäle 3/4) und stellt mit **Auto level** die Capture-Lautstärke nach ein
 paar Sekunden Spielen passend für Clean, Drive, Solo oder Fuzz ein. Im Browser kommen am Mac nur die Kanäle 1/2 (DI) an.
+Unten im Fenster lässt sich ein **Jamtrack-Player** einblenden: Ordner wählen, und alle Tracks laufen gleich laut,
+knapp unter deinen Presets; der Nano Cortex Controller schaltet sie im Looper-Modus mit den Fußschaltern.
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.

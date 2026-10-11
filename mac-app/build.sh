@@ -3,6 +3,8 @@
 #
 #   ./build.sh            app for yourself (includes ../img pedal pictures if present)
 #   ./build.sh --public   app for a GitHub release (no pedal pictures) + zip in ../release
+#
+# NANO_DIST=dist/next ./build.sh builds into another folder (under dist), next to an app that is running from dist.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -11,7 +13,8 @@ PUBLIC=false
 
 APP_NAME="Nano Cortex Editor"
 VERSION="$(node -p "require('./package.json').version")"
-OUT="dist/${APP_NAME}-darwin-arm64/${APP_NAME}.app"
+DIST="${NANO_DIST:-dist}"
+OUT="$DIST/${APP_NAME}-darwin-arm64/${APP_NAME}.app"
 
 # The editor shows its own version (EDITOR_VERSION in index.html); app and editor must agree.
 EDITOR_VERSION="$(sed -n "s/.*const EDITOR_VERSION = '\([^']*\)'.*/\1/p" ../index.html)"
@@ -51,7 +54,7 @@ fi
 npx @electron/packager . "$APP_NAME" \
   --platform=darwin \
   --arch=arm64 \
-  --out=dist \
+  --out="$DIST" \
   --overwrite \
   --icon=assets/icon.icns \
   --app-bundle-id=local.nanocortex.editor \

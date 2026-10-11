@@ -4,6 +4,7 @@ const { app, BrowserWindow, ipcMain, Menu, session, shell, systemPreferences } =
 const fs = require('fs');
 const path = require('path');
 const { registerMeter } = require('./meter');
+const { registerJam } = require('./jam');
 
 // Zoom like in Chrome: Cmd + / Cmd - step through these factors, Cmd 0 returns to 100 %. The zoom is kept for the next start.
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
@@ -158,6 +159,7 @@ function allowAudioInput() {
 app.whenReady().then(() => {
   buildMenu();
   allowAudioInput();
+  registerJam({ ipcMain });
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
