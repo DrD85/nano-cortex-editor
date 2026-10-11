@@ -22,6 +22,10 @@ fi
 
 [[ -d node_modules ]] || npm install
 
+# Level meter helper: reads the Nano's USB audio (channels 3/4), which the page itself cannot. Needs the Swift
+# compiler of Xcode or its command line tools. Built for macOS 13 and later, like the Electron app itself.
+swiftc -O -target arm64-apple-macos13.0 -o native/nano-meter native/nano-meter.swift
+
 # Bundle the editor (and, for personal builds, the optional pedal pictures).
 rm -rf app
 mkdir -p app
@@ -55,7 +59,11 @@ npx @electron/packager . "$APP_NAME" \
   --extend-info=assets/extend-info.plist \
   --ignore='^/dist' \
   --ignore='^/assets' \
+  --ignore='^/native' \
   --ignore='^/build\.sh$'
+
+# The helper sits next to the app's executable, so the signature below covers it.
+cp native/nano-meter "$OUT/Contents/MacOS/nano-meter"
 
 # Ad-hoc signature so macOS accepts the modified bundle and asks for Bluetooth access.
 codesign --force --deep --sign - "$OUT"

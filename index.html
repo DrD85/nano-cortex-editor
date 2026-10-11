@@ -370,6 +370,7 @@
       --ico-capture: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M5 12c2-4 3-4 4.5 0s2.5 4 4.5 0 3-4 5 0'/></g></svg>");
       --ico-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='3' width='16' height='18' rx='2'/><circle cx='12' cy='13' r='4.5'/><circle cx='12' cy='13' r='1'/></g></svg>");
       --ico-amp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='6' width='20' height='12' rx='2'/><path d='M2 11h20'/><circle cx='7' cy='14.5' r='1'/><circle cx='12' cy='14.5' r='1'/><circle cx='17' cy='14.5' r='1'/></g></svg>");
+      --ico-level: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M5 20v-7M10 20V5M15 20v-10M20 20v-4'/><path d='M3 9h3M13 6h9' stroke-dasharray='1.5 2.5'/></g></svg>");
       --ico-tuner: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2v8a4 4 0 0 0 8 0V2'/><path d='M12 14v8'/></g></svg>");
       --ico-exp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 18l14-5'/><path d='M5 21v-3M19 21v-8'/><path d='M6 9a9 9 0 0 1 12-4'/><path d='M15 3l3 2-2 3'/></g></svg>");
       --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
@@ -928,17 +929,18 @@
     .gate-card .block-head { gap: 8px; }
     .gate-card #gateParams { flex: 1; display: grid; place-items: center; margin-top: 4px; }
 
-    /* effect blocks: pedal silhouette (or faded photo) in the background */
+    /* effect blocks */
     .chain { gap: 14px; }
     .block { position: relative; overflow: hidden; min-height: 0; padding: 14px 16px 18px; border-radius: 14px; }
-    /* small pedal picture left of the model choice */
-    .model-row { display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 10px; margin-bottom: 14px; }
+    /* small pedal picture left of the model choice: only with own pictures (img/), see .pedal-pictures */
+    .model-row { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 10px; margin-bottom: 14px; }
     .model-row .model-select { margin-bottom: 0; }
-    .pedal-thumb { width: 46px; height: 62px; overflow: visible; }
-    .pedal-thumb img, .pedal-thumb svg { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
-    .pedal-thumb svg text { display: none; }
+    .pedal-thumb { display: none; width: 46px; height: 62px; overflow: visible; }
+    .pedal-pictures .model-row { grid-template-columns: 46px minmax(0, 1fr); }
+    .pedal-pictures .pedal-thumb { display: block; }
+    .pedal-thumb img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
     .pedal-thumb.empty { border: 1.5px dashed #3a3f45; border-radius: 9px; height: 58px; }
-    .block:not(.active) .pedal-thumb img, .block:not(.active) .pedal-thumb svg { filter: grayscale(.55) brightness(.55); }
+    .block:not(.active) .pedal-thumb img { filter: grayscale(.55) brightness(.55); }
     .model-select { margin-bottom: 12px; border-radius: 10px; }
     /* FX presets: Orig + "All presets", then the favourites in two columns with their full names */
     .fxp { display: grid; gap: 6px; margin: 0 0 16px; }
@@ -999,8 +1001,8 @@
       main { padding: 16px; }
       header.topbar { padding: 12px 16px; }
       .topbar .brand { min-width: 0; }
-      .topbar .preset-bar { flex: 1 1 100%; min-width: 0; }
-      .topbar .preset-field { flex: 1 1 auto; width: auto; min-width: 0; }
+      .topbar .preset-bar { flex: 1 1 100%; min-width: 0; flex-wrap: wrap; }   /* the A/B buttons take the next line on a phone */
+      .topbar .preset-field { flex: 1 1 0; width: auto; min-width: 130px; }
       .topbar .tools { flex: 1 1 100%; flex-wrap: wrap; justify-content: flex-start; }
       .tool-sep { display: none; }
       .conn-btn { margin-left: auto; }
@@ -1102,6 +1104,79 @@
     .fxi-tips { margin: 10px 0 0; padding-left: 16px; font-size: 12.5px; line-height: 1.5; color: #b8bcc1; }
     .fxi-tips li + li { margin-top: 4px; }
     .fxi-foot { margin-top: 12px; padding-top: 10px; border-top: 1px solid #2c3035; font-size: 10.5px; line-height: 1.45; color: #6f747a; }
+
+    /* A/B compare: two segments next to Rename; the lit one is the side you hear */
+    .ab-box { display: inline-flex; align-items: stretch; height: 40px; flex: none; border: 1px solid #3a3d40; border-radius: 10px; overflow: hidden;
+              background: linear-gradient(180deg, #191b1d, #111315); }
+    .ab-box:hover { border-color: var(--accent); }
+    .ab-box button { border: 0; border-radius: 0; background: transparent; padding: 0; letter-spacing: 0; }
+    .ab-seg { position: relative; width: 30px; font-size: 13px; font-weight: 700; color: #8e9297; }
+    .ab-seg:hover { color: #fff; }
+    .ab-seg + .ab-seg { border-left: 1px solid #2b2f33; }
+    .ab-box.active .ab-seg.on { background: #ececec; color: #0d0f11; }
+    .ab-box.active .ab-seg.differs:not(.on)::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 4px; height: 4px; margin-left: -2px;
+                                                      border-radius: 50%; background: #ffb02e; }   /* the other side differs from what you hear */
+    .ab-end { width: 28px; display: grid; place-items: center; color: #8e9297; border-left: 1px solid #2b2f33; }
+    .ab-end[hidden] { display: none; }
+    .ab-end:hover { color: #fff; }
+    .ab-end .ico { width: 13px; height: 13px; }
+    .ab-box.busy { opacity: .6; pointer-events: none; }
+
+    /* output level: small meter at the end of the signal chain, the dialog with the bars and Auto level */
+    .sc-node.io.out { cursor: pointer; }
+    .sc-node.io.out:hover .sc-tile { color: #fff; border-color: var(--accent); }
+    .sc-tile.io.meter { width: 38px; height: 60px; margin-top: 0; border-radius: 12px; display: flex; align-items: stretch; justify-content: center; gap: 5px; padding: 8px 0; }
+    .sc-tile.io.meter .vu { position: relative; width: 7px; border-radius: 3px; background: #23272b; overflow: hidden; }
+    .sc-tile.io.meter .vu i { position: absolute; inset: 0; background: linear-gradient(to top, #45F862 0, #45F862 70%, #f2d14b 70%, #f2d14b 90%, #ff5a4d 90%);
+                              clip-path: inset(calc(100% - var(--v, 0%)) 0 0 0); }
+    .sc-node.io.out .sc-sub { min-height: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .level-panel { width: min(580px, calc(100vw - 32px)); gap: 14px; max-height: calc(100vh - 32px); overflow: auto; }
+    .lv-source { display: flex; align-items: center; gap: 12px; }
+    .lv-source #levelInput { flex: 1 1 auto; min-width: 0; }
+    .lv-source #levelPair { flex: 0 0 auto; width: auto; }
+    .lv-source #levelPair[hidden] { display: none; }
+    .lv-hint { color: #9aa0a6; font-size: 12.5px; line-height: 1.5; }
+    .lv-hint.error { color: #ff8c8c; }
+    .lv-hint:empty { display: none; }
+    .lv-meter { display: grid; gap: 7px; padding: 14px 14px 8px; border: 1px solid #24282c; border-radius: 12px; background: #0c0d0f; }
+    .lv-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 84px; align-items: center; gap: 10px; }
+    .lv-ch { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8e9297; }
+    .lv-bar { position: relative; height: 12px; border-radius: 4px; background: #1d2024; overflow: hidden; }
+    .lv-bar i { position: absolute; inset: 0; background: linear-gradient(to right, #45F862 0, #45F862 70%, #f2d14b 70%, #f2d14b 90%, #ff5a4d 90%);
+                clip-path: inset(0 calc(100% - var(--v, 0%)) 0 0); }
+    .lv-bar b { position: absolute; top: 0; bottom: 0; left: var(--v, 0%); width: 2px; margin-left: -1px; background: #f2f2f2; opacity: 0; }
+    .lv-bar b.show { opacity: .9; }
+    .lv-row.loud .lv-bar { height: 8px; overflow: visible; }
+    .lv-row.loud .lv-bar i { background: #9aa0a6; border-radius: 4px; }
+    .lv-bar b.target { top: -4px; bottom: -4px; background: #45F862; opacity: 1; border-radius: 1px; }
+    .lv-num { font-size: 11px; color: #8e9297; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .lv-num strong { font-size: 13px; font-weight: 650; color: #f2f2f2; }
+    .lv-scale { position: relative; height: 14px; font-size: 9.5px; color: #6f747a; font-variant-numeric: tabular-nums; }
+    .lv-scale span { position: absolute; top: 0; transform: translateX(-50%); }
+    .lv-scale span:last-child { transform: translateX(-100%); }
+    .lv-clip { justify-self: end; padding: 1px 7px; border-radius: 999px; background: #ff5a4d; color: #1a0503; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .lv-clip[hidden] { display: none; }
+    .al { display: grid; gap: 12px; padding-top: 14px; border-top: 1px solid #24282c; }
+    .al-head { display: flex; align-items: baseline; justify-content: space-between; }
+    .al-head h3 { margin: 0; font-size: 15px; font-weight: 650; color: #f2f2f2; }
+    .al-link { padding: 0; border: 0; background: none; color: #8e9297; font-size: 12px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+    .al-link:hover { color: #fff; }
+    .al-kinds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .al-kind { display: grid; gap: 6px; padding: 10px 10px 9px; border: 1px solid #2c3035; border-radius: 11px; background: #17191c; cursor: pointer; text-align: left; }
+    .al-kind:hover { border-color: #4a4f55; }
+    .al-kind.sel { border-color: #45F862; background: #12261a; }
+    .al-kind .nm { font-size: 13.5px; font-weight: 650; color: #f2f2f2; }
+    .al-kind .tg { display: flex; align-items: baseline; gap: 5px; font-size: 10px; letter-spacing: .06em; color: #8e9297; }
+    .al-kind input { width: 100%; min-width: 0; padding: 4px 6px; border: 1px solid #33383e; border-radius: 7px; background: #0c0d0f; color: #f2f2f2; font-size: 12.5px;
+                     font-variant-numeric: tabular-nums; outline: none; }
+    .al-kind input:focus { border-color: #8a8a8a; }
+    .al-progress { height: 4px; border-radius: 2px; background: #1d2024; overflow: hidden; }
+    .al-progress i { display: block; height: 100%; width: var(--v, 0%); background: #45F862; transition: width .1s linear; }
+    .al-status { min-height: 38px; color: #d8dadc; font-size: 13px; line-height: 1.5; white-space: pre-line; }
+    .al-status.error { color: #ffb8b8; }
+    .al-status .al-link { display: block; margin-top: 4px; color: #c8ccd1; font-size: 13px; text-align: left; }
+    .level-panel .ask-buttons button { padding: 10px 14px; white-space: nowrap; }
+    @media (max-width: 520px) { .al-kinds { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   </style>
 </head>
 <body>
@@ -1118,6 +1193,11 @@
       <button id="presetNext" class="icon-btn" data-midi-id="preset::next" data-midi-target='{"kind":"preset","key":"next"}' title="Next preset" aria-label="Next preset"><span class="ico" style="--icon: var(--ico-right)"></span></button>
       <button id="saveBtn" class="icon-btn save-btn" title="Save the preset on the Nano" aria-label="Save"><span class="ico" style="--icon: var(--ico-save)"></span><span id="saveLabel" class="btn-label"></span></button>
       <button id="renameBtn" class="icon-btn" title="Rename the preset" aria-label="Rename"><span class="ico" style="--icon: var(--ico-rename)"></span></button>
+      <div id="abBox" class="ab-box" role="group" aria-label="A/B compare">
+        <button id="abA" class="ab-seg" aria-label="A">A</button>
+        <button id="abB" class="ab-seg" aria-label="B">B</button>
+        <button id="abEnd" class="ab-end" title="End the compare (the settings you hear stay)" aria-label="End the compare" hidden><span class="ico" style="--icon: var(--ico-close)"></span></button>
+      </div>
     </div>
     <div class="tools">
       <button id="exportBtn" class="icon-btn" title="Export: save the current preset as a file (to keep or to share)" aria-label="Export"><span class="ico" style="--icon: var(--ico-export)"></span></button>
@@ -1161,6 +1241,7 @@
         <div class="block-head">
           <div class="block-title"><span id="captureIcon" class="fx-icon" style="--icon: var(--ico-capture)"></span><h2>Capture</h2><span id="captureType" class="cap-type"></span></div>
           <div class="head-actions">
+            <button id="autoLevelBtn" class="icon-btn small" title="Output level and Auto level: sets the capture volume from your playing (over the Nano's USB audio)" aria-label="Auto level"><span class="ico" style="--icon: var(--ico-level)"></span></button>
             <button id="libraryBtn" class="icon-btn small" title="Browse the capture library" aria-label="Library"><span class="ico" style="--icon: var(--ico-library)"></span></button>
             <div id="captureToggle" class="toggle-switch on" data-midi-id="toggle::capture" data-midi-target='{"kind":"toggle","target":"capture"}'>
               <div class="toggle-dot"></div>
@@ -1229,6 +1310,41 @@
         <button type="submit" id="askOk" class="primary">OK</button>
       </div>
     </form>
+  </div>
+
+  <div id="levelOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel level-panel" role="dialog" aria-label="Output level">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-level)"></span><h2 class="dlg-title">Output level</h2></div>
+        <button id="levelClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+      </div>
+      <div class="lv-source">
+        <select id="levelInput" aria-label="Audio input"></select>
+        <select id="levelPair" aria-label="Channels" title="The channels to measure – on the Nano 1/2 are the dry guitar signal, 3/4 its sound" hidden></select>
+        <div id="levelToggle" class="toggle-switch" title="Meter on / off" role="switch" aria-label="Meter"><div class="toggle-dot"></div></div>
+      </div>
+      <div id="levelHint" class="lv-hint"></div>
+      <div class="lv-meter">
+        <div class="lv-row"><span class="lv-ch">L</span><div class="lv-bar"><i id="lvBarL"></i><b id="lvHoldL"></b></div><span class="lv-num"><strong id="lvNumL">–</strong> dB</span></div>
+        <div class="lv-row"><span class="lv-ch">R</span><div class="lv-bar"><i id="lvBarR"></i><b id="lvHoldR"></b></div><span class="lv-num"><strong id="lvNumR">–</strong> dB</span></div>
+        <div class="lv-row loud" title="Loudness of the last three seconds; the mark is the target of the chosen sound"><span class="lv-ch">Loud</span><div class="lv-bar"><i id="lvBarLoud"></i><b id="lvTarget" class="target"></b></div><span class="lv-num"><strong id="lvNumLoud">–</strong> LUFS</span></div>
+        <div class="lv-row"><span></span><div id="lvScale" class="lv-scale"></div><span id="lvClip" class="lv-clip" hidden>Clip</span></div>
+      </div>
+      <div class="al">
+        <div class="al-head"><h3>Auto level</h3><button id="alReset" class="al-link" title="Back to the suggested targets">Reset targets</button></div>
+        <div class="lv-hint">Choose the kind of sound, press Start and play for a few seconds. Level goes to 10 – the Nano's full output, which
+          the signal on USB follows – and only the capture volume is set, so that the preset lands on its target: a clean sound lowest, a solo
+          on top, with room to full scale for all of them.</div>
+        <div id="alKinds" class="al-kinds"></div>
+        <div class="al-progress"><i id="alBar"></i></div>
+        <div id="alStatus" class="al-status"></div>
+        <div class="ask-buttons">
+          <button type="button" id="alUndo" class="push-left" hidden>Undo</button>
+          <button type="button" id="alOnly" title="Measures your playing without changing anything – for example to take a preset you like as the target">Only measure</button>
+          <button type="button" id="alStart" class="primary">Start</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="keysOverlay" class="ask-overlay" hidden>
@@ -1790,6 +1906,12 @@
       'MX Vibe': 'img/MXR Univibe.png',
       'Love Meat': 'img/Lovetone Meatball.png'
     };
+    // The pictures are not part of the public editor: the picture column only shows where img/ exists.
+    {
+      const probe = new Image();
+      probe.onload = () => document.documentElement.classList.add('pedal-pictures');
+      probe.src = Object.values(MODEL_IMAGES)[0];
+    }
 
     const state = {
       device: null,
@@ -1804,6 +1926,7 @@
       libraryBytes: [],
       libraryTimer: null,
       presetDirty: false,
+      ab: { active: false, side: 'B', A: null, B: null, preset: 0, busy: false },   // A/B compare
       connected: false,
       selectedPreset: 1,
       presetNames: new Map(),
@@ -1859,7 +1982,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.5.2';
+    const EDITOR_VERSION = '1.6.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2107,6 +2230,7 @@
       state.protocol.feSyncComplete = false;
       gattWriteQueue.splice(0).forEach(job => job.waiters.forEach(resolve => resolve(false)));
       resetExpRequests();
+      abEnd();
       setStatus('Disconnected');
       log('Disconnected.');
     }
@@ -4226,6 +4350,7 @@ function parseSelectedCaptureState(payload) {
 
     async function setCaptureVolumeDb(db) {
       const clampedDb = Math.max(-24, Math.min(12, Number(db)));
+      state.captureVolumeDb = clampedDb;   // also what a preset export and the A/B compare read
       const raw = captureDbToRaw(clampedDb);
       const rawBytes = encodeVarint(raw);
 
@@ -4532,6 +4657,7 @@ function parseSelectedCaptureState(payload) {
     }
 
     function renderPresetSelect() {
+      renderAb();
       $('dirtyDot').hidden = !(state.connected && state.presetDirty);
       $('saveBtn').classList.toggle('dirty', Boolean(state.connected && state.presetDirty));
       const select = $('presetSelect');
@@ -5304,70 +5430,6 @@ function renderGate() {
       return icon ? '<span class="fx-icon" style="--icon: var(--ico-' + icon + ')"></span>' : '<span class="fx-icon fx-icon-empty"></span>';
     }
 
-    // Brand-free pedal drawing: enclosure in the category colour, one knob per continuous
-    // parameter (up to 6, pointing at the current values), model name, status LED and footswitch.
-    const PEDAL_CATEGORY_LABELS = {
-      overdrive: 'Overdrive', 'bass-overdrive': 'Bass Overdrive', fuzz: 'Fuzz', compressor: 'Compressor',
-      equalizer: 'Equalizer', filter: 'Filter', wah: 'Wah', utility: 'Utility', gate: 'Gate', doubler: 'Doubler',
-      pitch: 'Pitch', modulation: 'Modulation', delay: 'Delay', reverb: 'Reverb'
-    };
-
-    function pedalGraphicSVG(id, block, style) {
-      const body = style.color === FX_COLORS.utility ? '#d6d6d6' : style.color;
-      const ink = iconInk(body) === '#fff' ? '#ffffff' : '#141414';
-      const name = escapeHTML(block.model.toUpperCase());
-      const category = escapeHTML((PEDAL_CATEGORY_LABELS[style.icon] || '').toUpperCase());
-      const led = block.on ? '#ff3b30' : '#4a1d1a';
-      const gid = 'pg-' + id;
-      const nameAttrs = block.model.length > 10 ? ' textLength="72" lengthAdjust="spacingAndGlyphs"' : '';
-      const defs = '<defs>' +
-        '<linearGradient id="' + gid + '-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.22"/><stop offset="0.5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.28"/></linearGradient>' +
-        '<radialGradient id="' + gid + '-m" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#f4f4f4"/><stop offset="1" stop-color="#7c7c7c"/></radialGradient>' +
-        '</defs>';
-
-      if (style.icon === 'wah') {
-        // Wah: treadle seen from above.
-        return '<svg class="pedal-svg" viewBox="0 0 100 150" role="img" aria-label="' + name + '">' + defs +
-          '<rect x="10" y="6" width="80" height="138" rx="12" fill="#2b2b2b"/>' +
-          '<rect x="10" y="6" width="80" height="138" rx="12" fill="url(#' + gid + '-b)"/>' +
-          '<rect x="18" y="14" width="64" height="88" rx="8" fill="#161616" stroke="#000" stroke-opacity="0.5"/>' +
-          Array.from({ length: 9 }, (_, i) => '<line x1="26" x2="74" y1="' + (24 + i * 8) + '" y2="' + (24 + i * 8) + '" stroke="#3a3a3a" stroke-width="2.4" stroke-linecap="round"/>').join('') +
-          '<rect x="18" y="108" width="64" height="22" rx="4" fill="' + body + '"/>' +
-          '<text x="50" y="123" text-anchor="middle" font-family="IBM Plex Sans, -apple-system, Helvetica, Arial, sans-serif" font-size="8.5" font-weight="800" fill="' + ink + '"' + nameAttrs.replace('74', '58') + '>' + name + '</text>' +
-          '<circle cx="80" cy="138" r="2.2" fill="' + led + '"/>' +
-          '</svg>';
-      }
-
-      const knobs = (block.params || []).filter(param => !(param.meta && param.meta.kind === 'enum')).slice(0, 6);
-      const rows = knobs.length <= 3 ? [knobs] : knobs.length === 4 ? [knobs.slice(0, 2), knobs.slice(2)] : [knobs.slice(0, 3), knobs.slice(3)];
-      const r = knobs.length <= 3 ? 9 : 8;
-      let knobSVG = '';
-      rows.forEach((row, rowIndex) => {
-        const y = rows.length === 1 ? 36 : 28 + rowIndex * 26;
-        row.forEach((param, i) => {
-          const x = 50 + (i - (row.length - 1) / 2) * (row.length === 2 ? 30 : 26);
-          const a = (-225 + paramValueToNormalized(param) * 270) * Math.PI / 180;
-          knobSVG += '<circle cx="' + x + '" cy="' + (y + 1.5) + '" r="' + r + '" fill="#000" opacity="0.25"/>' +
-            '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#1b1b1b" stroke="#000" stroke-opacity="0.6"/>' +
-            '<line x1="' + x + '" y1="' + y + '" x2="' + (x + Math.cos(a) * (r - 2)).toFixed(1) + '" y2="' + (y + Math.sin(a) * (r - 2)).toFixed(1) + '" stroke="#f2f2f2" stroke-width="1.8" stroke-linecap="round"/>';
-        });
-      });
-
-      return '<svg class="pedal-svg" viewBox="0 0 100 150" role="img" aria-label="' + name + '">' + defs +
-        '<rect x="7" y="16" width="5" height="12" rx="1.5" fill="#9a9a9a"/><rect x="88" y="16" width="5" height="12" rx="1.5" fill="#9a9a9a"/>' +
-        '<rect x="10" y="4" width="80" height="142" rx="9" fill="' + body + '"/>' +
-        '<rect x="10" y="4" width="80" height="142" rx="9" fill="url(#' + gid + '-b)"/>' +
-        '<rect x="10.5" y="4.5" width="79" height="141" rx="8.5" fill="none" stroke="#000" stroke-opacity="0.35"/>' +
-        knobSVG +
-        '<text x="50" y="' + (rows.length === 1 ? 74 : 86) + '" text-anchor="middle" font-family="IBM Plex Sans, -apple-system, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" letter-spacing="0.4" fill="' + ink + '"' + nameAttrs + '>' + name + '</text>' +
-        '<text x="50" y="' + (rows.length === 1 ? 85 : 96) + '" text-anchor="middle" font-family="IBM Plex Sans, -apple-system, Helvetica, Arial, sans-serif" font-size="5.6" letter-spacing="1.2" fill="' + ink + '" opacity="0.65">' + category + '</text>' +
-        '<circle cx="50" cy="108" r="3" fill="' + led + '"/>' +
-        (block.on ? '<circle cx="50" cy="108" r="6" fill="' + led + '" opacity="0.25"/>' : '') +
-        '<circle cx="50" cy="128" r="10" fill="url(#' + gid + '-m)" stroke="#000" stroke-opacity="0.45"/>' +
-        '<circle cx="50" cy="128" r="5.5" fill="#cfcfcf" stroke="#000" stroke-opacity="0.3"/>' +
-        '</svg>';
-    }
-
     function renderBlock(key, block) {
       const style = fxStyle(block.models.find(m => m.name === block.model));
       const el = document.createElement('div');
@@ -5443,28 +5505,24 @@ function renderGate() {
         if (selected && selected.id) setFXModel(key, e.target.value);
       });
 
-      // Small pedal picture left of the model choice: your own image from img/ if available, otherwise a drawn, brand-free pedal.
+      // Small pedal picture left of the model choice - only with your own pictures in img/ (the published editor has
+      // none: a drawing would not be the real pedal). Without pictures the model choice takes the whole row.
       const modelRow = document.createElement('div');
       modelRow.className = 'model-row';
       const thumb = document.createElement('div');
-      thumb.className = 'pedal-thumb' + (block.model === 'None' ? ' empty' : '');
-      if (block.model !== 'None') {
+      const picture = block.model !== 'None' && MODEL_IMAGES[block.model];
+      thumb.className = 'pedal-thumb' + (picture ? '' : ' empty');
+      if (picture) {
         thumb.title = fxInfoOf(block.model) ? 'About ' + block.model : block.model;
         if (fxInfoOf(block.model)) {
           thumb.classList.add('has-info');
           thumb.addEventListener('click', e => { e.stopPropagation(); toggleFxInfo(key); });
         }
-        const showGraphic = () => { thumb.innerHTML = pedalGraphicSVG(key, block, style); };
-        const picture = typeof MODEL_IMAGES !== 'undefined' && MODEL_IMAGES[block.model];
-        if (picture) {
-          const img = document.createElement('img');
-          img.src = picture;
-          img.alt = block.model;
-          img.onerror = showGraphic;
-          thumb.appendChild(img);
-        } else {
-          showGraphic();
-        }
+        const img = document.createElement('img');
+        img.src = picture;
+        img.alt = block.model;
+        img.onerror = () => { img.remove(); thumb.classList.add('empty'); };
+        thumb.appendChild(img);
       }
       modelRow.appendChild(thumb);
       modelRow.appendChild(select);
@@ -6079,6 +6137,828 @@ function renderGate() {
       $('importFile').click();
     }
 
+    // ---- A/B compare ----
+    // The first click remembers the current settings as A; from then on you edit B. Switching keeps the side you leave
+    // and sends only what differs to the Nano, so going back and forth is quick. Nothing is stored by it: Save keeps
+    // the side you hear. A preset change or a disconnect ends the compare.
+    const AB_KEY_HINT = ' (A)';
+
+    function abSnapshot() {
+      const data = presetFileData();
+      delete data.expression;   // the expression assignments are stored at once: not part of the compare
+      delete data.exported;
+      delete data.name;
+      return data;
+    }
+
+    function abDiffers() {
+      const ab = state.ab;
+      if (!ab.active) return false;
+      const other = ab.side === 'A' ? ab.B : ab.A;
+      return JSON.stringify(abSnapshot()) !== JSON.stringify(other);
+    }
+
+    function renderAb() {
+      const ab = state.ab;
+      if (ab.active && (!state.connected || ab.preset !== state.selectedPreset)) abEnd(true);
+      $('abBox').classList.toggle('active', ab.active);
+      $('abBox').classList.toggle('busy', ab.busy);
+      const differs = !ab.busy && abDiffers();
+      ['A', 'B'].forEach(side => {
+        const seg = $('ab' + side);
+        seg.classList.toggle('on', ab.active && ab.side === side);
+        seg.classList.toggle('differs', differs);
+        seg.title = !ab.active ? 'A/B compare: remember the settings as they are now as A, change things, then switch between A and the new settings' + AB_KEY_HINT
+          : ab.side === side ? 'You hear ' + side + (side === 'A' ? ' (as remembered – changes you make now belong to A)' : ' (your changes)')
+          : 'Switch to ' + side + (differs ? '' : ' – no difference yet') + AB_KEY_HINT;
+      });
+      $('abEnd').hidden = !ab.active;
+    }
+
+    function abStart() {
+      if (!state.connected) { toast('Connect to the Nano first.', 'info'); return; }
+      const ab = state.ab;
+      ab.A = abSnapshot();
+      ab.B = structuredClone(ab.A);
+      ab.side = 'B';
+      ab.preset = state.selectedPreset;
+      ab.active = true;
+      renderAb();
+      toast('A remembered. Change what you like – the A/B button switches between A and your changes.', 'ok', 5000);
+    }
+
+    function abEnd(silent) {
+      const ab = state.ab;
+      if (!ab.active) return;
+      ab.active = false;
+      ab.A = ab.B = null;
+      if (!silent) renderAb();
+    }
+
+    // Sends what differs between the settings on the Nano (now) and the other side (target).
+    // Returns true when the capture or the cab changed (the Nano's state is read again then).
+    async function abApply(now, target, notes) {
+      const preset = state.selectedPreset;
+      const num = value => Number.isFinite(Number(value));
+      let reread = false;
+
+      // capture and cab first: the Nano answers them with its state
+      if (target.capture.on !== now.capture.on || (target.capture.on && !sameName(target.capture.name, now.capture.name))) {
+        await importCapture(target.capture, notes);
+        reread = true;
+      }
+      const cabNames = [target.cab.name, target.cab.fullName].filter(Boolean);
+      const sameCab = target.cab.on === now.cab.on &&
+        (!target.cab.on || cabNames.some(name => sameName(name, now.cab.name) || sameName(name, now.cab.fullName)));
+      if (!sameCab) {
+        await importCab(target.cab, notes);   // with its level, filters and microphone
+        reread = true;
+      } else if (target.cab.on) {
+        if (num(target.cab.levelDb) && target.cab.levelDb !== now.cab.levelDb) await setCabIRLevelDb(target.cab.levelDb);
+        if (num(target.cab.highPassHz) && target.cab.highPassHz !== now.cab.highPassHz) await setCabIRHighPassHz(target.cab.highPassHz);
+        if (num(target.cab.lowPassHz) && target.cab.lowPassHz !== now.cab.lowPassHz) await setCabIRLowPassHz(target.cab.lowPassHz);
+        if (target.cab.mic && (target.cab.mic !== now.cab.mic || target.cab.position !== now.cab.position) && isFactoryCabIR()) {
+          await setCabIRMicPosition(target.cab.mic, target.cab.position);
+        }
+      }
+
+      for (const key of AMP_KEYS) {
+        if (!num(target.amp[key]) || target.amp[key] === now.amp[key]) continue;
+        state.amp[key] = clamp(Math.round(target.amp[key]), 0, 255);
+        await setAmpKnob(key, state.amp[key]);
+      }
+      if (target.capture.volumeDb !== now.capture.volumeDb) {
+        state.captureVolumeDb = clamp(Number(target.capture.volumeDb), -24, 12);
+        setCaptureVolumeUI(state.captureVolumeDb);
+        await setCaptureVolumeDb(state.captureVolumeDb);
+      }
+      if (target.gate.reduction !== now.gate.reduction && state.gate.params[0]) {
+        state.gate.params[0].value = clamp(Math.round(target.gate.reduction), 0, 100);
+        await setGateReduction(state.gate.params[0].value);
+      }
+      if (target.gate.on !== now.gate.on) {
+        state.gate.on = target.gate.on;
+        await setGateEnabled(target.gate.on);
+      }
+
+      for (const key of FX_BLOCK_KEYS) {
+        const from = now.fx[key];
+        const to = target.fx[key];
+        const block = state.blocks[key];
+        if (to.model === 'None') {
+          if (from.model !== 'None') await importFx(key, to, preset, notes);   // an empty slot cannot be set: switched off, with a note
+          continue;
+        }
+        const switchOff = from.on && !to.on;
+        if (switchOff) {   // off first, so its other changes are not heard
+          await setFXBlockEnabled(key, false);
+          block.on = false;
+        }
+        const newModel = from.model !== to.model;
+        if (newModel) {
+          if (!block.models.some(m => m.name === to.model)) { notes.push(block.title + ': unknown effect "' + to.model + '" - left as it is.'); continue; }
+          await setFXModel(key, to.model, false);
+          await wait(250);
+        }
+        if (Array.isArray(to.values)) {
+          for (const param of block.params.slice(0, to.values.length)) {
+            const i = block.params.indexOf(param);
+            if (!newModel && Array.isArray(from.values) && from.values[i] === to.values[i]) continue;
+            param.value = normalizedToParamValue(param, to.values[i]);
+            await setFXParam(key, param, null, true);
+          }
+          block.importedModel = to.model;
+          block.importedPreset = preset;
+        } else if (newModel) {
+          notes.push(block.title + ' (' + to.model + '): its settings were not known - default values.');
+        }
+        if (to.on && !from.on) {
+          await setFXBlockEnabled(key, true);
+          block.on = true;
+        }
+      }
+      return reread;
+    }
+
+    async function abSwitch(side) {
+      const ab = state.ab;
+      if (!ab.active) { abStart(); return; }
+      if (ab.busy || ab.side === side) return;
+      if (state.fileBusy || state.saveBusy || state.protocol.presetLoad) { toast('The editor is still busy with the Nano – try again in a moment.', 'info'); return; }
+      const notes = [];
+      let reread = false;
+      ab.busy = true;
+      state.fileBusy = true;
+      renderAb();
+      try {
+        cancelFXParamRefresh();
+        const now = abSnapshot();
+        ab[ab.side] = now;
+        reread = await abApply(now, ab[side], notes);
+        ab.side = side;
+      } finally {
+        ab.busy = false;
+        state.fileBusy = false;
+        render();
+      }
+      if (reread) {
+        await wait(300);
+        requestCurrentPresetState();   // the Nano's view; it also reads the effects that are on
+      } else {
+        FX_BLOCK_KEYS.forEach(key => { if (state.blocks[key].on && !fxValuesKnown(state.blocks[key])) readAfterEnable(key); });
+      }
+      log('A/B compare: now on ' + side + (notes.length ? ': ' + notes.join(' ') : ''));
+      if (notes.length) toast(notes.join(' '), 'info', 7000);
+    }
+
+    $('abA').addEventListener('click', () => abSwitch('A'));
+    $('abB').addEventListener('click', () => abSwitch('B'));
+    $('abEnd').addEventListener('click', () => { abEnd(); toast('A/B compare ended – the settings you hear stay.', 'info'); });
+    setInterval(() => { if (state.ab.active && !state.ab.busy) renderAb(); }, 400);   // a turned knob redraws only itself
+
+    // ---- Output level (the Nano's USB audio) and Auto level ----
+    // The Nano is an audio interface over USB-C with eight channels: 1/2 carry the dry guitar signal (DI), 3/4 the sound
+    // with capture and effects. The editor shows peaks (dBFS) and loudness (LUFS, K-weighted as in ITU-R BS.1770) of one
+    // channel pair and can set the capture volume from what you play. Nothing is recorded: the samples are only measured.
+    // Two ways to the samples:
+    // - Mac app: a small helper reads the input with Core Audio (window.nanoMeter, see mac-app/meter.js) - any pair.
+    // - Browser: getUserMedia. Chromium opens an input with more than two channels as stereo, so on a Mac only 1/2
+    //   arrive (the Nano's DI); where a browser passes on more, the pair can be chosen as well.
+    const LEVEL_STORE = 'nanoCortexLevel';   // { input: label of the audio input, pairs: { label: first channel }, kind, targets }
+    const AL_KINDS = [
+      { key: 'clean', label: 'Clean', lufs: -20 },
+      { key: 'drive', label: 'Drive', lufs: -19 },
+      { key: 'solo', label: 'Solo', lufs: -16 },
+      { key: 'fuzz', label: 'Fuzz', lufs: -19 }
+    ];
+    const AL_SECONDS = 4;           // of played signal
+    const AL_PLAY_LUFS = -50;       // louder than this counts as playing
+    const AL_CEILING_DB = -1;       // the peaks stay below it
+    const METER_FLOOR_DB = -60;
+    const NANO_AUDIO = /nano\s*cortex|neural\s*dsp/i;
+
+    const levelStore = { input: '', pairs: {}, kind: 'clean', targets: Object.fromEntries(AL_KINDS.map(k => [k.key, k.lufs])) };
+    try {
+      const saved = JSON.parse(localStorage.getItem(LEVEL_STORE) || '{}');
+      if (typeof saved.input === 'string') levelStore.input = saved.input;
+      if (saved.pairs && typeof saved.pairs === 'object') levelStore.pairs = saved.pairs;
+      if (AL_KINDS.some(k => k.key === saved.kind)) levelStore.kind = saved.kind;
+      AL_KINDS.forEach(k => { if (saved.targets && Number.isFinite(saved.targets[k.key])) levelStore.targets[k.key] = saved.targets[k.key]; });
+    } catch (e) { /* storage unavailable */ }
+    function saveLevelStore() {
+      try { localStorage.setItem(LEVEL_STORE, JSON.stringify(levelStore)); } catch (e) { /* storage unavailable */ }
+    }
+
+    const nativeMeter = () => window.nanoMeter || null;   // the Mac app's helper
+    // channels: 1 or 2 measured ones, starting at channel "first" (1-based) of the "total" the input delivers
+    const meter = { on: false, starting: false, userOff: false, native: false, rate: 48000, ctx: null, stream: null, raw: [], weighted: [], buf: null,
+      timer: null, lastTime: 0, channels: 2, total: 2, first: 1, label: '', deviceId: '', inputs: [], error: '',
+      peakDb: [-Infinity, -Infinity], holdDb: [-Infinity, -Infinity], holdAt: [0, 0], clipAt: 0, energy: 0, frames: 0, blockPeak: 0, blocks: [] };
+    // before / undo: { preset, db, level } - capture volume and Level before a run; levelAsk: the preset whose Level was asked about
+    const autoLevel = { running: false, preparing: false, apply: true, kind: 'clean', preset: 0, blocks: [], played: 0, peak: 0, startedAt: 0,
+      before: null, undo: null, last: null, levelAsk: 0, text: '', error: false };
+
+    const toDb = amplitude => (amplitude > 0 ? 20 * Math.log10(amplitude) : -Infinity);
+    const lufsOf = energy => (energy > 0 ? -0.691 + 10 * Math.log10(energy) : -Infinity);   // as in BS.1770
+    const WEB_K_GAIN = Math.pow(10, 0.041 / 10);   // the high pass of BS.1770 has 0.04 dB of gain, the browser's has none
+    const dbText = (db, signed = false) => {
+      if (!Number.isFinite(db)) return '–';
+      const value = Math.abs(db) < 0.05 ? 0 : db;
+      return (signed && value > 0 ? '+' : '') + value.toFixed(1).replace('-', '−');
+    };
+    const meterPos = db => (clamp((db - METER_FLOOR_DB) / -METER_FLOOR_DB, 0, 1) * 100).toFixed(1) + '%';
+
+    // Mean energy of blocks of different lengths
+    function blockEnergy(blocks) {
+      const seconds = blocks.reduce((sum, b) => sum + b.s, 0);
+      return seconds > 0 ? blocks.reduce((sum, b) => sum + b.e * b.s, 0) / seconds : 0;
+    }
+
+    // Loudness of what was played, gated as in BS.1770: 400 ms windows in 100 ms steps, without those below -70 LUFS
+    // and without those more than 10 LU below the rest (pauses and ringing notes do not pull it down).
+    function gatedLoudness(blocks) {
+      const windows = blocks.map((b, i) => blockEnergy(blocks.slice(Math.max(0, i - 3), i + 1)));
+      const mean = list => list.reduce((a, b) => a + b, 0) / list.length;
+      let kept = windows.filter(e => lufsOf(e) > -70);
+      if (!kept.length) return -Infinity;
+      const gate = lufsOf(mean(kept)) - 10;
+      kept = kept.filter(e => lufsOf(e) > gate);
+      return lufsOf(mean(kept));
+    }
+
+    async function meterInputs() {
+      const all = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput' && d.label);
+      const real = all.filter(d => d.deviceId !== 'default' && d.deviceId !== 'communications');
+      return real.length ? real : all;
+    }
+
+    // The first channel of the pair to measure: the one chosen for this input before, else 3/4 on the Nano, else 1/2.
+    function meterPair(label, total) {
+      const stored = Number(levelStore.pairs[label]);
+      if (stored >= 1 && stored <= total && stored % 2 === 1) return stored;
+      return NANO_AUDIO.test(label) && total >= 4 ? 3 : 1;
+    }
+    const pairText = (first, total) => (first < total ? first + '/' + (first + 1) : String(first));
+    // The Nano's channels 1/2 are its dry input: no capture, no effects, and the capture volume does not move them.
+    const meterIsDry = () => meter.on && NANO_AUDIO.test(meter.label) && meter.first < 3;
+
+    const METER_DENIED = 'The audio input was not allowed. Allow the microphone for the editor – in the browser at the lock symbol in the address bar, ' +
+      'in the Mac app under System Settings > Privacy & Security > Microphone.';
+
+    // Opens the audio input (deviceId: a chosen one; without it the Nano by its name, or the input used last time).
+    async function meterStart(deviceId) {
+      const m = meter;
+      if (m.starting) return false;
+      if (!nativeMeter() && !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+        m.error = 'This browser gives the editor no audio input.';
+        renderLevel();
+        return false;
+      }
+      m.starting = true;
+      m.error = '';
+      renderLevel();
+      try {
+        m.error = (await (nativeMeter() ? meterStartNative(deviceId) : meterStartWeb(deviceId))) || '';
+      } catch (err) {
+        const name = err && err.name;
+        m.error = name === 'NotAllowedError' || name === 'SecurityError' ? METER_DENIED
+          : name === 'NotFoundError' || name === 'OverconstrainedError' ? 'This audio input is not there (any more).'
+          : 'The audio input did not open: ' + ((err && err.message) || err);
+      } finally {
+        m.starting = false;
+      }
+      if (m.error) log('Output meter: ' + m.error);
+      else {
+        log('Output meter on: ' + m.label + ', channel' + (m.channels > 1 ? 's ' : ' ') + pairText(m.first, m.total) + ' of ' + m.total + ', ' +
+          m.rate + ' Hz' + (m.native ? ' (helper of the Mac app)' : ''));
+      }
+      renderLevel();
+      renderSignalChain();
+      return !m.error;
+    }
+
+    // Mac app: the helper lists the inputs with all their channels and measures the pair. Returns an error text or ''.
+    async function meterStartNative(deviceId) {
+      const m = meter;
+      const listed = await nativeMeter().list();
+      if (listed.error) return listed.error;
+      m.inputs = listed.devices.map(d => ({ deviceId: d.uid, label: d.name, channels: d.channels, standard: d.default }));
+      const device = deviceId ? m.inputs.find(d => d.deviceId === deviceId)
+        : m.inputs.find(d => d.label === levelStore.input) || m.inputs.find(d => NANO_AUDIO.test(d.label)) || m.inputs.find(d => d.standard) || m.inputs[0];
+      if (!device) return deviceId ? 'This audio input is not there (any more).' : 'This Mac has no audio input.';
+      meterStop();
+      const reply = await nativeMeter().start({ uid: device.deviceId, first: meterPair(device.label, device.channels) });
+      if (reply.error) return reply.error === 'denied' ? METER_DENIED : reply.error;
+      Object.assign(m, { on: true, native: true, userOff: false, rate: reply.rate, total: reply.channels, first: reply.first, channels: reply.count,
+        label: reply.name || device.label, deviceId: device.deviceId });
+      nativeMeter().onData(data => {
+        if (!m.on || !m.native) return;
+        if (data.error) {
+          meterStop();
+          m.error = data.error;
+          renderLevel();
+          renderSignalChain();
+        } else if (Array.isArray(data.p)) {
+          meterFeed(data.p, Number(data.e) || 0, Number(data.n) || 0, m.rate);
+        }
+      });
+      return '';
+    }
+
+    // Browser: the samples come through Web Audio. Returns an error text or '' (getUserMedia may also throw).
+    async function meterStartWeb(deviceId) {
+      const m = meter;
+      let stream = null;
+      try {
+        const open = id => navigator.mediaDevices.getUserMedia({ audio: Object.assign(
+          { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 8 } }, id ? { deviceId: { exact: id } } : {}) });
+        stream = await open(deviceId);
+        m.inputs = await meterInputs();   // the names are readable once an input was allowed
+        if (!deviceId) {
+          const wanted = m.inputs.find(d => d.label === levelStore.input) || m.inputs.find(d => NANO_AUDIO.test(d.label));
+          if (wanted && wanted.deviceId !== stream.getAudioTracks()[0].getSettings().deviceId) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = await open(wanted.deviceId);
+          }
+        }
+        meterStop();
+        const track = stream.getAudioTracks()[0];
+        const settings = track.getSettings();
+        const label = track.label || 'Audio input';
+        const total = Math.max(1, Math.min(32, Number(settings.channelCount) || 2));
+        const first = meterPair(label, total);
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = ctx.createMediaStreamSource(stream);
+        const splitter = ctx.createChannelSplitter(Math.max(2, total));
+        const sink = ctx.createGain();   // silent: only keeps the measuring nodes running in every browser
+        sink.gain.value = 0;
+        sink.connect(ctx.destination);
+        source.connect(splitter);
+        m.channels = first < total ? 2 : 1;
+        for (let ch = 0; ch < m.channels; ch++) {
+          const raw = ctx.createAnalyser();
+          raw.fftSize = 8192;
+          splitter.connect(raw, first - 1 + ch);
+          raw.connect(sink);
+          // K-weighting with the browser's own filters, fitted to the BS.1770 curve (within 0.05 dB from 30 Hz to 12 kHz
+          // at any sample rate): high shelf +4 dB, then a high pass at 38 Hz with Q 0.5 (Web Audio takes that Q in dB).
+          const shelf = ctx.createBiquadFilter();
+          shelf.type = 'highshelf';
+          shelf.frequency.value = 1500;
+          shelf.gain.value = 4;
+          const highPass = ctx.createBiquadFilter();
+          highPass.type = 'highpass';
+          highPass.frequency.value = 38.4;
+          highPass.Q.value = -5.9;
+          const weighted = ctx.createAnalyser();
+          weighted.fftSize = 8192;
+          splitter.connect(shelf, first - 1 + ch);
+          shelf.connect(highPass);
+          highPass.connect(weighted);
+          weighted.connect(sink);
+          m.raw.push(raw);
+          m.weighted.push(weighted);
+        }
+        if (ctx.state === 'suspended') await ctx.resume();
+        Object.assign(m, { on: true, native: false, userOff: false, ctx, stream, buf: new Float32Array(8192), lastTime: ctx.currentTime, rate: ctx.sampleRate,
+          total, first, label, deviceId: settings.deviceId || deviceId || '' });
+        track.addEventListener('ended', () => {
+          if (m.stream !== stream) return;
+          meterStop();
+          m.error = 'The audio input is gone (USB cable?).';
+          renderLevel();
+          renderSignalChain();
+        });
+        m.timer = setInterval(meterTick, 25);
+        return '';
+      } catch (err) {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        throw err;
+      }
+    }
+
+    function meterStop() {
+      const m = meter;
+      autoLevelCancel('');
+      clearInterval(m.timer);
+      if (m.native && nativeMeter()) nativeMeter().stop();
+      if (m.stream) m.stream.getTracks().forEach(track => track.stop());
+      if (m.ctx) m.ctx.close().catch(() => {});
+      Object.assign(m, { on: false, native: false, ctx: null, stream: null, raw: [], weighted: [], timer: null, peakDb: [-Infinity, -Infinity],
+        holdDb: [-Infinity, -Infinity], clipAt: 0, energy: 0, frames: 0, blockPeak: 0, blocks: [] });
+    }
+
+    // Browser, every 25 ms: the samples that came since the last time (the analysers hold the newest 8192).
+    function meterTick() {
+      const m = meter;
+      if (!m.on || m.native) return;
+      const size = m.buf.length;
+      const time = m.ctx.currentTime;
+      const frames = Math.min(size, Math.round((time - m.lastTime) * m.ctx.sampleRate));
+      if (frames <= 0) return;
+      m.lastTime = time;
+      const peaks = [];
+      let sum = 0;
+      for (let ch = 0; ch < m.channels; ch++) {
+        m.raw[ch].getFloatTimeDomainData(m.buf);
+        let peak = 0;
+        for (let i = size - frames; i < size; i++) { const a = Math.abs(m.buf[i]); if (a > peak) peak = a; }
+        peaks.push(peak);
+        m.weighted[ch].getFloatTimeDomainData(m.buf);
+        for (let i = size - frames; i < size; i++) sum += m.buf[i] * m.buf[i];
+      }
+      meterFeed(peaks, sum * WEB_K_GAIN, frames, m.ctx.sampleRate);
+    }
+
+    // New samples from either source: the peak of each measured channel, the K-weighted squares of all of them
+    // together and how many frames that were.
+    function meterFeed(peaks, energy, frames, rate) {
+      const m = meter;
+      if (!m.on || frames <= 0) return;
+      const now = performance.now();
+      const fall = 26 * frames / rate;   // the bars fall with 26 dB per second
+      for (let ch = 0; ch < m.channels; ch++) {
+        const peak = Number(peaks[ch]) || 0;
+        const db = toDb(peak);
+        m.peakDb[ch] = Math.max(db, m.peakDb[ch] - fall);
+        if (db >= m.holdDb[ch]) { m.holdDb[ch] = db; m.holdAt[ch] = now; }
+        else if (now - m.holdAt[ch] > 1500) m.holdDb[ch] = Math.max(db, m.holdDb[ch] - fall);
+        if (peak >= 0.999) m.clipAt = now;
+        if (peak > m.blockPeak) m.blockPeak = peak;
+      }
+      m.energy += energy;
+      m.frames += frames;
+      if (m.frames >= rate / 10) {   // a block of about 100 ms: the energy of all channels together
+        const block = { e: m.energy / m.frames, s: m.frames / rate, peak: m.blockPeak };
+        m.energy = 0;
+        m.frames = 0;
+        m.blockPeak = 0;
+        m.blocks.push(block);
+        if (m.blocks.length > 30) m.blocks.shift();
+        autoLevelBlock(block);
+      }
+      meterDraw();
+    }
+
+    function meterDraw() {
+      const m = meter;
+      const loud = m.on ? lufsOf(blockEnergy(m.blocks)) : -Infinity;   // the last three seconds
+      const dialog = !$('levelOverlay').hidden;
+      ['L', 'R'].forEach((side, i) => {
+        const ch = Math.min(i, m.channels - 1);
+        const bar = $('outBar' + side);
+        if (bar) bar.style.setProperty('--v', meterPos(m.peakDb[ch]));
+        if (!dialog) return;
+        $('lvBar' + side).style.setProperty('--v', meterPos(m.peakDb[ch]));
+        $('lvHold' + side).style.setProperty('--v', meterPos(m.holdDb[ch]));
+        $('lvHold' + side).classList.toggle('show', m.holdDb[ch] > METER_FLOOR_DB);
+        $('lvNum' + side).textContent = m.holdDb[ch] > -90 ? dbText(m.holdDb[ch]) : '–';
+      });
+      const read = $('outRead');
+      if (read) read.textContent = loud > -70 ? dbText(loud) : '–';
+      if (!dialog) return;
+      $('lvBarLoud').style.setProperty('--v', meterPos(loud));
+      $('lvNumLoud').textContent = loud > -70 ? dbText(loud) : '–';
+      $('lvClip').hidden = !(m.clipAt && performance.now() - m.clipAt < 2000);
+    }
+
+    // The OUT end of the signal chain: with the meter on a small stereo meter with the loudness below.
+    function renderOutNode(node) {
+      node.id = 'outNode';
+      node.classList.add('out');
+      node.classList.toggle('metering', meter.on);
+      node.title = meter.on ? 'Output level over USB (' + meter.label + ', channel' + (meter.channels > 1 ? 's ' : ' ') + pairText(meter.first, meter.total) +
+          '): peaks left / right, below the loudness of the last three seconds – click for the meter and Auto level'
+        : 'Output level: shows the level of the Nano over its USB audio and sets the capture volume from your playing';
+      if (meter.on) {
+        node.innerHTML = '<div class="sc-tile io meter"><span class="vu"><i id="outBarL"></i></span><span class="vu"><i id="outBarR"></i></span></div>' +
+          '<span class="sc-lbl">LUFS</span><span class="sc-sub" id="outRead">–</span>';
+      }
+      node.addEventListener('click', openLevel);
+    }
+
+    function renderLevel() {
+      const m = meter;
+      $('levelToggle').classList.toggle('on', m.on);
+      $('levelToggle').setAttribute('aria-checked', String(m.on));
+      const select = $('levelInput');
+      select.innerHTML = '';
+      if (!m.inputs.length) select.appendChild(new Option(m.starting ? 'Opening the audio input …' : 'Audio input', ''));
+      m.inputs.forEach(d => select.appendChild(new Option(d.label, d.deviceId, false, m.on && d.deviceId === m.deviceId)));
+      if (m.on && !m.inputs.some(d => d.deviceId === m.deviceId)) select.appendChild(new Option(m.label, m.deviceId, false, true));
+      if (!m.on && m.inputs.length) select.insertBefore(new Option('Choose the audio input …', '', false, true), select.firstChild);
+      select.disabled = m.starting || !m.inputs.length;
+      // the channel pair, where the input delivers more than two channels
+      const pair = $('levelPair');
+      const nano = NANO_AUDIO.test(m.label);
+      pair.innerHTML = '';
+      for (let first = 1; m.on && first <= m.total; first += 2) {
+        const what = !nano ? '' : first === 1 ? ' · DI' : first === 3 ? ' · sound' : '';
+        pair.appendChild(new Option(pairText(first, m.total).replace('/', ' / ') + what, String(first), false, first === m.first));
+      }
+      pair.hidden = !(m.on && m.total > 2);
+      pair.disabled = m.starting;
+      const hint = $('levelHint');
+      hint.classList.toggle('error', Boolean(m.error));
+      hint.textContent = m.error ? m.error
+        : m.starting ? ''
+        : !m.on ? 'Connect the Nano to this computer with a USB-C cable and switch the meter on. The editor then reads the Nano\'s USB audio – ' +
+            (nativeMeter() ? 'macOS' : 'the browser') + ' asks once for the audio input ("microphone"). Nothing is recorded.'
+        : !nano ? 'This input does not look like the Nano – choose the Nano\'s USB audio above if the bars show something else.'
+        : meterIsDry() && m.total < 4 ? 'The browser passes on only the first two USB channels – on the Nano that is the dry guitar signal (DI). ' +
+            'Its sound with capture and effects is on channels 3/4: the Mac app reads them.'
+        : meterIsDry() ? 'Channels 1/2 of the Nano carry the dry guitar signal (DI). Its sound with capture and effects is on 3/4.'
+        : '';
+      renderAutoLevel();
+    }
+
+    function renderAutoLevel() {
+      const al = autoLevel;
+      $('lvTarget').style.setProperty('--v', meterPos(levelStore.targets[levelStore.kind]));
+      document.querySelectorAll('#alKinds .al-kind').forEach(el => {
+        el.classList.toggle('sel', el.dataset.kind === levelStore.kind);
+        const input = el.querySelector('input');
+        if (document.activeElement !== input) input.value = levelStore.targets[el.dataset.kind].toFixed(1);
+        input.disabled = al.running;
+      });
+      const kind = AL_KINDS.find(k => k.key === levelStore.kind);
+      $('alStatus').classList.toggle('error', al.error);
+      $('alStatus').textContent = al.text || 'Play the way you would in the song – chords for a rhythm sound, a lead line for a solo sound.';
+      if (al.last && !al.running && !al.error && al.last.offerTarget) {
+        const use = document.createElement('button');
+        use.type = 'button';
+        use.className = 'al-link';
+        use.textContent = 'Take ' + dbText(al.last.loud) + ' LUFS as the ' + AL_KINDS.find(k => k.key === al.last.kind).label + ' target (the others move along)';
+        use.addEventListener('click', () => autoLevelTakeTarget());
+        $('alStatus').appendChild(use);
+      }
+      $('alBar').style.setProperty('--v', (al.running ? clamp(al.played / AL_SECONDS, 0, 1) * 100 : 0) + '%');
+      const asked = !al.running && al.levelAsk === state.selectedPreset;   // Level is not at 10: the next press sets it
+      $('alStart').textContent = al.running ? 'Stop' : asked ? 'Set Level to 10 and start' : 'Start';
+      $('alStart').title = al.running ? '' : 'Listens for ' + AL_SECONDS + ' seconds of playing and sets the capture volume for a ' + kind.label + ' sound';
+      $('alStart').disabled = al.preparing;
+      $('alOnly').hidden = al.running;
+      $('alOnly').disabled = al.preparing;
+      $('alUndo').hidden = al.running || al.preparing || !al.undo;
+      $('alUndo').title = al.undo && al.undo.level < LEVEL_FULL ? 'Back to the capture volume and the Level from before' : 'Back to the capture volume from before';
+      $('alReset').hidden = AL_KINDS.every(k => levelStore.targets[k.key] === k.lufs);
+    }
+
+    async function openLevel() {
+      $('levelOverlay').hidden = false;
+      renderLevel();
+      meterDraw();
+      $('levelClose').focus();
+      if (!meter.on && !meter.userOff) { await meterStart(''); return; }
+      if (!nativeMeter()) return;
+      const listed = await nativeMeter().list();   // the inputs as they are now
+      if (!listed.devices) return;
+      meter.inputs = listed.devices.map(d => ({ deviceId: d.uid, label: d.name, channels: d.channels, standard: d.default }));
+      renderLevel();
+    }
+
+    function closeLevel() {
+      autoLevelCancel('');
+      autoLevel.levelAsk = 0;
+      $('levelOverlay').hidden = true;
+    }
+
+    // ---- Auto level ----
+    // The preset's Level (the LEVEL knob on the Nano) is its output level, and the signal on USB follows it. So every
+    // preset is measured with Level at 10 (full output) and Level stays there: the capture volume alone sets how loud
+    // a preset is, which is the only thing Auto level changes besides.
+    const LEVEL_FULL = 255;
+    const LEVEL_NEAR_FULL = 250;   // from 9.8 on it is set to 10 without asking: no jump to speak of
+
+    function autoLevelCancel(text, error = false) {
+      const al = autoLevel;
+      if (!al.running && !text) return;
+      al.running = false;
+      al.text = text;
+      al.error = error;
+      if (!$('levelOverlay').hidden) renderAutoLevel();
+    }
+
+    // The preset as the Nano has it now: a knob turned on the Nano itself does not reach the editor by itself.
+    async function readPresetNow() {
+      if (!(await waitUntil(() => state.stateMode === 'idle' && !state.protocol.presetLoad && !state.fileBusy, 5000))) return false;
+      const read = waitForPresetState(state.selectedPreset, 4000);
+      requestCurrentPresetState();
+      return read;
+    }
+
+    async function autoLevelStart(apply) {
+      const al = autoLevel;
+      if (al.running) { autoLevelCancel('Stopped.'); return; }
+      if (al.preparing) return;
+      if (!meter.on && !(await meterStart(''))) return;
+      if (apply && meterIsDry()) {
+        autoLevelCancel('Channels 1/2 of the Nano are the dry guitar signal – the capture volume does not change them. ' +
+          (meter.total >= 4 ? 'Choose channels 3 / 4 above.' : 'Auto level needs channels 3/4, which only the Mac app can read.'), true);
+        return;
+      }
+      if (apply && !state.connected) { autoLevelCancel('Connect to the Nano first – without it the editor can only measure.', true); return; }
+
+      let before = null;   // what the preset had before this run (for Undo)
+      if (state.connected) {
+        al.preparing = true;
+        al.error = false;
+        al.text = 'Reading the preset from the Nano …';
+        renderAutoLevel();
+        const read = await readPresetNow();
+        al.preparing = false;
+        if (!read) { autoLevelCancel('The Nano did not answer – press Start again.', true); return; }
+        if ($('levelOverlay').hidden) { al.text = ''; return; }
+        const preset = state.selectedPreset;
+        const level = state.amp.level;
+        before = { preset, db: Number(state.captureVolumeDb) || 0, level };
+        if (level < LEVEL_NEAR_FULL && al.levelAsk !== preset) {   // a jump in loudness: only after a second press
+          al.levelAsk = preset;
+          autoLevelCancel('Level is at ' + ampText(level) + ' in this preset. The signal on USB follows Level, so Auto level measures with Level at 10 ' +
+            '(full output) and leaves it there – the capture volume alone sets the loudness then.' + NL +
+            'That gets louder: turn your monitors or headphones down first, then press again.');
+          return;
+        }
+        if (level < LEVEL_FULL) {
+          state.amp.level = LEVEL_FULL;
+          await setAmpKnob('level', LEVEL_FULL);
+          renderAmp();
+          await wait(400);
+        }
+      }
+      al.levelAsk = 0;
+      Object.assign(al, { running: true, apply, kind: levelStore.kind, preset: state.selectedPreset, before, blocks: [], played: 0, peak: 0,
+        startedAt: performance.now(), last: null, error: false, text: 'Listening – play now …' });
+      renderLevel();
+    }
+
+    // Called for every 100 ms of audio while the meter runs
+    function autoLevelBlock(block) {
+      const al = autoLevel;
+      if (!al.running) return;
+      const waited = (performance.now() - al.startedAt) / 1000;
+      if (state.selectedPreset !== al.preset || (al.apply && !state.connected)) { autoLevelCancel('Stopped: the preset changed.', true); return; }
+      if (lufsOf(block.e) > AL_PLAY_LUFS) {
+        al.blocks.push(block);
+        al.played += block.s;
+        if (block.peak > al.peak) al.peak = block.peak;
+        al.text = 'Measuring – keep playing … ' + Math.min(AL_SECONDS, al.played).toFixed(1) + ' of ' + AL_SECONDS + ' s';
+      }
+      if (al.played >= AL_SECONDS || (waited > 30 && al.played >= 1.5)) { autoLevelFinish(); return; }
+      if (waited > 12 && al.played === 0) {
+        autoLevelCancel('No signal came. Is the Nano connected over USB and chosen as the audio input above, and is the guitar up?', true);
+        return;
+      }
+      if (waited > 30) { autoLevelCancel('That was too little playing to measure.', true); return; }
+      renderAutoLevel();
+    }
+
+    async function autoLevelFinish() {
+      const al = autoLevel;
+      al.running = false;
+      const kind = AL_KINDS.find(k => k.key === al.kind);
+      const target = levelStore.targets[al.kind];
+      const loud = gatedLoudness(al.blocks);
+      const peakDb = toDb(al.peak);
+      const levelRaised = Boolean(al.before && al.before.level < LEVEL_FULL);
+      const measured = 'Measured ' + dbText(loud) + ' LUFS, peaks up to ' + dbText(peakDb) + ' dBFS' + (al.before ? ', with Level at 10' : '') + '.';
+      const levelNote = levelRaised ? ' Level was at ' + ampText(al.before.level) + ' and stays at 10 now.' : '';
+      al.last = { loud, peakDb, kind: al.kind, offerTarget: !al.apply };
+      if (levelRaised) al.undo = al.before;
+      if (!al.apply) {
+        al.text = measured + ' The ' + kind.label + ' target is ' + dbText(target) + ' LUFS (' + dbText(target - loud, true) + ' dB from here).' + levelNote;
+        renderLevel();
+        renderAb();
+        return;
+      }
+      let change = target - loud;
+      let limit = '';
+      if (peakDb + change > AL_CEILING_DB) {
+        change = AL_CEILING_DB - peakDb;
+        limit = ' The target would clip: the level stops where the peaks reach ' + dbText(AL_CEILING_DB) + ' dBFS.';
+      }
+      const before = al.before ? al.before.db : Number(state.captureVolumeDb) || 0;
+      const after = Math.round(clamp(before + change, -24, 12) * 10) / 10;
+      if (after !== Math.round((before + change) * 10) / 10) limit = ' The capture volume is at its ' + (after >= 12 ? 'upper' : 'lower') + ' end: ' +
+        dbText(Math.abs(before + change - after)) + ' dB ' + (after >= 12 ? 'more' : 'less') + ' would be needed. An effect level or the gain can do the rest.';
+      if (Math.abs(after - before) < 0.05) {
+        al.text = measured + NL + (limit ? 'Capture volume unchanged at ' + dbText(before, true) + ' dB.' + limit
+          : 'That is the ' + kind.label + ' target (' + dbText(target) + ' LUFS) – nothing to change.') + levelNote;
+        renderLevel();
+        renderAb();
+        return;
+      }
+      al.undo = al.before || { preset: state.selectedPreset, db: before, level: LEVEL_FULL };
+      setCaptureVolumeUI(after);
+      await setCaptureVolumeDb(after);
+      al.text = measured + NL + 'Capture volume ' + dbText(before, true) + ' → ' + dbText(after, true) + ' dB (' + dbText(after - before, true) + ' dB) for the ' +
+        kind.label + ' target of ' + dbText(target) + ' LUFS.' + limit + levelNote + (state.capture.on ? '' : ' The capture is off in this preset – its volume may do nothing.') +
+        NL + 'Press Start again to check it, and Save to keep it.';
+      log('Auto level (' + kind.label + '): ' + al.text.split(NL).join(' '));
+      renderLevel();
+      renderAb();
+    }
+
+    // Back to the capture volume and the Level from before the last run
+    async function autoLevelUndo() {
+      const al = autoLevel;
+      if (!al.undo) return;
+      if (!state.connected || al.undo.preset !== state.selectedPreset) { al.undo = null; renderLevel(); return; }
+      const { db, level } = al.undo;
+      al.undo = null;
+      setCaptureVolumeUI(db);
+      await setCaptureVolumeDb(db);
+      const levelBack = level < LEVEL_FULL;
+      if (levelBack) {
+        state.amp.level = level;
+        await setAmpKnob('level', level);
+        renderAmp();
+      }
+      al.text = 'Capture volume back at ' + dbText(db, true) + ' dB' + (levelBack ? ', Level back at ' + ampText(level) : '') + '.';
+      al.error = false;
+      al.last = null;
+      renderLevel();
+      renderAb();
+    }
+
+    // The measured loudness becomes the target of its kind; the other kinds keep their distance to it.
+    function autoLevelTakeTarget() {
+      const al = autoLevel;
+      if (!al.last || !Number.isFinite(al.last.loud)) return;
+      const shift = al.last.loud - levelStore.targets[al.last.kind];
+      AL_KINDS.forEach(k => { levelStore.targets[k.key] = Math.round(clamp(levelStore.targets[k.key] + shift, -40, -6) * 10) / 10; });
+      saveLevelStore();
+      al.text = 'Targets: ' + AL_KINDS.map(k => k.label + ' ' + dbText(levelStore.targets[k.key])).join(', ') + ' LUFS.';
+      al.last = null;
+      renderLevel();
+    }
+
+    AL_KINDS.forEach(k => {
+      const el = document.createElement('div');
+      el.className = 'al-kind';
+      el.dataset.kind = k.key;
+      el.innerHTML = '<span class="nm">' + k.label + '</span><span class="tg"><input type="number" step="0.5" min="-40" max="-6" aria-label="' + k.label +
+        ' target in LUFS"><span>LUFS</span></span>';
+      el.addEventListener('click', () => {
+        if (autoLevel.running) return;
+        levelStore.kind = k.key;
+        saveLevelStore();
+        renderLevel();
+      });
+      el.querySelector('input').addEventListener('change', e => {
+        const value = Number(String(e.target.value).replace(',', '.'));
+        if (Number.isFinite(value)) levelStore.targets[k.key] = Math.round(clamp(value, -40, -6) * 10) / 10;
+        saveLevelStore();
+        e.target.blur();
+        renderLevel();
+      });
+      $('alKinds').appendChild(el);
+    });
+    $('lvScale').innerHTML = [-60, -48, -36, -24, -12, 0].map(db => '<span style="left:' + meterPos(db) + '">' + (db ? '−' + -db : '0') + '</span>').join('');
+    $('autoLevelBtn').addEventListener('click', openLevel);
+    $('levelClose').addEventListener('click', closeLevel);
+    $('levelOverlay').addEventListener('click', e => { if (e.target === $('levelOverlay')) closeLevel(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('levelOverlay').hidden) closeLevel(); });
+    $('levelToggle').addEventListener('click', async () => {
+      if (meter.starting) return;
+      if (meter.on) {
+        meterStop();
+        meter.userOff = true;
+        renderLevel();
+        renderSignalChain();
+        meterDraw();
+      } else {
+        await meterStart('');
+      }
+    });
+    $('levelInput').addEventListener('change', async e => {
+      const id = e.target.value;
+      if (!id) return;
+      const chosen = meter.inputs.find(d => d.deviceId === id);
+      if (await meterStart(id) && chosen) { levelStore.input = chosen.label; saveLevelStore(); }
+    });
+    $('levelPair').addEventListener('change', async e => {
+      if (!meter.on) return;
+      levelStore.pairs[meter.label] = Number(e.target.value);
+      saveLevelStore();
+      await meterStart(meter.deviceId);
+    });
+    if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+      navigator.mediaDevices.addEventListener('devicechange', async () => {
+        if (nativeMeter() || !meter.inputs.length) return;   // nothing was allowed yet: the names are not readable
+        try { meter.inputs = await meterInputs(); } catch (e) { return; }
+        if (!$('levelOverlay').hidden) renderLevel();
+      });
+    }
+    $('alStart').addEventListener('click', () => autoLevelStart(true));
+    $('alOnly').addEventListener('click', () => autoLevelStart(false));
+    $('alUndo').addEventListener('click', autoLevelUndo);
+    $('alReset').addEventListener('click', () => {
+      AL_KINDS.forEach(k => { levelStore.targets[k.key] = k.lufs; });
+      saveLevelStore();
+      renderLevel();
+    });
+
     // ---- Effect info ("i" in each effect block, or a click on the pedal picture) ----
     // basedOn: only where Neural DSP names the original (NanOS 2.0.0 notes and the Quad Cortex device list);
     // the other models get no reference. Texts and tips are our own short notes.
@@ -6276,6 +7156,7 @@ function renderGate() {
         if (n.io) {
           node.className = 'sc-node io';
           node.innerHTML = '<div class="sc-tile io">' + n.io + '</div>';
+          if (n.io === 'OUT') renderOutNode(node);
           box.appendChild(node);
           return;
         }
@@ -7157,6 +8038,7 @@ function renderGate() {
       [[CMD_KEY + 'E'], 'Export the preset as a file'],
       [[CMD_KEY + 'I'], 'Import a preset file'],
       [['T'], 'Tuner on / off'],
+      [['A'], 'A/B compare: remember the settings as A, then switch between A and your changes'],
       [[CMD_KEY + '+', CMD_KEY + '−', CMD_KEY + '0'], 'Zoom in / out / actual size'],
       [['Double-click'], 'Signal chain: switch a block on / off'],
       [['Esc'], 'Close a dialog or list'],
@@ -7193,6 +8075,7 @@ function renderGate() {
         return;
       }
       if (dialogOpen) return;
+      if (key === 'a') { e.preventDefault(); abSwitch(state.ab.side === 'A' ? 'B' : 'A'); return; }
       if (e.key === 'ArrowLeft') { e.preventDefault(); $('presetPrev').click(); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); $('presetNext').click(); }
       else if (e.key === '?') { e.preventDefault(); openKeys(); }

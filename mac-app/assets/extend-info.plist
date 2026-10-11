@@ -6,6 +6,8 @@
   <string>Nano Cortex Editor connects to your Nano Cortex over Bluetooth to read and change its settings.</string>
   <key>NSBluetoothPeripheralUsageDescription</key>
   <string>Nano Cortex Editor connects to your Nano Cortex over Bluetooth to read and change its settings.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Nano Cortex Editor listens to the USB audio of your Nano Cortex to show its output level. Nothing is recorded.</string>
   <key>LSApplicationCategoryType</key>
   <string>public.app-category.music</string>
 </dict>

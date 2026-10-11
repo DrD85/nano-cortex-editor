@@ -15,8 +15,8 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 - **Signal chain** at the top, as on the Quad Cortex: Gate → Pre FX 1–2 → Capture → Cab → Post FX 1–3, each block in its
   colour – filled when on, outlined when off, dashed when empty. Click a block to make it light up below,
   **double-click** to switch it on or off
-- **Compact top bar**: preset arrows, preset list (a dot marks unsaved changes, and **Save** turns green), save and
-  rename, then icons for export, import, tuner, expression, MIDI and MC6 Pro – hover an icon for its name. The
+- **Compact top bar**: preset arrows, preset list (a dot marks unsaved changes, and **Save** turns green), save,
+  rename and **A/B**, then icons for export, import, tuner, expression, MIDI and MC6 Pro – hover an icon for its name. The
   **Connect** button shows the connection; when connected it opens refresh, copy log and disconnect (also under **…**).
   Until the Nano is connected, the editor shows a short connect screen instead of placeholder values
 - **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
@@ -27,6 +27,17 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   (as many as the Nano Cortex Controller has places) – click to load, right-click or hold to save over them, rename or
   delete. **All presets** lists every preset of the model: load, star as favourite, rename, overwrite, delete, or save
   the current settings as a new one. **ORIG** returns to the settings read from the Nano
+- **A/B compare**: click **A | B** (or press **A**) and the settings as they are now are remembered as A. Change what
+  you like, then switch between A and your changes to hear the difference – only what differs is sent, so the switch
+  is quick. It covers amp, capture and its volume, cab, gate and all five effects with their models and values.
+  **Save** keeps the side you hear; **×** ends the compare
+- **Output level** (Mac app, Nano connected with a USB-C cable as well): a small stereo meter at the end of the signal
+  chain shows the Nano's sound from its USB audio (channels 3/4) – peaks left and right, below them the loudness in
+  LUFS. Click it for the large meter. macOS asks once for the audio input ("microphone"); nothing is recorded
+- **Auto level**: choose **Clean**, **Drive**, **Solo** or **Fuzz**, press **Start** and play for four seconds – with
+  Level at 10 (full output), the capture volume is set so that the preset lands on the loudness of its kind (clean
+  lowest, solo about 3 dB above drive) and its peaks stay below full scale. The four targets can be changed;
+  **Only measure** reads a preset you like and can take it as the target
 - **Preset files**: **Export** saves the current preset as a file (to keep or to share), **Import** – or dropping the
   file on the window – loads one into the current preset; **Save** keeps it. Captures and IRs travel by name: the
   import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
@@ -34,17 +45,17 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 - **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
 - **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs the mic (five drawn mic types) and its
   position 1–6 on a drawn speaker – click a mic or a position; load factory or user IRs from the device library into a slot
-- **Keyboard shortcuts**: ⌘S save, ← → previous / next preset, ⌘E export, ⌘I import, T tuner, ? for the overview
+- **Keyboard shortcuts**: ⌘S save, ← → previous / next preset, ⌘E export, ⌘I import, T tuner, A for A/B, ? for the overview
   (Ctrl instead of ⌘ on Windows)
 - **Tuner**: note and cents display, reference pitch (400–480 Hz), mute
 - **Expression pedal**: per-preset assignments for Gain, Bass, Mid, Treble, Level, Gate and FX amounts (min/max, invert) and bypass switching (Heel-Toe, Switch, Stop)
 - **MIDI controller with MIDI Learn**: map knobs and buttons of any USB/Bluetooth MIDI controller to amp, FX, gate, capture and cab controls, block on/off, tuner and preset up/down; optional pickup mode (no value jumps) and Program Change → preset
 - **Morningstar MC6 Pro export**: pick up to five presets and create a bank file: page 1 A–E recall the presets, F opens an FX page where A–E switch the five FX slots on/off. The switches are named after the effect type, use the category colours and MC6 Pro icons, and show which effects each preset uses
-- **Effect info**: the **i** in each effect block (or a click on its pedal picture) shows what the model does, a few
+- **Effect info**: the **i** in each effect block shows what the model does, a few
   tips for its controls and – where Neural DSP names it – the original it is based on (e.g. Green 808 → Ibanez TS808).
   The "based on" names follow Neural DSP's device list; they are trademarks of their owners and only identify the
   originals
-- A small pedal picture next to each effect's model choice: a drawn, brand-free pedal for every model (your own pictures in `img/` are used when present)
+- Optional: your own pedal pictures next to each effect's model choice (see *Pedal pictures* below)
 - Log export for troubleshooting
 
 ## Use it
@@ -90,14 +101,46 @@ Requires [Node.js](https://nodejs.org) on an Apple Silicon Mac.
 
 ```bash
 cd mac-app
-./build.sh            # app for yourself, includes pedal pictures from ../img if present
+./build.sh            # app for yourself, includes your pedal pictures from ../img if present
 ./build.sh --public   # release build without pedal pictures, plus a zip in ../release
 ```
 
 The app is a small [Electron](https://www.electronjs.org) shell around `index.html`
-(Safari/WKWebView has no Web Bluetooth). It connects to the first Bluetooth device whose name contains
+(Safari/WKWebView has no Web Bluetooth), plus a level meter helper written in Swift that `build.sh` compiles – so the
+build also needs the Swift compiler of Xcode or its command line tools (`xcode-select --install`). It connects to the first Bluetooth device whose name contains
 "Nano" or "Cortex" – the Nano itself or the Nano Cortex Controller. The version in `mac-app/package.json` must match
 `EDITOR_VERSION` in `index.html` (shown next to the title); `build.sh` checks it.
+
+## Output level and Auto level
+
+The Nano Cortex is also an audio interface over USB-C with eight channels: **1/2 carry the dry guitar signal (DI),
+3/4 the sound with capture and effects**. With the cable plugged in (Bluetooth stays the connection for editing),
+click the meter symbol in the Capture card or **OUT** at the end of the signal chain. The first time macOS asks whether
+the app may use the "microphone" – that is the Nano's USB audio. The editor only measures the samples: nothing is
+recorded or sent anywhere.
+
+![Output level and Auto level](docs/output-level.png)
+
+- **Meter**: peaks of the left and right channel in dBFS with peak hold, and the loudness of the last three seconds in
+  LUFS (K-weighted as in ITU-R BS.1770). The small meter in the signal chain keeps running after the dialog is closed.
+- **Input and channels**: the Nano is found by its name and measured on channels **3 / 4**; the two lists at the top
+  choose another input or another pair.
+- **Auto level**: pick the kind of sound, press **Start** and play the way you would in the song. After four seconds
+  of playing (pauses do not count) the capture volume moves by the distance to the target, at most so far that the
+  peaks stay 1 dB below full scale. **Undo** takes it back, **Save** keeps it. If the capture volume reaches the end of
+  its range (−24 to +12 dB), the note says how much is missing.
+- **Level at 10**: the signal on USB follows the preset's Level (the LEVEL knob on the Nano). So Auto level first reads
+  the preset from the Nano and measures with Level at 10, the full output, and leaves it there – the capture volume
+  alone sets how loud a preset is, and all presets compare. If Level is lower, the first press says so and the second
+  sets it: that gets louder, so turn your monitors down first. Auto level changes nothing else.
+- **Targets**: Clean −20, Drive −19, Solo −16 and Fuzz −19 LUFS are a starting point. They can be typed in; with
+  **Only measure** on a preset you like and *Take … as the target* all four move by the same amount.
+
+**Mac app or browser?** Channels 3/4 need the Mac app: it reads the input with a small helper
+(`mac-app/native/nano-meter.swift`). A browser on the Mac opens every input with more than two channels as stereo, so
+the page only gets channels 1/2 – on the Nano the dry signal, which the capture volume does not change. The editor
+says so and Auto level stays off there. Measuring another interface that records the Nano's outputs works in the
+browser as well.
 
 ## MIDI controller
 
@@ -124,9 +167,9 @@ The long name of each preset switch lists the effect types in Pre FX 1, Pre FX 2
 
 ## Pedal pictures
 
-Every effect model is shown as a simple drawn pedal in its category colour. If you prefer pictures, put your own PNG
-files into an `img/` folder next to `index.html`, using the file names listed in `MODEL_IMAGES` inside
-`index.html`. The `img/` folder is not part of this repository.
+The editor comes without pedal pictures: each effect shows its symbol and category colour. If you would like a
+picture next to the model choice, put your own PNG files into an `img/` folder next to `index.html`, using the file
+names listed in `MODEL_IMAGES` inside `index.html`. The `img/` folder is not part of this repository.
 
 ## How it works
 
@@ -155,5 +198,8 @@ Du kannst Presets wechseln, umbenennen und speichern und Amp, Gate und Effekte l
 Oben zeigt eine Signal Chain alle Blöcke: Ein Klick lässt den Block unten aufleuchten, ein Doppelklick schaltet ihn an oder aus.
 Captures und Cabs lädst du aus der Library des Geräts. Dazu gibt es einen Tuner, die Zuweisungen
 für das Expression-Pedal und die Steuerung per MIDI-Controller mit MIDI Learn.
+Mit **A | B** vergleichst du den gemerkten Stand mit deinen Änderungen. Ist der Nano zusätzlich per USB-C verbunden,
+zeigt die Mac-App seinen Ausgangspegel (USB-Kanäle 3/4) und stellt mit **Auto level** die Capture-Lautstärke nach ein
+paar Sekunden Spielen passend für Clean, Drive, Solo oder Fuzz ein. Im Browser kommen am Mac nur die Kanäle 1/2 (DI) an.
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.

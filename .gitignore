@@ -8,6 +8,7 @@ img/
 mac-app/node_modules/
 mac-app/dist/
 mac-app/app/
+mac-app/native/nano-meter
 release/
 
 # Python

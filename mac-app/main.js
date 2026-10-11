@@ -1,8 +1,9 @@
 // Nano Cortex Editor - macOS app shell (Electron) around the web editor.
-// The editor itself is app/index.html (copied from ../index_final_fixed.html by build.sh).
-const { app, BrowserWindow, Menu, shell } = require('electron');
+// The editor itself is app/index.html (copied from ../index.html by build.sh).
+const { app, BrowserWindow, ipcMain, Menu, session, shell, systemPreferences } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const { registerMeter } = require('./meter');
 
 // Zoom like in Chrome: Cmd + / Cmd - step through these factors, Cmd 0 returns to 100 %. The zoom is kept for the next start.
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
@@ -72,7 +73,8 @@ function createWindow() {
     trafficLightPosition: { x: 20, y: 27 },
     webPreferences: {
       contextIsolation: true,
-      sandbox: true
+      sandbox: true,
+      preload: path.join(__dirname, 'preload.js')   // only the level meter bridge (window.nanoMeter)
     }
   });
 
@@ -125,11 +127,37 @@ function createWindow() {
     return { action: 'deny' };
   });
 
+  win.on('closed', () => stopMeter());
   win.loadFile(path.join(__dirname, 'app', 'index.html'));
+}
+
+// The output meter listens to the Nano's USB audio, which is an audio input ("microphone") for macOS: macOS asks the
+// user once.
+function askForAudioInput() {
+  if (process.platform !== 'darwin') return Promise.resolve(true);
+  return systemPreferences.askForMediaAccess('microphone').catch(() => false);
+}
+
+// The meter runs in a small helper next to the app's executable (in a development run: mac-app/native/nano-meter),
+// because the page cannot read the Nano's channels 3/4. Should the page ask for an audio input itself, only audio is
+// let through - the editor has no use for a camera. Everything else stays allowed as before.
+let stopMeter = () => {};
+function allowAudioInput() {
+  stopMeter = registerMeter({
+    ipcMain,
+    helperPath: app.isPackaged ? path.join(path.dirname(process.execPath), 'nano-meter') : path.join(__dirname, 'native', 'nano-meter'),
+    askAccess: askForAudioInput
+  });
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback, details) => {
+    if (permission !== 'media') { callback(true); return; }
+    if ((details.mediaTypes || []).includes('video')) { callback(false); return; }
+    askForAudioInput().then(callback);
+  });
 }
 
 app.whenReady().then(() => {
   buildMenu();
+  allowAudioInput();
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -137,3 +165,4 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => app.quit());
+app.on('will-quit', () => stopMeter());
