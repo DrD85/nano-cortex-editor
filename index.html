@@ -371,6 +371,7 @@
       --ico-cab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='3' width='16' height='18' rx='2'/><circle cx='12' cy='13' r='4.5'/><circle cx='12' cy='13' r='1'/></g></svg>");
       --ico-amp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='6' width='20' height='12' rx='2'/><path d='M2 11h20'/><circle cx='7' cy='14.5' r='1'/><circle cx='12' cy='14.5' r='1'/><circle cx='17' cy='14.5' r='1'/></g></svg>");
       --ico-level: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M5 20v-7M10 20V5M15 20v-10M20 20v-4'/><path d='M3 9h3M13 6h9' stroke-dasharray='1.5 2.5'/></g></svg>");
+      --ico-footswitch: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2.5' y='6.5' width='19' height='11' rx='3'/><circle cx='8' cy='12' r='2.4'/><circle cx='16' cy='12' r='2.4'/></g></svg>");
       --ico-tuner: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2v8a4 4 0 0 0 8 0V2'/><path d='M12 14v8'/></g></svg>");
       --ico-exp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 18l14-5'/><path d='M5 21v-3M19 21v-8'/><path d='M6 9a9 9 0 0 1 12-4'/><path d='M15 3l3 2-2 3'/></g></svg>");
       --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
@@ -1177,6 +1178,21 @@
     .al-status .al-link { display: block; margin-top: 4px; color: #c8ccd1; font-size: 13px; text-align: left; }
     .level-panel .ask-buttons button { padding: 10px 14px; white-space: nowrap; }
     @media (max-width: 520px) { .al-kinds { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    /* footswitches of the Nano: one row per slot */
+    .fs-panel { width: min(520px, calc(100vw - 32px)); gap: 14px; }
+    .fs-list { display: grid; gap: 8px; }
+    .fs-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid #2c3035;
+              border-radius: 11px; background: #17191c; }
+    .fs-row.sel { border-color: #45F862; background: #12261a; }
+    .fs-row .slot { display: grid; place-items: center; height: 30px; border-radius: 8px; background: #0c0d0f; border: 1px solid #33383e; font-size: 13px;
+                    font-weight: 700; color: #f2f2f2; font-variant-numeric: tabular-nums; }
+    .fs-row.sel .slot { background: #45F862; border-color: #45F862; color: #06150a; }
+    .fs-row select { padding-top: 8px; padding-bottom: 8px; }
+    .fs-row button { padding: 8px 12px; font-size: 12.5px; white-space: nowrap; }
+    .fs-row button:disabled { opacity: .35; cursor: default; }
+    .fs-list.busy { opacity: .6; pointer-events: none; }
+    .fs-panel .al-status { min-height: 20px; }
   </style>
 </head>
 <body>
@@ -1206,6 +1222,7 @@
       <span class="tool-sep"></span>
       <button id="tunerBtn" class="icon-btn" data-midi-id="tuner::" data-midi-target='{"kind":"tuner"}' title="Tuner" aria-label="Tuner"><span class="ico" style="--icon: var(--ico-tuner)"></span></button>
       <button id="expBtn" class="icon-btn" title="Expression pedal assignments" aria-label="Expression"><span class="ico" style="--icon: var(--ico-exp)"></span></button>
+      <button id="fsBtn" class="icon-btn" title="Footswitches of the Nano: which preset 1A, 1B, 2A and 2B call up" aria-label="Footswitches"><span class="ico" style="--icon: var(--ico-footswitch)"></span></button>
       <button id="midiBtn" class="icon-btn" title="MIDI controller and MIDI Learn" aria-label="MIDI"><span class="ico" style="--icon: var(--ico-midi)"></span></button>
       <button id="mc6Btn" class="icon-btn" title="Morningstar MC6 Pro export" aria-label="MC6 Pro export"><span class="ico" style="--icon: var(--ico-controller)"></span></button>
       <span class="tool-sep"></span>
@@ -1310,6 +1327,19 @@
         <button type="submit" id="askOk" class="primary">OK</button>
       </div>
     </form>
+  </div>
+
+  <div id="fsOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel fs-panel" role="dialog" aria-label="Footswitches of the Nano">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-footswitch)"></span><h2 class="dlg-title">Footswitches of the Nano</h2></div>
+        <button id="fsClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+      </div>
+      <div class="lv-hint">The preset each footswitch of the Nano calls up – footswitch 1 and 2, each with A and B. A change is stored on the Nano at once.</div>
+      <div id="fsList" class="fs-list"></div>
+      <div id="fsNote" class="lv-hint"></div>
+      <div id="fsStatus" class="al-status"></div>
+    </div>
   </div>
 
   <div id="levelOverlay" class="ask-overlay" hidden>
@@ -1927,6 +1957,8 @@
       libraryTimer: null,
       presetDirty: false,
       ab: { active: false, side: 'B', A: null, B: null, preset: 0, busy: false },   // A/B compare
+      fs: { busy: false, status: '', error: false },   // footswitch assignment dialog
+      fourPresetMode: true,   // the Nano's 4-Preset Mode (footswitch slots B), from its state
       connected: false,
       selectedPreset: 1,
       presetNames: new Map(),
@@ -2338,6 +2370,7 @@
       const varintField = (n, fallback) => fields[n] && fields[n][0] && fields[n][0].wire === 0 ? fields[n][0].value : fallback;
       state.selectedPreset = varintField(13, 0) + 1;
       state.presetSlots = { a1: varintField(14, 0), b1: varintField(15, 0), a2: varintField(38, 0), b2: varintField(39, 0) };
+      state.fourPresetMode = Boolean(varintField(37, 0));
       state.presetDirty = Boolean(varintField(41, 0));
       const tunerFreq = fields[46] && fields[46][0];
       if (tunerFreq && tunerFreq.wire === 5) {
@@ -3303,6 +3336,24 @@ function parseSelectedCaptureState(payload) {
         0x38, ...encodeInt32(-1),
         0x40, ...encodeInt32(-1),
         0x48, currentSlot
+      ], MSG.SetPresetSlotsRequest);
+    }
+
+    // The same message with the footswitch slots filled in: 5 slotA1PresetIndex, 6 slotB1PresetIndex, 7 slotA2PresetIndex,
+    // 8 slotB2PresetIndex (preset indices from 0, as the Nano itself sends them in this message and in its state).
+    // The current preset stays the one that is loaded.
+    function presetSlotsFrame(presetIndex, slots) {
+      // a slot the editor has no valid preset for is sent as -1, like in a preset change: the Nano keeps it
+      const list = [slots.a1, slots.b1, slots.a2, slots.b2].map(v => (Number.isInteger(v) && v >= 0 && v <= 63 ? v : -1));
+      const slotIndex = list.indexOf(presetIndex);
+      return buildFrame([
+        0x18, 0x00,
+        0x20, ...encodeVarint(presetIndex),
+        0x28, ...encodeInt32(list[0]),
+        0x30, ...encodeInt32(list[1]),
+        0x38, ...encodeInt32(list[2]),
+        0x40, ...encodeInt32(list[3]),
+        0x48, slotIndex === -1 ? PRESET_SLOT_OTHER : slotIndex
       ], MSG.SetPresetSlotsRequest);
     }
 
@@ -4658,6 +4709,7 @@ function parseSelectedCaptureState(payload) {
 
     function renderPresetSelect() {
       renderAb();
+      if (!state.fs.busy) renderFootswitches();
       $('dirtyDot').hidden = !(state.connected && state.presetDirty);
       $('saveBtn').classList.toggle('dirty', Boolean(state.connected && state.presetDirty));
       const select = $('presetSelect');
@@ -4665,8 +4717,9 @@ function parseSelectedCaptureState(payload) {
       for (let i = 1; i <= 64; i++) {
         const option = document.createElement('option');
         option.value = i;
+        const slots = state.connected ? FS_SLOTS.filter(slot => state.presetSlots[slot.key] === i - 1).map(slot => slot.label) : [];
         option.textContent = i + '  ·  ' + (state.presetNames.get(i) || ('Preset ' + i)) +
-          (i === state.selectedPreset && state.presetDirty ? ' *' : '');
+          (i === state.selectedPreset && state.presetDirty ? ' *' : '') + (slots.length ? '   [' + slots.join(' ') + ']' : '');
         if (i === state.selectedPreset) option.selected = true;
         select.appendChild(option);
       }
@@ -6315,6 +6368,96 @@ function renderGate() {
     $('abB').addEventListener('click', () => abSwitch('B'));
     $('abEnd').addEventListener('click', () => { abEnd(); toast('A/B compare ended – the settings you hear stay.', 'info'); });
     setInterval(() => { if (state.ab.active && !state.ab.busy) renderAb(); }, 400);   // a turned knob redraws only itself
+
+    // ---- Footswitches of the Nano ----
+    // The Nano has two footswitches; each calls up a preset A and, in its 4-Preset Mode, a preset B: slots 1A, 1B, 2A, 2B.
+    // An assignment is sent as SetPresetSlotsRequest with all four slots (read from the Nano just before) and checked
+    // by reading the Nano's state again.
+    const FS_SLOTS = [{ key: 'a1', label: '1A' }, { key: 'b1', label: '1B' }, { key: 'a2', label: '2A' }, { key: 'b2', label: '2B' }];
+    const presetLabel = n => n + ' · ' + (state.presetNames.get(n) || 'Preset ' + n);
+
+    function renderFootswitches() {
+      if ($('fsOverlay').hidden) return;
+      const fs = state.fs;
+      const list = $('fsList');
+      list.classList.toggle('busy', fs.busy);
+      list.innerHTML = '';
+      FS_SLOTS.forEach(slot => {
+        const preset = state.presetSlots[slot.key] + 1;   // 1-64, anything else: nothing known
+        const known = preset >= 1 && preset <= 64;
+        const row = document.createElement('div');
+        row.className = 'fs-row' + (known && preset === state.selectedPreset ? ' sel' : '');
+        row.innerHTML = '<span class="slot">' + slot.label + '</span>';
+        const select = document.createElement('select');
+        select.setAttribute('aria-label', 'Preset of footswitch ' + slot.label);
+        if (!known) select.appendChild(new Option('–', '', false, true));
+        for (let n = 1; n <= 64; n++) select.appendChild(new Option(presetLabel(n), String(n), false, n === preset));
+        select.addEventListener('change', () => { if (select.value) assignFootswitch(slot, Number(select.value)); });
+        const current = document.createElement('button');
+        current.type = 'button';
+        current.textContent = 'This preset';
+        current.title = 'Put the loaded preset (' + presetLabel(state.selectedPreset) + ') on ' + slot.label;
+        current.disabled = known && preset === state.selectedPreset;
+        current.addEventListener('click', () => assignFootswitch(slot, state.selectedPreset));
+        row.appendChild(select);
+        row.appendChild(current);
+        list.appendChild(row);
+      });
+      $('fsNote').textContent = state.fourPresetMode ? '' : '4-Preset Mode is off on the Nano: 1B and 2B are only reached with it (Cortex Cloud > Settings).';
+      $('fsStatus').classList.toggle('error', fs.error);
+      $('fsStatus').textContent = fs.status;
+    }
+
+    async function assignFootswitch(slot, preset) {
+      const fs = state.fs;
+      if (fs.busy) return;
+      if (!state.connected) { toast('Connect to the Nano first.', 'info'); return; }
+      const done = (text, error = false) => { fs.status = text; fs.error = error; };
+      if (state.presetDirty && !(await askConfirm('Assign with unsaved changes?', 'Preset ' + state.selectedPreset + ' has unsaved changes. The Nano may load the ' +
+          'preset again when its footswitches are assigned, which would discard them. Save first to be safe.', { ok: 'Assign anyway' }))) {
+        renderFootswitches();   // the list shows the Nano's assignment again
+        return;
+      }
+      fs.busy = true;
+      done('Storing on the Nano …');
+      renderFootswitches();
+      try {
+        if (!(await readPresetNow())) { done('The Nano did not answer – nothing was changed.', true); return; }
+        const wanted = Object.assign({}, state.presetSlots, { [slot.key]: preset - 1 });
+        if (!(await writeC304('Footswitch ' + slot.label + ' = preset ' + preset, presetSlotsFrame(state.selectedPreset - 1, wanted)))) {
+          done('The Bluetooth write failed – nothing was changed.', true);
+          return;
+        }
+        await wait(500);
+        const read = await readPresetNow();
+        if (read && FS_SLOTS.every(s => state.presetSlots[s.key] === wanted[s.key])) {
+          done(slot.label + ' now calls up ' + presetLabel(preset) + '.');
+          log('Footswitch ' + slot.label + ' assigned to preset ' + preset + ' and checked.');
+        } else {
+          done('Not confirmed: ' + (read ? 'the Nano reports ' + FS_SLOTS.map(s => s.label + ' = ' + (state.presetSlots[s.key] + 1)).join(', ') + '.'
+            : 'the Nano did not answer the check.'), true);
+          log('Footswitch ' + slot.label + ': assignment to preset ' + preset + ' not confirmed.');
+        }
+      } finally {
+        fs.busy = false;
+        renderFootswitches();
+        renderPresetSelect();
+      }
+    }
+
+    function openFootswitches() {
+      if (!state.connected) { toast('Connect to the Nano first.', 'info'); return; }
+      state.fs.status = '';
+      state.fs.error = false;
+      $('fsOverlay').hidden = false;
+      renderFootswitches();
+      $('fsClose').focus();
+    }
+    const closeFootswitches = () => { $('fsOverlay').hidden = true; };
+    $('fsBtn').addEventListener('click', openFootswitches);
+    $('fsClose').addEventListener('click', closeFootswitches);
+    $('fsOverlay').addEventListener('click', e => { if (e.target === $('fsOverlay')) closeFootswitches(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('fsOverlay').hidden && $('askOverlay').hidden) closeFootswitches(); });
 
     // ---- Output level (the Nano's USB audio) and Auto level ----
     // The Nano is an audio interface over USB-C with eight channels: 1/2 carry the dry guitar signal (DI), 3/4 the sound

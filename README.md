@@ -16,10 +16,13 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   colour – filled when on, outlined when off, dashed when empty. Click a block to make it light up below,
   **double-click** to switch it on or off
 - **Compact top bar**: preset arrows, preset list (a dot marks unsaved changes, and **Save** turns green), save,
-  rename and **A/B**, then icons for export, import, tuner, expression, MIDI and MC6 Pro – hover an icon for its name. The
+  rename and **A/B**, then icons for export, import, tuner, expression, footswitches, MIDI and MC6 Pro – hover an icon for its name. The
   **Connect** button shows the connection; when connected it opens refresh, copy log and disconnect (also under **…**).
   Until the Nano is connected, the editor shows a short connect screen instead of placeholder values
 - **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
+- **Footswitches of the Nano**: the footswitch icon opens the four slots **1A, 1B, 2A, 2B** – choose the preset each
+  one calls up, or put the loaded preset on a slot with one click. The change is stored on the Nano at once and read
+  back as a check; the preset list shows the slot next to the name (B slots need the Nano's 4-Preset Mode)
 - **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style).
   The capture is shown as an amp: its name on the name plate, Gain, Bass, Mid, Treble and Level (0–10) plus the
   capture **Volume** on the control panel
