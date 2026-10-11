@@ -9,6 +9,7 @@ mac-app/node_modules/
 mac-app/dist/
 mac-app/app/
 mac-app/native/nano-meter
+mac-app/native/nano-monitor
 release/
 
 # Python

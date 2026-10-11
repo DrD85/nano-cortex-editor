@@ -111,6 +111,7 @@ Requires [Node.js](https://nodejs.org) on an Apple Silicon Mac.
 cd mac-app
 ./build.sh            # app for yourself, includes your pedal pictures from ../img if present
 ./build.sh --public   # release build without pedal pictures, plus a zip in ../release
+./build.sh --beta     # the separate beta app (see "Beta: Monitor"); with --public as well for its release zip
 ```
 
 The app is a small [Electron](https://www.electronjs.org) shell around `index.html`
@@ -188,6 +189,17 @@ m4a (AAC), wav, flac and ogg; the Mac app also plays **Apple Lossless** (m4a), A
 
 How loud a track sits against the guitar in the Nano's output depends on the Nano's own mixing, which the editor
 cannot measure: if all tracks are too loud or too quiet, set the level once with **−** / **+** of *LUFS · all*.
+
+## Beta: Monitor
+
+> **Beta – a separate app, not part of the normal editor.** Tested with a test tone only so far.
+
+*Nano Cortex Editor Beta* is the normal Mac app plus one thing to try out: the **Monitor**. It plays the sound the
+Nano sends over USB (channels 3/4) through another audio device – an audio interface, the Mac's speakers,
+headphones –, like the audio settings of a standalone plugin: choose input and output, start. The sound passes
+through the Mac, so it arrives a few milliseconds late. The beta installs next to the normal app and keeps its own
+settings. How to install and use it, what to expect and what feedback helps:
+**[docs/beta-monitor.md](docs/beta-monitor.md)**.
 
 ## MIDI controller
 
