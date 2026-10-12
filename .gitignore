@@ -10,6 +10,7 @@ mac-app/dist/
 mac-app/app/
 mac-app/native/nano-meter
 mac-app/native/nano-monitor
+mac-app/native/nano-spectrum
 release/
 
 # Python

@@ -1,6 +1,5 @@
-// Monitor of the beta app: runs the nano-monitor helper, which plays a channel pair of an audio input (the Nano's
+// Monitor of the Mac app: runs the nano-monitor helper, which plays a channel pair of an audio input (the Nano's
 // sound on USB channels 3/4) through another audio device, and passes its lines on to the editor page.
-// Only a beta build has the helper and uses this (see main.js).
 const { execFile, spawn } = require('child_process');
 
 // helperPath: the nano-monitor binary; askAccess: async () => boolean (macOS asks for the "microphone" once).

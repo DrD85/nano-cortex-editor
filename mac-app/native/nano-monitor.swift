@@ -1,4 +1,4 @@
-// nano-monitor - play-through helper of the Nano Cortex Editor Beta (Mac app).
+// nano-monitor - play-through helper of the Nano Cortex Editor Mac app.
 //
 // Plays one channel pair of an audio input (the Nano's processed sound on USB channels 3/4) through another audio
 // device (an audio interface, the Mac's speakers), like the audio settings of a standalone plugin. Input and output

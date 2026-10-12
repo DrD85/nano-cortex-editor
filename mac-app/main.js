@@ -6,15 +6,8 @@ const path = require('path');
 const { registerMeter } = require('./meter');
 const { registerJam } = require('./jam');
 const { registerMonitor } = require('./monitor');
+const { registerSpectrum } = require('./spectrum');
 
-// A beta build (build.sh --beta) carries app/beta.json { version }: it tries out something the normal app does not
-// have yet - its helper, its bridge to the page and its part of the page come with that build only.
-let beta = null;
-try { beta = require('./app/beta.json'); } catch (err) { /* the normal app */ }
-if (beta) {   // an app of its own: its settings do not mix with the normal app's (both may run, one after the other)
-  app.setName('Nano Cortex Editor Beta');
-  app.setPath('userData', path.join(app.getPath('appData'), 'Nano Cortex Editor Beta'));
-}
 
 // Zoom like in Chrome: Cmd + / Cmd - step through these factors, Cmd 0 returns to 100 %. The zoom is kept for the next start.
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
@@ -76,7 +69,7 @@ function createWindow() {
     height: 960,
     minWidth: 900,
     minHeight: 640,
-    title: beta ? 'Nano Cortex Editor Beta' : 'Nano Cortex Editor',
+    title: 'Nano Cortex Editor',
     backgroundColor: '#000000',
     // No title bar: the window buttons sit in the editor's top bar (the page leaves room for them and lets the
     // bar move the window), centred on its first row.
@@ -85,8 +78,7 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true,
       sandbox: true,
-      preload: path.join(__dirname, 'preload.js'),   // only the level meter bridge (window.nanoMeter)
-      additionalArguments: beta ? ['--nano-beta=' + beta.version] : []
+      preload: path.join(__dirname, 'preload.js')   // the bridges to the helpers: meter, monitor, spectrum, jam tracks
     }
   });
 
@@ -139,7 +131,7 @@ function createWindow() {
     return { action: 'deny' };
   });
 
-  win.on('closed', () => { stopMeter(); stopMonitor(); });
+  win.on('closed', () => { stopMeter(); stopMonitor(); stopSpectrum(); });
   win.loadFile(path.join(__dirname, 'app', 'index.html'));
 }
 
@@ -150,15 +142,17 @@ function askForAudioInput() {
   return systemPreferences.askForMediaAccess('microphone').catch(() => false);
 }
 
-// The meter runs in a small helper next to the app's executable (in a development run: mac-app/native/nano-meter),
-// because the page cannot read the Nano's channels 3/4. Should the page ask for an audio input itself, only audio is
+// The meter, the monitor and the spectrum run in small helpers next to the app's executable (in a development run:
+// mac-app/native/), because the page cannot read the Nano's channels 3/4 or play them through another device. Should the page ask for an audio input itself, only audio is
 // let through - the editor has no use for a camera. Everything else stays allowed as before.
 let stopMeter = () => {};
-let stopMonitor = () => {};   // (beta) the play-through of the Nano's sound to another audio device
+let stopMonitor = () => {};   // the play-through of the Nano's sound to another audio device
+let stopSpectrum = () => {};  // the spectrum behind the EQ view's curve
 const helper = name => (app.isPackaged ? path.join(path.dirname(process.execPath), name) : path.join(__dirname, 'native', name));
 function allowAudioInput() {
   stopMeter = registerMeter({ ipcMain, helperPath: helper('nano-meter'), askAccess: askForAudioInput });
-  if (beta) stopMonitor = registerMonitor({ ipcMain, helperPath: helper('nano-monitor'), askAccess: askForAudioInput });
+  stopMonitor = registerMonitor({ ipcMain, helperPath: helper('nano-monitor'), askAccess: askForAudioInput });
+  stopSpectrum = registerSpectrum({ ipcMain, helperPath: helper('nano-spectrum'), askAccess: askForAudioInput });
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback, details) => {
     if (permission !== 'media') { callback(true); return; }
     if ((details.mediaTypes || []).includes('video')) { callback(false); return; }
@@ -177,4 +171,4 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => app.quit());
-app.on('will-quit', () => { stopMeter(); stopMonitor(); });
+app.on('will-quit', () => { stopMeter(); stopMonitor(); stopSpectrum(); });

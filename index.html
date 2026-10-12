@@ -771,11 +771,91 @@
     .conn-btn #status { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .conn-btn.connected { background: #0e1f12; border-color: #1d4d27; color: #c8f0cf; }
     .more { position: relative; }
-    .more-menu { position: absolute; right: 0; top: 46px; z-index: 30; display: grid; gap: 4px; min-width: 230px; padding: 6px;
+    .more-menu { position: absolute; right: 0; top: 46px; z-index: 30; display: grid; gap: 4px; min-width: 270px; padding: 6px;
                  background: #121416; border: 1px solid #2e3236; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.6); }
     .more-menu[hidden] { display: none; }
-    .more-menu button { display: flex; align-items: center; gap: 10px; text-align: left; border: 0; background: transparent; font-size: 13px; padding: 9px 12px; border-radius: 8px; }
+    .more-menu button { display: flex; align-items: center; gap: 10px; text-align: left; border: 0; background: transparent; font-size: 13px; padding: 9px 12px; border-radius: 8px;
+                        white-space: nowrap; }
     .more-menu .ico { width: 16px; height: 16px; opacity: .8; }
+    .more-menu .menu-sep { height: 1px; margin: 3px 8px; background: #24282c; }
+    .more-menu .menu-key { margin-left: auto; padding-left: 22px; color: #6f747a; font-size: 12px; font-variant-numeric: tabular-nums; }
+    .more-menu .menu-key:empty { display: none; }
+    .more-menu button:disabled { opacity: .45; }
+    .more-menu button[hidden] { display: none; }
+
+    /* monitor: the Nano's USB sound through another audio device (Mac app) */
+    :root { --ico-monitor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9.5h3l4.5-4v13L7 14.5H4z'/><path d='M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11'/></g></svg>"); }
+    #moreBtn { position: relative; }
+    #moreBtn.playing::after { content: ""; position: absolute; right: 5px; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: #45F862;
+                              box-shadow: 0 0 8px rgba(69, 248, 98, .7); }   /* the monitor plays while its dialog is closed */
+    #monitorOverlay { z-index: 59; }   /* below the page's own question dialog */
+    .monitor-panel { width: min(560px, calc(100vw - 32px)); gap: 14px; max-height: calc(100vh - 32px); overflow: auto; }
+    .mon-rows { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px 12px; align-items: center; }
+    .mon-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8e9297; }
+    .mon-pick { display: flex; gap: 10px; min-width: 0; }
+    .mon-pick select:first-child { flex: 1 1 auto; min-width: 0; }
+    .mon-pick #monPair { flex: 0 0 auto; width: auto; }
+    .mon-set { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .mon-set .seg-box .seg.text { width: auto; padding: 0 14px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .mon-set .spacer { flex: 1 1 auto; }
+    .mon-state { display: flex; align-items: baseline; gap: 10px; min-height: 22px; }
+    .mon-state strong { font-size: 20px; font-weight: 650; color: #f2f2f2; font-variant-numeric: tabular-nums; }
+    .mon-state strong:empty { display: none; }
+    .mon-state span { color: #9aa0a6; font-size: 12.5px; line-height: 1.5; }
+    .mon-state.error span { color: #ff8c8c; }
+    .mon-state.warn span { color: #f2d14b; }
+    .monitor-panel .ask-buttons { align-items: center; }
+    .monitor-panel .ask-buttons .lv-hint { margin-right: auto; }
+
+    /* EQ view: the EQ models' curve in the block and in its dialog */
+    :root { --ico-expand: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M14 5h5v5M19 5l-6 6M10 19H5v-5M5 19l6-6'/></g></svg>"); }
+    .eq-mini { position: relative; margin-top: 10px; border: 1px solid #24282c; border-radius: 12px; overflow: hidden; background: #0b0c0e; }
+    .eq-mini canvas { display: block; width: 100%; height: 150px; touch-action: none; }
+    .eq-mini .eq-open { position: absolute; right: 6px; top: 6px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border-radius: 8px;
+                        background: rgba(18, 20, 22, .82); border-color: #2f3338; color: #d6d6d6; }
+    .eq-mini .eq-open .ico { width: 15px; height: 15px; }
+    .eq-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 11.5px; color: #8e9297; font-variant-numeric: tabular-nums; }
+    .eq-foot button { height: auto; padding: 4px 9px; border-radius: 7px; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: #b9bdc2; }
+    .block.eq-graph .param-grid { display: none; }
+    #eqOverlay { z-index: 58; }
+    .eq-panel { width: min(1080px, calc(100vw - 32px)); gap: 14px; padding: 18px; max-height: calc(100vh - 32px); overflow: auto; }
+    .eq-panel .tuner-head .block-title { min-width: 0; }
+    .eq-panel .eq-slot { color: #8e9297; font-size: 12px; margin-left: 2px; white-space: nowrap; }
+    .eq-panel .eq-head-right { display: flex; align-items: center; gap: 12px; }
+    .eq-stage { position: relative; border: 1px solid #24282c; border-radius: 14px; overflow: hidden; background: #0b0c0e; }
+    .eq-stage canvas { display: block; width: 100%; height: min(430px, calc(100vh - 330px)); min-height: 240px; touch-action: none; }
+    .eq-read { position: absolute; left: 14px; top: 12px; padding: 5px 10px; border-radius: 8px; background: rgba(14, 16, 18, .78); font-size: 12px; color: #d8dadc;
+               font-variant-numeric: tabular-nums; pointer-events: none; }
+    .eq-read:empty { display: none; }
+    .eq-spec { position: absolute; right: 14px; top: 12px; padding: 5px 10px; border-radius: 8px; background: rgba(14, 16, 18, .78); font-size: 11.5px; color: #8e9297;
+               pointer-events: none; }
+    .eq-spec:empty { display: none; }
+    .eq-note .toggle-switch { flex: none; transform: scale(.8); transform-origin: left center; margin-right: -6px; }
+    .eq-note [hidden] { display: none; }
+    .eq-read b { font-weight: 650; }
+    .eq-strip { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid #24282c; border-radius: 14px; background: #101214; }
+    .eq-strip .seg-box .seg.text { display: inline-flex; align-items: center; gap: 7px; width: auto; min-width: 40px; padding: 0 12px; font-size: 12.5px; font-weight: 650;
+                                   font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .eq-strip .seg-box .seg.text i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .eq-strip .seg-box .seg.text.on i { box-shadow: 0 0 0 1.5px #0d0f11; }
+    .eq-strip .eq-bands { max-width: 100%; overflow-x: auto; }
+    .eq-strip .eq-bands.many .seg.text { min-width: 0; padding: 0 9px; gap: 5px; font-size: 11.5px; }
+    .eq-strip .seg-box .seg.shape { width: 46px; }
+    .eq-strip .seg-box .seg.shape svg { width: 26px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .eq-strip .seg-box[hidden], .eq-strip .toggle-switch[hidden] { display: none; }
+    .eq-field { display: grid; gap: 2px; min-width: 76px; padding: 5px 12px; border: 1px solid #2b2f33; border-radius: 10px; background: linear-gradient(180deg, #191b1d, #111315);
+                text-align: left; height: 40px; cursor: pointer; letter-spacing: 0; }
+    .eq-field:hover { border-color: var(--accent); }
+    .eq-field em { font-style: normal; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: #8e9297; line-height: 1; }
+    .eq-field strong { font-size: 13px; font-weight: 650; color: #f2f2f2; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; }
+    .eq-field[disabled] { opacity: .4; cursor: default; }
+    .eq-strip .spacer { flex: 1 1 auto; }
+    .eq-strip .mon-label, .eq-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8e9297; }
+    .eq-note { display: flex; align-items: center; gap: 10px; color: #8e9297; font-size: 11.5px; line-height: 1.5; }
+    .eq-note > span:first-child { flex: 1 1 0; min-width: 0; }
+    .eq-note .eq-label { white-space: nowrap; }
+    .eq-note .seg-box { height: 28px; }
+    .eq-note .seg-box .seg.text { width: auto; padding: 0 10px; font-size: 11px; font-weight: 600; }
     .more-menu button:hover { background: #1d2024; }
 
     main { padding: 18px 24px 24px; gap: 16px; }
@@ -812,27 +892,22 @@
 
     /* top row: capture + amp, cab, gate */
     .top-row { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.15fr) 178px; gap: 16px; }
-    .top-card { padding: 14px 16px 16px; border-radius: 14px; }
-    .top-card .block-head { margin-bottom: 10px; min-height: 32px; }   /* same height with and without the library button */
+    .top-card { min-height: 0; padding: 12px 14px 14px; border-radius: 14px; }
+    .top-card .block-head { margin-bottom: 6px; min-height: 32px; }
     .head-actions { display: flex; align-items: center; gap: 8px; }
     #captureSelect, #irSelect { border-radius: 10px; }
 
-    /* Capture: dark amp front - grille with the capture name as name plate, control panel with cream knobs and jewel light */
-    .amp-face { position: relative; margin-top: 12px; padding: 14px; border-radius: 14px; border: 1px solid #2a2e33;
-      background: linear-gradient(#1c1e21, #141618); box-shadow: inset 0 0 0 6px #121315, inset 0 0 0 7px #2a2e33; }
-    .amp-grille { height: 68px; border-radius: 8px; display: grid; place-items: center;
-      background: repeating-linear-gradient(45deg, #1f2226 0 2px, #17191c 2px 5px), #17191c; }
-    .amp-badge { max-width: 86%; padding: 5px 14px; border-radius: 6px; background: linear-gradient(#e9e3d3, #b9b1a0); color: #1b1b1b;
-      font: italic 700 13px/1.1 Georgia, "Times New Roman", serif; letter-spacing: .02em; box-shadow: 0 2px 6px rgba(0,0,0,.6);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .amp-badge small { font: 700 9px/1 Inter, system-ui, sans-serif; letter-spacing: .14em; color: #5d574b; margin-left: 8px; font-style: normal; vertical-align: 1px; }
-    .amp-panel { margin-top: 10px; border-radius: 8px; padding: 8px 10px; display: grid; grid-template-columns: 22px minmax(0, 1fr) 20px; align-items: center; gap: 8px;
-      background: linear-gradient(#34383d, #22252a 45%, #1b1d21); border-top: 1px solid #4a4f56; }
-    .amp-jacks { display: grid; justify-items: center; }
-    .amp-jacks i { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(#000 35%, #8b9097 40%, #3a3e43 70%); }
-    .amp-jewel { width: 12px; height: 12px; border-radius: 50%; justify-self: end; background: radial-gradient(#ffb3a3, #e0301b 55%, #6e140b); box-shadow: 0 0 10px #ff3b1f; }
-    .amp-face.off .amp-jewel { background: radial-gradient(#6b4a45, #3e1510 55%, #1f0805); box-shadow: none; }
-    .amp-face.off .amp-badge { opacity: .5; }
+    /* Capture, cab and gate: one slim strip each - symbol, name, choice and switch on one line, the knobs below.
+       (Until 1.8 the capture was a drawn amp front and the cab a drawn cabinet.) */
+    .capture-card, .cab-card { display: flex; flex-flow: row wrap; align-items: center; gap: 10px 12px; }
+    :is(.capture-card, .cab-card) > .block-head { display: contents; }
+    :is(.capture-card, .cab-card) .block-title { order: 1; flex: 0 0 auto; }
+    :is(.capture-card, .cab-card) > select { order: 2; flex: 1 1 190px; width: auto; min-width: 0; height: 40px; }
+    .capture-card .head-actions, .cab-card #cabIRToggle { order: 3; flex: 0 0 auto; }
+    :is(.capture-card, .cab-card) > :is(.amp-face, .cabinet) { order: 4; flex: 1 1 100%; min-width: 0; }
+    :is(.capture-card, .cab-card) > .mini-param-grid:empty { display: none; }
+    .amp-face, .cabinet { padding: 10px 12px 8px; border: 1px solid #23272b; background: #0e1012; }
+    .amp-face.off .amp-knobs { opacity: .45; pointer-events: none; }
     .amp-knobs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; align-items: start; }
     :is(.amp-knobs, .cab-controls) .knob-param { gap: 2px; }
     :is(.amp-knobs, .cab-controls) .knob-param .knob { order: 1; }
@@ -845,25 +920,31 @@
     :is(.amp-knobs, .cab-controls) .knob::before { content: ""; position: absolute; inset: 6px; border-radius: 50%;
       background: radial-gradient(circle at 40% 35%, #f3efe4, #c9c2b2 55%, #8d8676); box-shadow: 0 2px 4px rgba(0,0,0,.7); }
     :is(.amp-knobs, .cab-controls) .knob::after { z-index: 1; top: 8px; height: 11px; width: 2px; background: #1b1b1b; transform-origin: 50% 12px; }
-    .amp-face.off .amp-knobs { opacity: .45; pointer-events: none; }
 
-    /* Cab: dark speaker cabinet, the cab settings in front of the speaker */
-    .cabinet { position: relative; margin-top: 12px; min-height: 196px; padding: 22px; border-radius: 14px; overflow: hidden; border: 1px solid #2a2e33;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      background: linear-gradient(#1c1e21, #141618); box-shadow: inset 0 0 0 6px #121315, inset 0 0 0 7px #2a2e33; }
-    .cab-grille { position: absolute; inset: 14px; border-radius: 8px; background: repeating-linear-gradient(45deg, #1f2226 0 2px, #17191c 2px 5px); }
-    .cab-cone { position: absolute; left: 50%; top: 42%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; opacity: .8;
-      background: radial-gradient(circle, #2b2f34 0 14%, #15171a 15% 46%, #23262b 47% 49%, #121416 50% 70%, #2a2e33 71% 72%, transparent 73%); }
-    .cabinet.off .cab-cone { opacity: .35; }
-    .cabinet .cab-controls { position: relative; grid-template-columns: repeat(2, minmax(0, 1.15fr)) repeat(3, minmax(0, 1fr)) !important; gap: 8px; align-items: center;
-      padding: 8px 10px; border-radius: 8px; background: linear-gradient(#34383d, #22252a 45%, #1b1d21); border-top: 1px solid #4a4f56; }
+    /* Cab: the mic of a factory cab as a small tile (a click opens the speaker), then level and the two filters */
+    .cabinet { display: flex; align-items: center; gap: 14px; }
+    .cabinet .cab-controls { flex: 1 1 auto; min-width: 0; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px; align-items: start; }
     .cab-controls .placeholder-param { background: rgba(10, 11, 13, .55); border: 1px solid rgba(255,255,255,.06); border-radius: 9px; padding: 7px 6px 6px; gap: 4px; }
-    .cab-note { grid-column: span 2; color: #8e9297; font-size: 11.5px; line-height: 1.35; text-align: center; padding: 0 4px; }
     .cabinet.off .cab-controls { opacity: .45; pointer-events: none; }
 
-    /* factory cabs: speaker with the mic positions and the mic choice above the knobs */
-    .cabinet.has-mics .cab-cone { display: none; }
-    .cabinet.has-mics .cab-controls { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    .mic-mini { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; height: auto; padding: 5px 14px 5px 6px; border-radius: 12px; text-align: left;
+                letter-spacing: 0; background: #131518; border-color: #2a2e33; }
+    .mic-mini[hidden] { display: none; }
+    .mic-mini .spk { width: 50px; height: 50px; filter: none; }
+    .mic-mini em { display: block; font-style: normal; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; }
+    .mic-mini strong { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 650; color: #e6e6e6; white-space: nowrap; }
+    .mic-mini small { display: block; font-size: 11px; font-weight: 500; color: #9aa0a6; white-space: nowrap; }
+    .cabinet.off .mic-mini { opacity: .45; pointer-events: none; }
+    /* the speaker with the mic positions and the mic choice: in its dialog */
+    .mic-panel { width: min(660px, calc(100vw - 32px)); gap: 16px; }
+    .mic-panel .mic-stage { grid-template-columns: 250px minmax(0, 1fr); gap: 26px; margin: 0; }
+    .mic-panel .spk { width: 250px; height: 250px; }
+    .mic-panel .mic-side { gap: 9px; }
+    .mic-panel .mic-choice button { padding: 9px 2px 7px; font-size: 12px; }
+    .mic-panel .mic-choice .ico { width: 30px; height: 30px; }
+    .mic-panel .mic-pos button { padding: 9px 0; font-size: 13px; }
+    .mic-panel .mic-label { margin-top: 4px; }
+    #micCab { color: #8e9297; font-size: 12px; margin-left: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mic-stage { position: relative; display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 18px; align-items: center; margin: 0 4px 12px; }
     .mic-stage[hidden] { display: none; }
     .spk { width: 118px; height: 118px; display: block; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .55)); }
@@ -886,18 +967,12 @@
     .mic-pos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); padding: 2px; border-radius: 10px; background: rgba(10, 11, 13, .6); border: 1px solid #2c3035; }
     .mic-pos button { border: 0; background: transparent; padding: 5px 0; font-size: 12px; font-weight: 600; color: #c8ccd1; border-radius: 8px; }
     :is(.mic-choice, .mic-pos) button.on { background: #ececec; border-color: #ececec; color: #0d0f11; }
-    .cabinet.off .mic-stage { opacity: .45; pointer-events: none; }
-    @media (max-width: 560px) {
-      .mic-stage { grid-template-columns: 1fr; justify-items: center; }
+    @media (max-width: 620px) {
+      .mic-panel .mic-stage { grid-template-columns: 1fr; justify-items: center; }
+      .mic-panel .spk { width: 200px; height: 200px; }
       .mic-side { width: 100%; }
+      .cabinet { flex-wrap: wrap; }
     }
-
-    /* amp and cab fill their cards, so both end at the same height whatever the cab shows */
-    .capture-card, .cab-card { display: flex; flex-direction: column; }
-    .capture-card .amp-face, .cab-card .cabinet { flex: 1 1 auto; }
-    .amp-face { display: flex; flex-direction: column; }
-    .amp-grille { flex: 1 1 auto; height: auto; min-height: 68px; }
-    .cabinet { padding: 18px; }
     .cab-controls .param-name { font-size: 9.5px; color: var(--muted); }
     .cab-controls select { font-size: 11px; padding: 4px; }
     .cab-controls .value-text { font-size: 11.5px; text-align: center; color: #e6e6e6; }
@@ -989,6 +1064,13 @@
     .fxp-new { text-align: left; border: 0; background: transparent; padding: 8px; font-size: 13px; color: #c8ccd1; border-radius: 8px; }
     .fxp-new:hover { background: #22262a; }
 
+    /* Wide enough: one line - the name left, the preset in the middle, the tools right. A side that needs more room
+       than the other pushes the preset over by half the difference; the preset list gives way first. */
+    @media (min-width: 1251px) {
+      header.topbar { display: grid; grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr); }
+      .topbar .preset-bar { min-width: 0; }
+      .topbar .preset-field { flex: 0 1 auto; min-width: 150px; }
+    }
     @media (max-width: 1250px) {
       .topbar .brand { flex-basis: 100%; }
       .topbar .tools { flex: 1 1 auto; }
@@ -1320,24 +1402,27 @@
       </div>
     </div>
     <div class="tools">
-      <button id="exportBtn" class="icon-btn" title="Export: save the current preset as a file (to keep or to share)" aria-label="Export"><span class="ico" style="--icon: var(--ico-export)"></span></button>
-      <button id="importBtn" class="icon-btn" title="Import: load a preset file into the current preset (or drop the file on the window)" aria-label="Import"><span class="ico" style="--icon: var(--ico-import)"></span></button>
       <input id="importFile" type="file" accept=".json,application/json" hidden>
-      <span class="tool-sep"></span>
       <button id="tunerBtn" class="icon-btn" data-midi-id="tuner::" data-midi-target='{"kind":"tuner"}' title="Tuner" aria-label="Tuner"><span class="ico" style="--icon: var(--ico-tuner)"></span></button>
       <button id="expBtn" class="icon-btn" title="Expression pedal assignments" aria-label="Expression"><span class="ico" style="--icon: var(--ico-exp)"></span></button>
       <button id="fsBtn" class="icon-btn" title="Footswitches of the Nano: which preset 1A, 1B, 2A and 2B call up" aria-label="Footswitches"><span class="ico" style="--icon: var(--ico-footswitch)"></span></button>
       <button id="midiBtn" class="icon-btn" title="MIDI controller and MIDI Learn" aria-label="MIDI"><span class="ico" style="--icon: var(--ico-midi)"></span></button>
-      <button id="mc6Btn" class="icon-btn" title="Morningstar MC6 Pro export" aria-label="MC6 Pro export"><span class="ico" style="--icon: var(--ico-controller)"></span></button>
       <button id="jamBtn" class="icon-btn" title="Jam tracks: a player for backing tracks, levelled to your presets" aria-label="Jam tracks"><span class="ico" style="--icon: var(--ico-jam)"></span></button>
       <span class="tool-sep"></span>
       <button id="connectBtn" class="conn-btn" title="Connect to the Nano Cortex"><span id="dot" class="dot"></span><span id="status">Connect</span></button>
       <div class="more">
         <button id="moreBtn" class="icon-btn" title="More" aria-label="More"><span class="ico" style="--icon: var(--ico-more)"></span></button>
         <div id="moreMenu" class="more-menu" hidden>
+          <button id="exportBtn" title="Save the current preset as a file (to keep or to share)"><span class="ico" style="--icon: var(--ico-export)"></span>Export preset file…<span class="menu-key"></span></button>
+          <button id="importBtn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="ico" style="--icon: var(--ico-import)"></span>Import preset file…<span class="menu-key"></span></button>
+          <div class="menu-sep"></div>
+          <button id="mc6Btn" title="A bank for the Morningstar MC6 Pro from up to five presets"><span class="ico" style="--icon: var(--ico-controller)"></span>Morningstar MC6 Pro export…</button>
+          <button id="monitorBtn" title="Hear the Nano from USB through another audio device (Mac app)" hidden><span class="ico" style="--icon: var(--ico-monitor)"></span>Monitor…</button>
+          <div class="menu-sep"></div>
           <button id="refreshBtn"><span class="ico" style="--icon: var(--ico-refresh)"></span>Refresh from the Nano</button>
-          <button id="keysBtn"><span class="ico" style="--icon: var(--ico-keyboard)"></span>Keyboard shortcuts</button>
+          <button id="keysBtn"><span class="ico" style="--icon: var(--ico-keyboard)"></span>Keyboard shortcuts<span class="menu-key">?</span></button>
           <button id="copyLogBtn"><span class="ico" style="--icon: var(--ico-copy)"></span><span id="copyLogLabel">Copy log</span></button>
+          <div class="menu-sep"></div>
           <button id="disconnectBtn" class="btn-disconnect"><span class="ico" style="--icon: var(--ico-power)"></span>Disconnect</button>
         </div>
       </div>
@@ -1372,14 +1457,7 @@
         </div>
         <select id="captureSelect"></select>
         <div id="currentCaptureText" class="current-item" hidden></div>
-        <div id="ampFace" class="amp-face">
-          <div class="amp-grille"><span id="ampBadge" class="amp-badge">Capture</span></div>
-          <div class="amp-panel">
-            <span class="amp-jacks" title="Input"><i></i></span>
-            <div id="ampKnobs" class="amp-knobs"></div>
-            <span id="ampJewel" class="amp-jewel" title="Capture on"></span>
-          </div>
-        </div>
+        <div id="ampFace" class="amp-face"><div id="ampKnobs" class="amp-knobs"></div></div>
         <div hidden>
           <input id="captureVolumeSlider" type="range" min="-24" max="12" step="0.1" value="0">
           <div id="captureVolumeValue">0.0 dB</div>
@@ -1397,8 +1475,7 @@
         <select id="irSelect"></select>
         <div id="currentIRText" class="current-item" hidden></div>
         <div id="cabinet" class="cabinet">
-          <div class="cab-grille"></div><span class="cab-cone"></span>
-          <div id="micStage" class="mic-stage" hidden></div>
+          <button id="micMini" class="mic-mini" title="Microphone and its place in front of the speaker – click to choose" hidden></button>
           <div id="irExtraParams" class="mini-param-grid cab-controls"></div>
         </div>
       </div>
@@ -1479,6 +1556,89 @@
           <button type="button" id="alOnly" title="Measures your playing without changing anything – for example to take a preset you like as the target">Only measure</button>
           <button type="button" id="alStart" class="primary">Start</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="micOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel mic-panel" role="dialog" aria-label="Microphone">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-cab)"></span><h2 class="dlg-title">Microphone</h2><span id="micCab"></span></div>
+        <button id="micClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+      </div>
+      <div id="micStage" class="mic-stage"></div>
+      <div class="lv-hint">Click a place on the speaker – from its centre (1) out to its edge (6) – and choose the microphone. The Nano takes both at once.</div>
+    </div>
+  </div>
+
+  <div id="monitorOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel monitor-panel" role="dialog" aria-label="Monitor">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-monitor)"></span><h2 class="dlg-title">Monitor</h2></div>
+        <button id="monClose" class="dlg-close" title="Close (Esc) – the monitor keeps playing, a green dot on … shows it" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+      </div>
+      <div class="lv-hint">Plays the Nano's sound from USB through another audio device – an audio interface, speakers, headphones – like the
+        audio settings of a standalone plugin. The sound passes through the Mac, so it arrives a few milliseconds late.</div>
+      <div class="mon-rows">
+        <span class="mon-label">Input</span>
+        <div class="mon-pick"><select id="monInput" aria-label="Audio input"></select>
+          <select id="monPair" aria-label="Channels" title="The channels to play – on the Nano 1/2 are the dry guitar signal, 3/4 its sound"></select></div>
+        <span class="mon-label">Output</span>
+        <div class="mon-pick"><select id="monOutput" aria-label="Audio output"></select></div>
+        <span class="mon-label">Buffer</span>
+        <div class="mon-set">
+          <div id="monBuffers" class="seg-box" role="group" aria-label="Buffer size" title="Frames per round on both devices: smaller is a shorter delay, larger is safer against dropouts"></div>
+          <span class="spacer"></span>
+          <span class="mon-label">Volume</span>
+          <div id="monGainBox" class="seg-box" role="group" aria-label="Volume of the monitor">
+            <button id="monDown" class="seg sign" aria-label="Quieter">−</button>
+            <span class="seg-value"><strong id="monGain"></strong><em>dB</em></span>
+            <button id="monUp" class="seg sign" aria-label="Louder">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="lv-meter">
+        <div class="lv-row"><span class="lv-ch">L</span><div class="lv-bar"><i id="monBarL"></i></div><span class="lv-num"><strong id="monNumL">–</strong> dB</span></div>
+        <div class="lv-row"><span class="lv-ch">R</span><div class="lv-bar"><i id="monBarR"></i></div><span class="lv-num"><strong id="monNumR">–</strong> dB</span></div>
+      </div>
+      <div id="monState" class="mon-state"><strong id="monDelay"></strong><span id="monText"></span></div>
+      <div class="ask-buttons">
+        <span class="lv-hint">Start with a low volume on speakers.</span>
+        <button type="button" id="monStart" class="primary">Start</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="eqOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel eq-panel" role="dialog" aria-label="EQ">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #0A74E0; --icon-ink: #fff;"><span class="fx-icon" style="--icon: var(--ico-equalizer)"></span><h2 id="eqTitle" class="dlg-title"></h2>
+          <span id="eqSlot" class="eq-slot"></span></div>
+        <div class="eq-head-right"><div id="eqToggle" class="toggle-switch" style="--block-color: #0A74E0" title="Effect on / off" role="switch" aria-label="Effect on or off"><div class="toggle-dot"></div></div>
+          <button id="eqClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button></div>
+      </div>
+      <div class="eq-stage"><canvas id="eqCanvas"></canvas><div id="eqRead" class="eq-read"></div><div id="eqSpec" class="eq-spec"></div></div>
+      <div class="eq-strip">
+        <div id="eqBands" class="seg-box eq-bands" role="group" aria-label="Bands"></div>
+        <button id="eqFreq" class="eq-field"><em>Freq</em><strong></strong></button>
+        <button id="eqGain" class="eq-field"><em>Gain</em><strong></strong></button>
+        <button id="eqQ" class="eq-field"><em>Q</em><strong></strong></button>
+        <div id="eqTypes" class="seg-box" role="group" aria-label="Shape of the band"></div>
+        <div id="eqOn" class="toggle-switch" style="--block-color: #f2f2f2" title="Band on / off" role="switch" aria-label="Band on or off"><div class="toggle-dot"></div></div>
+        <span class="spacer"></span>
+        <span class="eq-label">Output</span>
+        <div class="seg-box" role="group" aria-label="Output level">
+          <button id="eqOutDown" class="seg sign" aria-label="Output quieter">−</button>
+          <span class="seg-value"><strong id="eqOut"></strong><em>dB</em></span>
+          <button id="eqOutUp" class="seg sign" aria-label="Output louder">+</button>
+        </div>
+      </div>
+      <div class="eq-note">
+        <span>Drag a point · scroll over it: Q or slope · double-click: band on / off, fader to 0 · Shift: slowly. The curve is drawn with textbook filters – near the Nano's, not measured.</span>
+        <span id="eqSpecLabel" class="eq-label" title="The spectrum of the Nano's sound behind the curve: what comes out of the Nano over USB (channels 3/4), after all its effects. Its scale is its own, not the curve's dB.">Spectrum</span>
+        <div id="eqSpecToggle" class="toggle-switch" style="--block-color: #f2f2f2" role="switch" aria-label="Spectrum behind the curve"><div class="toggle-dot"></div></div>
+        <span class="eq-label" title="How a frequency control's travel becomes Hz is not checked against the Nano yet. Compare a value with the Cortex Cloud app and choose what fits.">Frequency scale</span>
+        <div id="eqScale" class="seg-box" role="group" aria-label="Frequency scale"><button class="seg text" data-scale="log">Log</button><button class="seg text" data-scale="lin">Linear</button></div>
       </div>
     </div>
   </div>
@@ -1849,10 +2009,7 @@
           p.includes('16khz')) return rangeMeta(-12, 12, 0.1, 'dB', 1);
 
       if (p.includes('gain') && (p.startsWith('1 ') || p.startsWith('2 ') || p.startsWith('3 '))) return rangeMeta(-12, 12, 0.1, 'dB', 1);
-      if (p.includes('output')) return rangeMeta(-12, 12, 0.1, 'dB', 1);
-      if (m.includes('graphic 9') && p === 'output') return rangeMeta(-20, 20, 0.1, 'dB', 1);
-      if (m.includes('low-high cut') && p === 'output') return rangeMeta(-20, 20, 0.1, 'dB', 1);
-      if (m.includes('parametric 3') && p === 'output') return rangeMeta(-20, 20, 0.1, 'dB', 1);
+      if (p.includes('output')) return rangeMeta(-12, 12, 0.1, 'dB', 1);   // (also the three EQ models')
 
       if (p.includes('threshold') && m.includes('utility gate')) return rangeMeta(-90, 0, 0.1, 'dB', 1);
       if (p === 'range' && m.includes('utility gate')) return rangeMeta(-90, -6, 0.1, 'dB', 1);
@@ -1893,7 +2050,7 @@
       if (p.includes('hold')) return rangeMeta(1, 2000, 1, 'ms', 0);
       if (p.includes('release')) return rangeMeta(2, 5000, 1, 'ms', 0);
 
-      if (p.includes('q') && (p.startsWith('1 ') || p.startsWith('2 ') || p.startsWith('3 '))) return rangeMeta(0.1, 10, 0.1, '', 1);
+      if (/^[123] q$/.test(p)) return rangeMeta(0.1, 10, 0.1, '', 1);   // (not "1 freq": that has a q in it, too)
       if (p === 'reso') return rangeMeta(1, 10, 0.01, '', 2);
       if (p === 'ratio' && (m.includes('opto') || m.includes('vca'))) return rangeMeta(2, m.includes('opto') ? 20 : 10, 0.01, '', 2);
       if (p === 'knee') return rangeMeta(1, 20, 0.01, 'dB', 2);
@@ -2086,6 +2243,7 @@
       probe.src = Object.values(MODEL_IMAGES)[0];
     }
 
+    let eqView = null;   // the EQ models' curve view (set near the end of this script)
     const state = {
       device: null,
       server: null,
@@ -2157,7 +2315,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.7.0';
+    const EDITOR_VERSION = '1.9.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2190,10 +2348,11 @@
     function hex(bytes) { return Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' '); }
     function printableASCII(bytes) { return Array.from(bytes).map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.').join(''); }
     function setStatus(text, connected = false) {
-      $('status').textContent = text === 'Disconnected' ? 'Connect' : text;
+      // (in the bar "Via controller" - the green dot says connected -, in full in the tooltip: the bar stays on one line)
+      $('status').textContent = text === 'Disconnected' ? 'Connect' : text === 'Connected via controller' ? 'Via controller' : text;
       $('dot').classList.toggle('connected', connected);
       $('connectBtn').classList.toggle('connected', connected);
-      $('connectBtn').title = connected ? text + ' - click for refresh / disconnect' : 'Connect to the Nano Cortex';
+      $('connectBtn').title = connected ? text + ' - click for preset files, refresh and disconnect' : 'Connect to the Nano Cortex';
       // Not connected: the editor is dimmed behind a connect card (no made-up values); while connecting it shows the step.
       $('connectHero').hidden = connected;
       document.querySelector('main').classList.toggle('offline', !connected);
@@ -2408,8 +2567,23 @@
       gattWriteQueue.splice(0).forEach(job => job.waiters.forEach(resolve => resolve(false)));
       resetExpRequests();
       abEnd();
+      closeDeviceDialogs();
       setStatus('Disconnected');
       log('Disconnected.');
+    }
+
+    // The connection is gone: the dialogs that work on the Nano close (none of them could act any more, and the
+    // connect card comes up behind them). The meter, MIDI and the jam tracks do not need the connection.
+    function closeDeviceDialogs() {
+      closeTuner(false);
+      closeExpPanel();
+      closeFootswitches();
+      closeLibraryBrowser();
+      closeMic();
+      if (eqView) eqView.closeDialog();
+      $('mc6Overlay').hidden = true;
+      if (!$('slotOverlay').hidden && $('slotCancel').onclick) $('slotCancel').onclick();
+      if (!$('askOverlay').hidden && $('askCancel').onclick) $('askCancel').onclick();
     }
 
     function onC305(event) {
@@ -4658,13 +4832,24 @@ function parseSelectedCaptureState(payload) {
       return Array.from(new Uint8Array(buf));
     }
 
+    // A value with its unit as it reads best: from 1000 Hz on in kHz ("8.50 kHz", "12.0 kHz"), from 1000 ms on in
+    // seconds ("1.20 s"). Below that as the parameter counts it.
+    function readableValue(value, unit, decimals) {
+      const v = Number(value), shown = Number(v.toFixed(decimals));   // (999.96 ms is "1.00 s", not "1000.0 ms")
+      if (unit === 'Hz' && shown >= 1000) return (v / 1000).toFixed(v >= 9995 ? 1 : 2) + ' kHz';
+      if (unit === 'ms' && shown >= 1000) return (v / 1000).toFixed(2) + ' s';
+      return v.toFixed(decimals) + (unit ? ' ' + unit : '');
+    }
+
     function paramDisplayValue(param) {
       const meta = param.meta || rangeMeta(0, 10, 0.1, '', 1);
 
       if (meta.kind === 'enum') return meta.options[param.value] || meta.options[0] || '';
+      const hz = eqView && eqView.frequencyText(param);   // a frequency of an EQ model: by the EQ view's scale
+      if (hz) return hz;
 
       const decimals = meta.decimals === null || meta.decimals === undefined ? decimalsFromStep(meta.step || 0.1) : meta.decimals;
-      return Number(param.value).toFixed(decimals) + (meta.unit ? ' ' + meta.unit : '');
+      return readableValue(param.value, meta.unit, decimals);
     }
 
     function paramValueToNormalized(param) {
@@ -4736,6 +4921,7 @@ function parseSelectedCaptureState(payload) {
     }
 
     async function promptManualValue(blockKey, param) {
+      if (eqView && await eqView.typeFrequency(blockKey, param)) return;
       const meta = param.meta || rangeMeta(0, 10, 0.1, '', 1);
 
       if (meta.kind === 'enum') {
@@ -5092,16 +5278,10 @@ function parseSelectedCaptureState(payload) {
       box.innerHTML = '';
       box.style.gridTemplateColumns = '';
 
-      // Mic and position exist only for the factory cabs: there they are chosen on the drawn speaker above the
-      // knobs; for own IRs a note takes their place.
-      $('cabinet').classList.toggle('has-mics', isFactory);
-      renderMicStage(isFactory);
-      if (!isFactory) {
-        const note = document.createElement('div');
-        note.className = 'cab-note';
-        note.textContent = 'Mic and position: factory cabs only';
-        box.appendChild(note);
-      }
+      // Mic and position exist only for the factory cabs: a small tile shows them, a click opens the speaker to
+      // choose them on. Own IRs have neither.
+      renderMicMini(isFactory);
+      if (!$('micOverlay').hidden) { if (isFactory) renderMicStage(); else closeMic(); }
 
       box.appendChild(renderCabKnob('Level', 'level', state.cabIR.levelDb, setCabIRLevelDb));
       box.appendChild(renderCabKnob('High Pass', 'highPass', state.cabIR.highPassHz, setCabIRHighPassHz));
@@ -5120,29 +5300,52 @@ function parseSelectedCaptureState(payload) {
     ];
 
     // Speaker seen from the front with the six mic positions from the centre (1) towards the edge (6); the chosen
-    // one carries the mic. Click a position on the speaker or below, and a mic on the right.
-    function renderMicStage(show) {
-      const stage = $('micStage');
-      stage.hidden = !show;
-      if (!show) { stage.innerHTML = ''; return; }
-      const pos = clamp(Math.round(Number(state.cabIR.position) || 1), 1, 6);
-      const mic = CAB_MICS.find(m => m.name === state.cabIR.mic) || CAB_MICS[0];
+    // one carries the mic. places: with the positions to click on (the dialog), without them the small tile's.
+    function micSpeaker(pos, places, id) {
       const x = p => 50 + (p - 1) * 7.6;
       let dots = '';
       for (let p = 1; p <= 6; p++) {
         dots += '<circle cx="' + x(p) + '" cy="50" r="' + (p === pos ? 0 : 2.1) + '" class="spk-dot"/>' +
-                '<circle cx="' + x(p) + '" cy="50" r="4.6" class="spk-hit" data-pos="' + p + '"><title>Position ' + p + '</title></circle>';
+                (places ? '<circle cx="' + x(p) + '" cy="50" r="4.6" class="spk-hit" data-pos="' + p + '"><title>Position ' + p + '</title></circle>' : '');
       }
-      stage.innerHTML =
-        '<svg class="spk" viewBox="0 0 100 100" aria-label="Mic position ' + pos + '">' +
-          '<defs><radialGradient id="spkCone" cx=".5" cy=".5" r=".5"><stop offset=".28" stop-color="#2a2e33"/><stop offset=".3" stop-color="#16181b"/>' +
+      return '<svg class="spk" viewBox="0 0 100 100" aria-label="Mic position ' + pos + '">' +
+          '<defs><radialGradient id="' + id + '" cx=".5" cy=".5" r=".5"><stop offset=".28" stop-color="#2a2e33"/><stop offset=".3" stop-color="#16181b"/>' +
           '<stop offset=".92" stop-color="#202327"/><stop offset="1" stop-color="#2c3035"/></radialGradient></defs>' +
-          '<circle cx="50" cy="50" r="48" class="spk-rim"/><circle cx="50" cy="50" r="42" fill="url(#spkCone)"/>' +
+          '<circle cx="50" cy="50" r="48" class="spk-rim"/><circle cx="50" cy="50" r="42" fill="url(#' + id + ')"/>' +
           '<circle cx="50" cy="50" r="12.5" class="spk-cap"/>' +
           '<line x1="50" y1="50" x2="' + x(6) + '" y2="50" class="spk-axis"/>' + dots +
           '<circle cx="' + x(pos) + '" cy="50" r="7.5" class="spk-glow"/><circle cx="' + x(pos) + '" cy="50" r="5.2" class="spk-mic"/>' +
           '<circle cx="' + x(pos) + '" cy="50" r="1.9" class="spk-mic-core"/>' +
-        '</svg>' +
+        '</svg>';
+    }
+    const micNow = () => ({ pos: clamp(Math.round(Number(state.cabIR.position) || 1), 1, 6), mic: CAB_MICS.find(m => m.name === state.cabIR.mic) || CAB_MICS[0] });
+
+    // The small tile in the cab's strip: the speaker with the mic's place, the mic's name and position.
+    function renderMicMini(show) {
+      const tile = $('micMini');
+      tile.hidden = !show;
+      if (!show) { tile.innerHTML = ''; return; }
+      const { pos, mic } = micNow();
+      tile.innerHTML = micSpeaker(pos, false, 'spkConeMini') + '<span><em>Mic</em><strong>' + escapeHTML(mic.name) + '</strong><small>Position ' + pos +
+        (pos === 1 ? ' · centre' : pos === 6 ? ' · edge' : '') + '</small></span>';
+    }
+
+    function openMic() {
+      if (!state.cabIR.on || !isFactoryCabIR()) return;
+      $('micOverlay').hidden = false;
+      renderMicStage();
+      $('micClose').focus();
+    }
+    function closeMic() {
+      $('micOverlay').hidden = true;
+    }
+
+    // The dialog: the speaker to click a place on, the five mics, the six positions.
+    function renderMicStage() {
+      const stage = $('micStage');
+      const { pos, mic } = micNow();
+      $('micCab').textContent = state.currentIR.shortName || '';
+      stage.innerHTML = micSpeaker(pos, true, 'spkCone') +
         '<div class="mic-side">' +
           '<div class="mic-label">Mic <span>' + escapeHTML(mic.name) + '</span></div>' +
           '<div class="mic-choice">' + CAB_MICS.map(m => '<button class="' + (m === mic ? 'on' : '') + '" data-mic="' + m.name + '" title="' + m.name + '">' +
@@ -5158,10 +5361,14 @@ function parseSelectedCaptureState(payload) {
         else setCabIRMicPosition(state.cabIR.mic || mic.name, Number(target.dataset.pos));
       };
     }
+    $('micMini').addEventListener('click', openMic);
+    $('micClose').addEventListener('click', closeMic);
+    $('micOverlay').addEventListener('click', e => { if (e.target === $('micOverlay')) closeMic(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('micOverlay').hidden) closeMic(); });
 
     function formatCabValue(key, value) {
       if (key === 'level') return (value > 0 ? '+' : '') + Number(value).toFixed(1) + ' dB';
-      return value >= 1000 ? (value / 1000).toFixed(1) + ' kHz' : Math.round(value) + ' Hz';
+      return readableValue(value, 'Hz', 0);
     }
 
     // Cab level / high pass / low pass as cream knobs like on the amp: drag, scroll, or click the value to type it.
@@ -5211,41 +5418,7 @@ function parseSelectedCaptureState(payload) {
       return p;
     }
 
-    function renderSmallSelect(label, id, options, enabled, selectedValue, onChange) {
-      const wrap = document.createElement('div');
-      wrap.className = 'placeholder-param';
-      wrap.style.opacity = enabled ? '1' : '0.35';
-      wrap.style.pointerEvents = enabled ? 'auto' : 'none';
-
-      const name = document.createElement('div');
-      name.className = 'param-name';
-      name.textContent = label;
-
-      const select = document.createElement('select');
-      select.id = id;
-      select.disabled = !enabled;
-      select.style.fontSize = '11px';
-      select.style.padding = '6px';
-
-      options.forEach(optionText => {
-        const option = document.createElement('option');
-        option.value = optionText;
-        option.textContent = optionText;
-        if (String(optionText) === String(selectedValue)) option.selected = true;
-        select.appendChild(option);
-      });
-
-      select.addEventListener('change', e => {
-        if (!enabled || !onChange) return;
-        onChange(e.target.value);
-      });
-
-      wrap.appendChild(name);
-      wrap.appendChild(select);
-      return wrap;
-    }
-
-function renderGate() {
+    function renderGate() {
       const gate = $('gateToggle');
       gate.classList.toggle('on', state.gate.on);
       gate.onclick = () => {
@@ -5448,12 +5621,6 @@ function renderGate() {
       $('captureIcon').title = type ? type.label + ' capture' : 'Capture';
       $('captureType').textContent = type && type.key !== 'default' ? type.label : '';
       face.classList.toggle('off', !state.capture.on);
-      const name = state.currentCapture.name || 'Capture';
-      $('ampBadge').innerHTML = state.capture.on
-        ? escapeHTML(name) + (state.currentCapture.inBank ? '' : '<small>LIBRARY</small>')
-        : 'Bypassed';
-      $('ampBadge').title = state.capture.on ? name : 'Capture bypassed';
-      $('ampJewel').title = state.capture.on ? 'Capture on' : 'Capture bypassed';
     }
 
     // Capture volume (-24 to +12 dB) as the master knob of the amp; the hidden slider stays the value store.
@@ -5757,6 +5924,7 @@ function renderGate() {
       el.appendChild(grid);
       const mc6Exp = renderMc6ExpControls(key, block, style.color);
       if (mc6Exp) el.appendChild(mc6Exp);
+      if (eqView) eqView.decorateBlock(el, key, block);   // an EQ model: its curve in place of the knobs
       return el;
     }
 
@@ -7567,6 +7735,7 @@ function renderGate() {
       chain.innerHTML = '';
       Object.entries(state.blocks).forEach(([key, block]) => chain.appendChild(renderBlock(key, block)));
       renderSignalChain();
+      if (eqView) eqView.afterRender();
     }
 
     function disconnect() {
@@ -8969,8 +9138,8 @@ function renderGate() {
     });
 
     // The shortcuts in the tooltips
-    [['presetPrev', ' (←)'], ['presetNext', ' (→)'], ['exportBtn', ' (' + CMD_KEY + 'E)'], ['importBtn', ' (' + CMD_KEY + 'I)'], ['tunerBtn', ' (T)']]
-      .forEach(([id, hint]) => { $(id).title += hint; });
+    [['presetPrev', ' (←)'], ['presetNext', ' (→)'], ['tunerBtn', ' (T)']].forEach(([id, hint]) => { $(id).title += hint; });
+    [['exportBtn', 'E'], ['importBtn', 'I']].forEach(([id, key]) => { $(id).querySelector('.menu-key').textContent = CMD_KEY + key; });
     $('saveBtn').title = 'Save the preset on the Nano (' + CMD_KEY + 'S)';
 
     if (!navigator.bluetooth) {
@@ -8978,6 +9147,922 @@ function renderGate() {
       $('heroText').textContent = 'Open the editor in Chrome or Edge on the computer, or in the Bluefy browser on the iPhone / iPad. Safari and Firefox have no Web Bluetooth.';
       $('heroConnect').hidden = true;
     }
+    // ---- Monitor (Mac app) ----
+    // Plays the Nano's sound from USB (channels 3/4) through another audio device - an interface, speakers,
+    // headphones -, like the audio settings of a standalone plugin. The page cannot do that itself (it only gets
+    // the first two channels of the Nano, and no second device): a helper next to the app reads the pair, keeps it
+    // in a short buffer and plays it through the output, a little faster or slower so that the two devices' clocks
+    // do not drift apart (window.nanoMonitor: mac-app/monitor.js, native/nano-monitor.swift). In the "..." menu.
+    const monitorView = (() => {
+      if (!window.nanoMonitor || !window.nanoMeter) return null;   // only the Mac app has the helper
+      const button = $('monitorBtn'), overlay = $('monitorOverlay');
+      button.hidden = false;
+
+      const STORE = 'nanoCortexMonitor';   // { input, output: names of the devices, buffer, gainDb }
+      const BUFFERS = [64, 128, 256];
+      const GAIN_MIN_DB = -40, GAIN_MAX_DB = 12;
+      const store = { input: '', output: '', buffer: 128, gainDb: 0 };
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
+        if (typeof saved.input === 'string') store.input = saved.input;
+        if (typeof saved.output === 'string') store.output = saved.output;
+        if (BUFFERS.includes(saved.buffer)) store.buffer = saved.buffer;
+        if (Number.isFinite(saved.gainDb)) store.gainDb = clamp(Math.round(saved.gainDb), GAIN_MIN_DB, GAIN_MAX_DB);
+      } catch (e) { /* storage unavailable */ }
+      const save = () => { try { localStorage.setItem(STORE, JSON.stringify(store)); } catch (e) { /* storage unavailable */ } };
+
+      // inputs / outputs: { uid, name, channels, rate }; input / output: the chosen uid; first: first channel of the pair
+      const monitor = { on: false, starting: false, inputs: [], outputs: [], input: '', output: '', first: 3, info: null, status: null, error: '',
+        peakDb: [-Infinity, -Infinity] };
+
+
+
+      BUFFERS.forEach(size => {
+        const seg = document.createElement('button');
+        seg.className = 'seg text';
+        seg.dataset.buffer = size;
+        seg.textContent = size;
+        seg.addEventListener('click', () => { if (store.buffer !== size) { store.buffer = size; save(); render(); restart(); } });
+        $('monBuffers').appendChild(seg);
+      });
+
+      // ---- state ----
+      const inputNow = () => monitor.inputs.find(d => d.uid === monitor.input) || null;
+      const outputNow = () => monitor.outputs.find(d => d.uid === monitor.output) || null;
+      // (the device that is the input is no output here: the Nano would get its own sound back)
+      const outputsShown = () => monitor.outputs.filter(d => d.uid !== monitor.input);
+
+      async function refresh() {
+        const [inputs, outputs] = await Promise.all([window.nanoMeter.list(), window.nanoMonitor.list()]);
+        monitor.inputs = (inputs && inputs.devices) || [];
+        monitor.outputs = (outputs && outputs.devices) || [];
+        const failed = (inputs && inputs.error) || (outputs && outputs.error) || '';
+        if (failed) monitor.error = failed;   // (what stopped the monitor stays to be read until it is opened or started again)
+        if (!monitor.on) {   // while it plays the choice stays as it is
+          // The Nano, or the input used last time. Never a microphone by itself: played through speakers it would howl.
+          const input = monitor.inputs.find(d => d.name === store.input) || monitor.inputs.find(d => NANO_AUDIO.test(d.name));
+          monitor.input = input ? input.uid : '';
+          monitor.first = input ? meterPair(input.name, input.channels) : 3;
+          const shown = outputsShown();
+          const output = shown.find(d => d.name === store.output) || shown.find(d => d.default) || shown[0];
+          monitor.output = output ? output.uid : '';
+        }
+        render();
+      }
+
+      function render() {
+        $('moreBtn').classList.toggle('playing', monitor.on && overlay.hidden);
+        if (overlay.hidden) return;
+        const input = inputNow(), busy = monitor.starting;
+        const fill = (select, list, chosen, none) => {
+          select.innerHTML = '';
+          if (!list.length) select.appendChild(new Option(none, ''));
+          list.forEach(d => select.appendChild(new Option(d.name, d.uid, false, d.uid === chosen)));
+          select.disabled = busy || !list.length;
+        };
+        fill($('monInput'), monitor.inputs, monitor.input, 'No audio input');
+        if (monitor.inputs.length && !input) $('monInput').insertBefore(new Option('Choose an input …', '', true, true), $('monInput').firstChild);
+        fill($('monOutput'), outputsShown(), monitor.output, 'No other audio output');
+        const pair = $('monPair');
+        pair.innerHTML = '';
+        const total = input ? input.channels : 0;
+        for (let first = 1; first <= total; first += 2) pair.appendChild(new Option('Ch ' + pairText(first, total), first, false, first === monitor.first));
+        pair.hidden = total <= 2;
+        pair.disabled = busy;
+        $('monBuffers').querySelectorAll('.seg').forEach(seg => {
+          seg.classList.toggle('on', Number(seg.dataset.buffer) === store.buffer);
+          seg.disabled = busy;
+        });
+        $('monGain').textContent = dbText(store.gainDb, true);
+        $('monGainBox').title = 'Volume of the monitor: ' + (store.gainDb ? dbText(Math.abs(store.gainDb)) + ' dB ' + (store.gainDb < 0 ? 'quieter' : 'louder') + ' than' : 'as') +
+          ' the sound comes from the Nano. The Mac\'s own volume for the output comes on top';
+        const start = $('monStart');
+        start.textContent = busy ? 'Starting …' : monitor.on ? 'Stop' : 'Start';
+        start.classList.toggle('primary', !monitor.on);
+        start.disabled = busy || (!monitor.on && (!monitor.input || !monitor.output));
+
+        const state = $('monState'), status = monitor.status;
+        let text = '', delay = '', kind = '';
+        if (monitor.error) { text = monitor.error; kind = 'error'; }
+        else if (busy) text = 'Opening the two audio devices …';
+        else if (monitor.on && status) {
+          delay = status.lat.toFixed(1) + ' ms';
+          const lost = status.under + status.skip;
+          text = 'delay through the Mac · ' + (lost ? lost + ' dropout' + (lost === 1 ? '' : 's') + (store.buffer < 256 ? ' – try a larger buffer' : '') : 'no dropouts') +
+            (monitor.info && monitor.info.outRate !== monitor.info.rate ? ' · ' + (monitor.info.rate / 1000) + ' → ' + (monitor.info.outRate / 1000) + ' kHz' : '');
+          if (lost) kind = 'warn';
+        } else if (monitor.on) text = 'Running …';
+        else if (!input && !monitor.inputs.some(d => NANO_AUDIO.test(d.name))) text = 'No Nano Cortex on USB – connect it to the Mac with a USB-C cable.';
+        else if (input && NANO_AUDIO.test(input.name) && monitor.first < 3) text = 'Channels 1/2 are the dry guitar signal – the Nano\'s sound is on 3/4.';
+        else if (!outputsShown().length) text = 'No other audio output found.';
+        else text = 'Off.';
+        state.className = 'mon-state' + (kind ? ' ' + kind : '');
+        $('monDelay').textContent = delay;
+        $('monText').textContent = text;
+        drawPeaks();
+      }
+
+      function drawPeaks() {
+        [['monBarL', 'monNumL'], ['monBarR', 'monNumR']].forEach(([bar, num], i) => {
+          const db = monitor.on ? monitor.peakDb[i] : -Infinity;
+          $(bar).style.setProperty('--v', meterPos(db));
+          $(num).textContent = db > -100 ? dbText(db) : '–';
+        });
+      }
+
+      const gainNow = () => Math.pow(10, store.gainDb / 20);
+
+      async function start() {
+        const input = inputNow(), output = outputNow();
+        if (monitor.starting || !input || !output) return;
+        if (!NANO_AUDIO.test(input.name) && !(await askConfirm('Play "' + input.name + '" through "' + output.name + '"?',
+          'This input is not a Nano Cortex. If it is a microphone that hears the output, the sound feeds back and howls – use headphones, or start with the volume low.',
+          { ok: 'Play' }))) return;
+        monitor.starting = true;
+        monitor.error = '';
+        monitor.status = null;
+        render();
+        const info = await window.nanoMonitor.start({ input: input.uid, first: monitor.first, output: output.uid, buffer: store.buffer, gain: gainNow() });
+        monitor.starting = false;
+        if (!info || info.error) {
+          monitor.on = false;
+          monitor.error = info && info.error === 'denied' ? METER_DENIED : (info && info.error) || 'The monitor did not start.';
+          log('Monitor: ' + monitor.error);
+        } else {
+          monitor.on = true;
+          monitor.info = info;
+          store.input = input.name;
+          store.output = output.name;
+          save();
+          if (levelStore.pairs[input.name] !== monitor.first) { levelStore.pairs[input.name] = monitor.first; saveLevelStore(); }
+          log('Monitor: ' + info.in + ' ' + pairText(info.first, info.first + info.count - 1) + ' → ' + info.out + ', buffer ' + info.buffer + ' / ' + info.outBuffer);
+        }
+        render();
+      }
+
+      async function stop() {
+        monitor.on = false;
+        monitor.status = null;
+        monitor.peakDb = [-Infinity, -Infinity];
+        await window.nanoMonitor.stop();
+        render();
+      }
+
+      // A setting that the running monitor cannot take over: once more with it.
+      async function restart() {
+        if (!monitor.on) return;
+        await stop();
+        await start();
+      }
+
+      window.nanoMonitor.onData(data => {
+        if (data.error) {
+          if (!monitor.on) return;
+          monitor.on = false;
+          monitor.status = null;
+          monitor.error = data.error;
+          toast('Monitor: ' + data.error, 'error');
+          render();
+          refresh();
+          return;
+        }
+        if (!monitor.on || !Number.isFinite(data.lat)) return;
+        monitor.status = data;
+        monitor.peakDb = [toDb(data.p[0]), toDb(data.p[1])];
+        render();
+      });
+
+      function open() {
+        overlay.hidden = false;
+        monitor.error = '';
+        render();
+        $('monClose').focus();
+        refresh();
+      }
+      function close() {
+        overlay.hidden = true;
+        render();
+      }
+
+      button.addEventListener('click', () => (overlay.hidden ? open() : close()));
+      $('monClose').addEventListener('click', close);
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) close(); });
+      $('monStart').addEventListener('click', () => (monitor.on ? stop() : start()));
+      $('monInput').addEventListener('change', e => {
+        monitor.input = e.target.value;
+        const input = inputNow();
+        monitor.first = input ? meterPair(input.name, input.channels) : 3;
+        if (monitor.output === monitor.input) { const other = outputsShown()[0]; monitor.output = other ? other.uid : ''; }
+        render();
+        restart();
+      });
+      $('monPair').addEventListener('change', e => { monitor.first = Number(e.target.value) || 1; render(); restart(); });
+      $('monOutput').addEventListener('change', e => { monitor.output = e.target.value; render(); restart(); });
+      const nudge = step => {
+        store.gainDb = clamp(store.gainDb + step, GAIN_MIN_DB, GAIN_MAX_DB);
+        save();
+        if (monitor.on) window.nanoMonitor.gain(gainNow());
+        render();
+      };
+      $('monDown').addEventListener('click', () => nudge(-1));
+      $('monUp').addEventListener('click', () => nudge(1));
+      // the audio devices change (a cable): the lists follow while the dialog is open
+      if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+        navigator.mediaDevices.addEventListener('devicechange', () => { if (!overlay.hidden) refresh(); });
+      }
+
+      window.nanoMonitor.stop();   // (a reloaded page: nothing plays that the page does not know of)
+      render();
+      return { monitor, store, open, close, start, stop, refresh, render };
+    })();
+
+    // ---- EQ view ----
+    // The Nano's three EQ models - Parametric 3, Graphic 9 and Low-High Cut - show a response curve with points to
+    // drag in place of their rows of knobs: small in the effect's block, large in a dialog. In the Mac app, with the
+    // Nano on USB, the large view has the spectrum of the Nano's sound behind the curve (window.nanoSpectrum:
+    // mac-app/spectrum.js, native/nano-spectrum.swift).
+    // Two things are assumptions, and the dialog says so:
+    // - the curve: the Nano's filters are drawn as textbook ones (peak, shelf, 12 dB pass filters, Butterworth cuts);
+    // - the frequency scale: how a frequency control's travel (0-1) becomes Hz. Logarithmic is assumed; "Linear" can
+    //   be chosen to compare with what the Cortex Cloud app shows.
+    eqView = (() => {
+      const overlay = $('eqOverlay');
+      const STORE = 'nanoCortexEq';   // { knobs: { model: true }, scale: 'log' | 'lin', spectrum: false to hide it }
+      const store = { knobs: {}, scale: 'log', spectrum: true };
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
+        if (saved.knobs && typeof saved.knobs === 'object') store.knobs = saved.knobs;
+        if (saved.scale === 'lin') store.scale = 'lin';
+        if (saved.spectrum === false) store.spectrum = false;
+      } catch (e) { /* storage unavailable */ }
+      const save = () => { try { localStorage.setItem(STORE, JSON.stringify(store)); } catch (e) { /* storage unavailable */ } };
+
+      const F_LO = 20, F_HI = 20000;           // the graph's frequency range
+      const DB_SPAN = 18;                      // ... and its level range, up and down
+      const WHITE = '#f4f5f6';
+      const BAND_COLORS = ['#45F862', '#38C6FF', '#FF8A3D'];
+      const CUT_COLOR = '#B9A2FF';
+      const GRAPHIC_Q = 1.41;                  // an octave band
+      const SPEC_FLOOR_DB = -96, SPEC_TOP_DB = -12;   // the spectrum's own scale: the graph's bottom and top edge in dBFS
+      const TYPES = ['peak', 'hp', 'lp', 'hs', 'ls'];   // the order of "1 Type" on the Nano
+      const TYPE_NAMES = { peak: 'Peak', hp: 'High pass', lp: 'Low pass', hs: 'High shelf', ls: 'Low shelf' };
+      const TYPE_SHAPES = { peak: 'M2 11h4.5c2.5 0 3-7 5.5-7s3 7 5.5 7H22', hp: 'M2 13c5 0 5.5-8 9-8h11', lp: 'M2 5h11c3.5 0 4 8 9 8', hs: 'M2 11h6.5c3.5 0 3.5-6 7-6H22', ls: 'M2 5h6.5c3.5 0 3.5 6 7 6H22' };
+
+      // ---- what a control's travel means in Hz ----
+      const toHz = (n, lo, hi) => (store.scale === 'lin' ? lo + n * (hi - lo) : lo * Math.pow(hi / lo, n));
+      const fromHz = (hz, lo, hi) => clamp(store.scale === 'lin' ? (hz - lo) / (hi - lo) : Math.log(hz / lo) / Math.log(hi / lo), 0, 1);
+      const hzText = hz => (hz >= 10000 ? (hz / 1000).toFixed(1) + ' kHz' : hz >= 1000 ? (hz / 1000).toFixed(2) + ' kHz' : hz >= 100 ? Math.round(hz) + ' Hz' : hz.toFixed(1) + ' Hz');
+      const dbTextSigned = db => (db > 0.04 ? '+' : db < -0.04 ? '−' : '') + Math.abs(db).toFixed(1) + ' dB';
+
+      // ---- the model of a block: bands with what they do and which of the Nano's parameters they move ----
+      const param = (block, name) => block.params.find(p => p.name.toLowerCase() === name.toLowerCase()) || null;
+      const norm = p => (p ? paramValueToNormalized(p) : 0);
+      // a range parameter's value from its travel, unrounded (the knob's steps are too coarse for a point that is dragged)
+      const valueAt = (p, n) => p.meta.min + clamp(n, 0, 1) * (p.meta.max - p.meta.min);
+      const freqRange = (model, name) => (model === 'Graphic 9' ? (name === 'HPF' ? [20, 800] : [1000, 16000]) : [20, 20000]);
+
+      function eqModel(block) {
+        const model = block.model;
+        const bands = [];
+        if (model === 'Parametric 3') {
+          for (let i = 1; i <= 3; i++) {
+            const p = { gain: param(block, i + ' Gain'), freq: param(block, i + ' Freq'), q: param(block, i + ' Q'), type: param(block, i + ' Type'), on: param(block, i + ' Active') };
+            if (!p.gain || !p.freq || !p.q || !p.type || !p.on) return null;
+            const kind = TYPES[p.type.value] || 'peak';
+            bands.push({ id: String(i), label: String(i), color: BAND_COLORS[i - 1], kind, f: toHz(norm(p.freq), 20, 20000), range: [20, 20000],
+              gain: Number(p.gain.value), q: Number(p.q.value), on: Number(p.on.value) === 1, p, moveX: true, moveY: kind !== 'hp' && kind !== 'lp', hasQ: true, canSwitch: true });
+          }
+        } else if (model === 'Graphic 9') {
+          const centres = [['65Hz', 65], ['125Hz', 125], ['250Hz', 250], ['500hz', 500], ['1kHz', 1000], ['2kHz', 2000], ['4kHz', 4000], ['8kHz', 8000], ['16kHz', 16000]];
+          const hpf = param(block, 'HPF'), lpf = param(block, 'LPF');
+          if (hpf) bands.push({ id: 'hpf', label: 'HP', color: CUT_COLOR, kind: 'hp', f: toHz(norm(hpf), 20, 800), range: [20, 800], gain: 0, q: 0.707, on: true, p: { freq: hpf }, moveX: true });
+          centres.forEach(([name, f], i) => {
+            const gain = param(block, name);
+            if (gain) bands.push({ id: name, label: f >= 1000 ? f / 1000 + 'k' : String(f), color: 'hsl(' + Math.round(150 + i * 17) + ' 90% 62%)', kind: 'peak', f, range: [f, f],
+              gain: Number(gain.value), q: GRAPHIC_Q, on: true, p: { gain }, moveY: true });
+          });
+          if (lpf) bands.push({ id: 'lpf', label: 'LP', color: CUT_COLOR, kind: 'lp', f: toHz(norm(lpf), 1000, 16000), range: [1000, 16000], gain: 0, q: 0.707, on: true, p: { freq: lpf }, moveX: true });
+          if (bands.length < 3) return null;
+        } else if (model === 'Low-High Cut') {
+          for (const [id, label, kind] of [['HPF', 'HP', 'hpN'], ['LPF', 'LP', 'lpN']]) {
+            const p = { freq: param(block, id + ' Freq'), slope: param(block, id + ' Slope') };
+            if (!p.freq || !p.slope) return null;
+            bands.push({ id, label, color: id === 'HPF' ? BAND_COLORS[0] : BAND_COLORS[1], kind, order: Number(p.slope.value) || 0, f: toHz(norm(p.freq), 20, 20000), range: [20, 20000],
+              gain: 0, on: true, p, moveX: true, hasSlope: true });
+          }
+        } else return null;
+        const output = param(block, 'Output');
+        return { model, bands, output, outputDb: output ? Number(output.value) : 0 };
+      }
+
+      // What one band does to a frequency, in dB (textbook filters - see the note at the top).
+      function bandDb(b, f) {
+        if (!b.on) return 0;
+        const w = f / b.f, w2 = w * w;
+        const log = x => 10 * Math.log10(Math.max(x, 1e-12));
+        if (b.kind === 'hpN' || b.kind === 'lpN') {
+          if (!b.order) return 0;
+          const x = Math.pow(b.kind === 'hpN' ? 1 / w2 : w2, b.order);   // (fc/f)^2n for the high pass
+          return -log(1 + x);
+        }
+        const q = Math.max(b.q, 0.05);
+        if (b.kind === 'hp') return log(w2 * w2 / ((1 - w2) * (1 - w2) + w2 / (q * q)));
+        if (b.kind === 'lp') return log(1 / ((1 - w2) * (1 - w2) + w2 / (q * q)));
+        const a = Math.pow(10, b.gain / 40);
+        if (b.kind === 'peak') return log(((1 - w2) * (1 - w2) + w2 * a * a / (q * q)) / ((1 - w2) * (1 - w2) + w2 / (a * a * q * q)));
+        const mid = a * w2 / (q * q);
+        if (b.kind === 'ls') return 20 * Math.log10(a) + log(((a - w2) * (a - w2) + mid) / ((1 - a * w2) * (1 - a * w2) + mid));
+        return 20 * Math.log10(a) + log(((1 - a * w2) * (1 - a * w2) + mid) / ((a - w2) * (a - w2) + mid));   // high shelf
+      }
+      const totalDb = (eq, f) => eq.bands.reduce((sum, b) => sum + bandDb(b, f), eq.outputDb);
+
+      // ---- drawing ----
+      const xOf = (f, w) => Math.log(f / F_LO) / Math.log(F_HI / F_LO) * w;
+      const fOf = (x, w) => F_LO * Math.pow(F_HI / F_LO, clamp(x / w, 0, 1));
+      const yOf = (db, h) => h / 2 - db / DB_SPAN * (h / 2 - 12);
+      const dbOf = (y, h) => (h / 2 - y) / (h / 2 - 12) * DB_SPAN;
+      // where a band's point sits: on its curve's level at its frequency (pass filters: on the 0 dB line)
+      const pointDb = b => (b.kind === 'peak' || b.kind === 'ls' || b.kind === 'hs' ? b.gain : 0);
+
+      function draw(canvas, eq, view) {
+        const ratio = window.devicePixelRatio || 1;
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        if (!w || !h) return;
+        if (canvas.width !== Math.round(w * ratio) || canvas.height !== Math.round(h * ratio)) {
+          canvas.width = Math.round(w * ratio);
+          canvas.height = Math.round(h * ratio);
+        }
+        const c = canvas.getContext('2d');
+        c.setTransform(ratio, 0, 0, ratio, 0, 0);
+        c.clearRect(0, 0, w, h);
+        const big = view.big, font = getComputedStyle(document.body).fontFamily;
+        const back = c.createLinearGradient(0, 0, 0, h);
+        back.addColorStop(0, '#101317');
+        back.addColorStop(1, '#090a0c');
+        c.fillStyle = back;
+        c.fillRect(0, 0, w, h);
+
+        // the grid: decades strong, the steps between faint; level lines every 6 dB
+        c.lineWidth = 1;
+        for (let decade = 10; decade < F_HI; decade *= 10) {
+          for (let k = 1; k < 10; k++) {
+            const f = decade * k;
+            if (f < F_LO || f > F_HI) continue;
+            const x = Math.round(xOf(f, w)) + 0.5;
+            c.strokeStyle = k === 1 ? 'rgba(255,255,255,.10)' : 'rgba(255,255,255,.035)';
+            if (!big && k !== 1) continue;
+            c.beginPath();
+            c.moveTo(x, 0);
+            c.lineTo(x, h);
+            c.stroke();
+          }
+        }
+        for (let db = -12; db <= 12; db += 6) {
+          const y = Math.round(yOf(db, h)) + 0.5;
+          c.strokeStyle = db === 0 ? 'rgba(255,255,255,.16)' : 'rgba(255,255,255,.05)';
+          c.beginPath();
+          c.moveTo(0, y);
+          c.lineTo(w, y);
+          c.stroke();
+        }
+        if (big) {
+          c.font = '500 10.5px ' + font;
+          c.fillStyle = 'rgba(255,255,255,.34)';
+          c.textBaseline = 'bottom';
+          c.textAlign = 'center';
+          [[50, '50'], [100, '100'], [200, '200'], [500, '500'], [1000, '1k'], [2000, '2k'], [5000, '5k'], [10000, '10k']].forEach(([f, text]) => c.fillText(text, xOf(f, w), h - 5));
+          c.textAlign = 'right';
+          c.textBaseline = 'middle';
+          for (let db = -12; db <= 12; db += 6) c.fillText((db > 0 ? '+' : db < 0 ? '−' : '') + Math.abs(db), w - 8, yOf(db, h) - (db === 0 ? 8 : 0));
+        }
+
+        // the sound itself: its level in narrow bands, on a scale of its own (not the curve's dB)
+        if (view.spectrum && view.spectrum.levels) {
+          const { levels, from, perOctave } = view.spectrum;
+          const y = db => h - clamp((db - SPEC_FLOOR_DB) / (SPEC_TOP_DB - SPEC_FLOOR_DB), 0, 1) * h;
+          const points = [];
+          for (let i = 0; i < levels.length; i++) {
+            const f = from * Math.pow(2, i / perOctave);
+            if (f >= F_LO && f <= F_HI) points.push([xOf(f, w), y(levels[i])]);
+          }
+          // a soft line through the bands (from the middle of one stretch to the middle of the next)
+          const soft = () => {
+            c.moveTo(points[0][0], points[0][1]);
+            for (let i = 1; i < points.length - 1; i++) c.quadraticCurveTo(points[i][0], points[i][1], (points[i][0] + points[i + 1][0]) / 2, (points[i][1] + points[i + 1][1]) / 2);
+            c.lineTo(points[points.length - 1][0], points[points.length - 1][1]);
+          };
+          if (points.length > 2) {
+            c.beginPath();
+            soft();
+            c.lineTo(w, h);
+            c.lineTo(0, h);
+            c.closePath();
+            const shade = c.createLinearGradient(0, 0, 0, h);
+            shade.addColorStop(0, 'rgba(190, 205, 225, .24)');
+            shade.addColorStop(1, 'rgba(190, 205, 225, .04)');
+            c.fillStyle = shade;
+            c.fill();
+            c.beginPath();
+            soft();
+            c.strokeStyle = 'rgba(205, 215, 230, .28)';
+            c.lineWidth = 1;
+            c.stroke();
+          }
+        }
+
+        const steps = Math.max(120, Math.min(600, Math.round(w)));
+        const curve = fn => {
+          const points = [];
+          for (let i = 0; i <= steps; i++) {
+            const x = i / steps * w;
+            points.push([x, yOf(clamp(fn(fOf(x, w)), -60, 40), h)]);
+          }
+          return points;
+        };
+        const trace = points => { c.beginPath(); points.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); };
+        const zero = yOf(eq.outputDb, h);
+
+        // each band on its own: a soft shape in its colour (from the level of the output setting)
+        if (!view.off) {
+          eq.bands.forEach(b => {
+            if (!b.on || (b.kind === 'peak' && Math.abs(b.gain) < 0.05) || ((b.kind === 'hpN' || b.kind === 'lpN') && !b.order)) return;
+            const points = curve(f => bandDb(b, f) + eq.outputDb);
+            trace(points);
+            c.lineTo(w, zero);
+            c.lineTo(0, zero);
+            c.closePath();
+            c.globalAlpha = view.selected === b.id ? 0.30 : big ? 0.15 : 0.12;
+            c.fillStyle = b.color;
+            c.fill();
+            if (big) {
+              trace(points);
+              c.globalAlpha = view.selected === b.id ? 0.9 : 0.4;
+              c.strokeStyle = b.color;
+              c.lineWidth = 1;
+              c.stroke();
+            }
+            c.globalAlpha = 1;
+          });
+        }
+
+        // all together: the bright line
+        const all = curve(f => (view.off ? 0 : totalDb(eq, f)));
+        trace(all);
+        c.lineTo(w, h / 2);
+        c.lineTo(0, h / 2);
+        c.closePath();
+        const glow = c.createLinearGradient(0, 0, 0, h);
+        glow.addColorStop(0, 'rgba(255,255,255,.10)');
+        glow.addColorStop(0.5, 'rgba(255,255,255,.02)');
+        glow.addColorStop(1, 'rgba(255,255,255,.10)');
+        c.fillStyle = glow;
+        c.fill();
+        trace(all);
+        c.strokeStyle = view.off ? 'rgba(255,255,255,.35)' : WHITE;
+        c.lineWidth = big ? 2.2 : 1.6;
+        c.lineJoin = 'round';
+        c.shadowColor = 'rgba(255,255,255,.35)';
+        c.shadowBlur = view.off ? 0 : big ? 10 : 5;
+        c.stroke();
+        c.shadowBlur = 0;
+
+        // the points
+        const r = big ? 9 : 4.5;
+        eq.bands.forEach(b => {
+          const x = xOf(clamp(b.f, F_LO, F_HI), w), y = yOf(clamp(pointDb(b) + eq.outputDb, -DB_SPAN, DB_SPAN), h);
+          const active = view.selected === b.id || view.hover === b.id;
+          if (active && big) {
+            c.beginPath();
+            c.arc(x, y, r + 7, 0, Math.PI * 2);
+            c.globalAlpha = 0.22;
+            c.fillStyle = b.color;
+            c.fill();
+            c.globalAlpha = 1;
+          }
+          c.beginPath();
+          c.arc(x, y, r, 0, Math.PI * 2);
+          c.fillStyle = b.on && !view.off ? b.color : '#15181c';
+          c.fill();
+          c.lineWidth = big ? 2 : 1.5;
+          c.strokeStyle = b.on && !view.off ? '#0a0b0d' : b.color;
+          c.stroke();
+          if (big) {
+            c.font = '700 ' + (b.label.length > 2 ? 8 : b.label.length > 1 ? 9 : 10.5) + 'px ' + font;
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillStyle = b.on && !view.off ? '#0a0b0d' : b.color;
+            c.fillText(b.label, x, y + 0.5);
+          }
+        });
+      }
+
+      // ---- changing values: the Nano gets them at once, the page is drawn anew when the gesture ends ----
+      const send = (key, p, value) => { if (p) setFXParam(key, p, value); };
+      function setBand(key, eq, b, change) {
+        if (change.f !== undefined && b.moveX) {
+          b.f = clamp(change.f, b.range[0], b.range[1]);
+          send(key, b.p.freq, valueAt(b.p.freq, fromHz(b.f, b.range[0], b.range[1])));
+        }
+        if (change.gain !== undefined && b.moveY) {
+          b.gain = clamp(change.gain, b.p.gain.meta.min, b.p.gain.meta.max);
+          send(key, b.p.gain, Math.round(b.gain * 10) / 10);
+        }
+        if (change.q !== undefined && b.hasQ) {
+          b.q = clamp(change.q, b.p.q.meta.min, b.p.q.meta.max);
+          send(key, b.p.q, Math.round(b.q * 100) / 100);
+        }
+        if (change.order !== undefined && b.hasSlope) {
+          b.order = clamp(Math.round(change.order), 0, b.p.slope.meta.options.length - 1);
+          send(key, b.p.slope, b.order);
+        }
+        if (change.on !== undefined && b.canSwitch) {
+          b.on = change.on;
+          send(key, b.p.on, b.on ? 1 : 0);
+        }
+        if (change.kind !== undefined && b.p.type) {
+          b.kind = change.kind;
+          b.moveY = b.kind !== 'hp' && b.kind !== 'lp';
+          send(key, b.p.type, TYPES.indexOf(b.kind));
+        }
+      }
+
+      // A canvas that shows a block's EQ and lets its points be dragged. onChange: after every change (to redraw what
+      // else shows the values); onDone: when a gesture ends.
+      function attach(canvas, key, view, onChange, onDone) {
+        const current = () => { const block = state.blocks[key]; return block ? eqModel(block) : null; };
+        let eq = current();
+        const redraw = () => { if (eq) draw(canvas, eq, view); };
+        const hit = e => {
+          const box = canvas.getBoundingClientRect(), x = e.clientX - box.left, y = e.clientY - box.top;
+          const reach = view.big ? 20 : 13;
+          let best = null, bestDistance = reach;
+          eq.bands.forEach(b => {
+            const d = Math.hypot(x - xOf(clamp(b.f, F_LO, F_HI), box.width), y - yOf(clamp(pointDb(b) + eq.outputDb, -DB_SPAN, DB_SPAN), box.height));
+            if (d < reach && b.id === view.selected) { best = b; bestDistance = -1; }   // points on top of each other: the chosen one
+            else if (d < bestDistance) { best = b; bestDistance = d; }
+          });
+          return best;
+        };
+        canvas.addEventListener('pointermove', e => {
+          if (!eq || canvas.hasPointerCapture(e.pointerId)) return;
+          const b = hit(e);
+          const id = b ? b.id : null;
+          if (id !== view.hover) { view.hover = id; canvas.style.cursor = b ? 'grab' : 'default'; redraw(); }
+        });
+        canvas.addEventListener('pointerleave', () => { if (view.hover) { view.hover = null; redraw(); } });
+        canvas.addEventListener('pointerdown', e => {
+          eq = current();
+          if (!eq) return;
+          const b = hit(e);
+          if (!b) { if (view.big) return; view.open && view.open(); return; }
+          e.preventDefault();
+          view.selected = b.id;
+          try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no such pointer (a test) */ }
+          canvas.style.cursor = 'grabbing';
+          const box = canvas.getBoundingClientRect();
+          const start = { x: e.clientX, y: e.clientY, f: b.f, gain: b.gain };
+          const move = m => {
+            const fine = m.shiftKey ? 0.25 : 1;   // Shift: slowly
+            const change = {};
+            if (b.moveX) change.f = fOf(xOf(start.f, box.width) + (m.clientX - start.x) * fine, box.width);
+            if (b.moveY) change.gain = start.gain + (dbOf(m.clientY, box.height) - dbOf(start.y, box.height)) * fine;
+            setBand(key, eq, b, change);
+            redraw();
+            onChange && onChange(eq);
+          };
+          const up = () => {
+            canvas.removeEventListener('pointermove', move);
+            canvas.removeEventListener('pointerup', up);
+            canvas.removeEventListener('pointercancel', up);
+            canvas.style.cursor = 'grab';
+            onDone && onDone();
+          };
+          canvas.addEventListener('pointermove', move);
+          canvas.addEventListener('pointerup', up);
+          canvas.addEventListener('pointercancel', up);
+          redraw();
+          onChange && onChange(eq);
+        });
+        // the wheel over a point: its Q (or the slope of a cut)
+        let wheelDone = null;
+        canvas.addEventListener('wheel', e => {
+          if (!eq) return;
+          const b = hit(e) || (view.big && eq.bands.find(x => x.id === view.selected && (x.hasQ || x.hasSlope)));
+          if (!b || !(b.hasQ || b.hasSlope)) return;
+          e.preventDefault();
+          view.selected = b.id;
+          if (b.hasQ) setBand(key, eq, b, { q: b.q * Math.pow(1.08, e.deltaY < 0 ? 1 : -1) });
+          else if (Math.abs(e.deltaY) > 8) setBand(key, eq, b, { order: b.order + (e.deltaY < 0 ? 1 : -1) });
+          redraw();
+          onChange && onChange(eq);
+          clearTimeout(wheelDone);
+          wheelDone = setTimeout(() => onDone && onDone(), 500);
+        }, { passive: false });
+        // double click: a band on / off (Parametric 3), a fader back to 0 dB (Graphic 9)
+        canvas.addEventListener('dblclick', e => {
+          eq = current();
+          const b = eq && hit(e);
+          if (!b) return;
+          if (b.canSwitch) setBand(key, eq, b, { on: !b.on });
+          else if (b.moveY) setBand(key, eq, b, { gain: 0 });
+          redraw();
+          onChange && onChange(eq);
+          onDone && onDone();
+        });
+        return { redraw, refresh: () => { eq = current(); redraw(); return eq; }, eq: () => eq };
+      }
+
+
+
+      const dialog = { key: '', view: { big: true, selected: null, hover: null, off: false, spectrum: null }, graph: null };
+
+      // ---- the sound behind the curve: the helper listens to the Nano on USB while the dialog is open ----
+      const spec = { on: false, starting: false, note: '', pending: false, run: 0 };
+      const specUsable = () => Boolean(window.nanoSpectrum && window.nanoMeter);
+      function renderSpec() {
+        $('eqSpecLabel').hidden = $('eqSpecToggle').hidden = !specUsable();
+        $('eqSpecToggle').classList.toggle('on', store.spectrum);
+        $('eqSpec').textContent = specUsable() && store.spectrum ? spec.note : '';
+      }
+      async function specStart() {
+        if (!specUsable() || !store.spectrum || spec.on || spec.starting || overlay.hidden) return;
+        spec.starting = true;
+        const run = ++spec.run;
+        spec.note = '';
+        renderSpec();
+        const listed = await window.nanoMeter.list();
+        const nano = ((listed && listed.devices) || []).find(d => NANO_AUDIO.test(d.name));
+        let info = null;
+        if (nano) info = await window.nanoSpectrum.start({ uid: nano.uid, first: meterPair(nano.name, nano.channels) });
+        spec.starting = false;
+        if (run !== spec.run || overlay.hidden || !store.spectrum) { if (info && !info.error) window.nanoSpectrum.stop(); return; }   // closed meanwhile
+        if (!nano) spec.note = 'Spectrum: no Nano Cortex on USB';
+        else if (!info || info.error) spec.note = 'Spectrum: ' + (info && info.error === 'denied' ? 'the audio input was not allowed' : (info && info.error) || 'not started');
+        else {
+          spec.on = true;
+          spec.note = 'Spectrum: ' + info.name + ' ' + info.first + (info.count > 1 ? '/' + (info.first + 1) : '');
+          dialog.view.spectrum = { levels: null, from: info.from, perOctave: info.perOctave };
+        }
+        renderSpec();
+      }
+      function specStop() {
+        spec.run++;
+        if (spec.on) window.nanoSpectrum.stop();
+        spec.on = false;
+        spec.note = '';
+        dialog.view.spectrum = null;
+        renderSpec();
+      }
+      if (specUsable()) {
+        window.nanoSpectrum.onData(data => {
+          const shown = dialog.view.spectrum;
+          if (data.error) {
+            if (!spec.on) return;
+            spec.on = false;
+            dialog.view.spectrum = null;
+            spec.note = 'Spectrum: ' + data.error;
+            renderSpec();
+            if (dialog.graph) dialog.graph.redraw();
+            return;
+          }
+          if (!spec.on || !shown || !Array.isArray(data.s)) return;
+          // up at once (a little softened), down slowly: readable, not nervous
+          if (!shown.levels || shown.levels.length !== data.s.length) shown.levels = Float32Array.from(data.s);
+          else for (let i = 0; i < data.s.length; i++) shown.levels[i] = data.s[i] > shown.levels[i] ? shown.levels[i] + (data.s[i] - shown.levels[i]) * 0.65 : Math.max(data.s[i], shown.levels[i] - 1.4);
+          if (spec.pending) return;
+          spec.pending = true;
+          requestAnimationFrame(() => { spec.pending = false; if (!overlay.hidden && dialog.graph) dialog.graph.redraw(); });
+        });
+        window.nanoSpectrum.stop();   // (a reloaded page: no helper runs that the page does not know of)
+      }
+
+      function selectedBand(eq) {
+        return eq.bands.find(b => b.id === dialog.view.selected) || eq.bands.find(b => b.moveX || b.moveY) || eq.bands[0];
+      }
+
+      function renderDialog(eq) {
+        const block = state.blocks[dialog.key];
+        if (overlay.hidden || !block) return;
+        eq = eq || eqModel(block);
+        if (!eq) { closeDialog(); return; }
+        const b = selectedBand(eq);
+        dialog.view.selected = b.id;
+        dialog.view.off = !block.on;
+        $('eqTitle').textContent = block.model;
+        $('eqSlot').textContent = block.title;
+        $('eqToggle').classList.toggle('on', block.on);
+        const bands = $('eqBands');
+        bands.innerHTML = '';
+        bands.classList.toggle('many', eq.bands.length > 6);
+        eq.bands.forEach(band => {
+          const seg = document.createElement('button');
+          seg.className = 'seg text' + (band.id === b.id ? ' on' : '');
+          seg.style.setProperty('--c', band.color);
+          seg.innerHTML = '<i></i>';
+          seg.appendChild(document.createTextNode(band.label));
+          seg.title = 'Band ' + band.label;
+          seg.addEventListener('click', () => { dialog.view.selected = band.id; renderDialog(); dialog.graph.redraw(); });
+          bands.appendChild(seg);
+        });
+        const field = (id, text, usable) => { $(id).querySelector('strong').textContent = text; $(id).disabled = !usable; };
+        field('eqFreq', hzText(b.f), b.moveX);
+        field('eqGain', b.moveY ? dbTextSigned(b.gain) : '–', b.moveY);
+        field('eqQ', b.hasQ ? b.q.toFixed(2) : b.hasSlope ? (b.order ? b.order * 6 + ' dB/oct' : 'Flat') : '–', b.hasQ || b.hasSlope);
+        $('eqQ').querySelector('em').textContent = b.hasSlope ? 'Slope' : 'Q';
+        const types = $('eqTypes');
+        types.innerHTML = '';
+        types.hidden = !b.p.type;
+        if (b.p.type) {
+          TYPES.forEach(kind => {
+            const seg = document.createElement('button');
+            seg.className = 'seg shape' + (kind === b.kind ? ' on' : '');
+            seg.title = TYPE_NAMES[kind];
+            seg.setAttribute('aria-label', TYPE_NAMES[kind]);
+            seg.innerHTML = '<svg viewBox="0 0 24 16"><path d="' + TYPE_SHAPES[kind] + '"/></svg>';
+            seg.addEventListener('click', () => { setBand(dialog.key, eq, b, { kind }); render(); });
+            types.appendChild(seg);
+          });
+        }
+        $('eqOn').hidden = !b.canSwitch;
+        $('eqOn').classList.toggle('on', b.on);
+        $('eqOut').textContent = (eq.outputDb > 0.04 ? '+' : eq.outputDb < -0.04 ? '−' : '') + Math.abs(eq.outputDb).toFixed(1);
+        $('eqScale').querySelectorAll('.seg').forEach(seg => seg.classList.toggle('on', seg.dataset.scale === store.scale));
+        $('eqRead').innerHTML = '<b style="color:' + b.color + '">' + (eq.model === 'Parametric 3' ? 'Band ' + b.label : b.label) + '</b> · ' + hzText(b.f) +
+          (b.moveY ? ' · ' + dbTextSigned(b.gain) : '') + (b.hasQ ? ' · Q ' + b.q.toFixed(2) : '') + (b.hasSlope ? ' · ' + (b.order ? b.order * 6 + ' dB/oct' : 'flat') : '') +
+          (b.p.type ? ' · ' + TYPE_NAMES[b.kind] : '') + (b.canSwitch && !b.on ? ' · off' : '');
+      }
+
+      function openDialog(key) {
+        const block = state.blocks[key];
+        if (!block || !eqModel(block)) return;
+        dialog.key = key;
+        dialog.view.selected = null;
+        overlay.hidden = false;
+        if (!dialog.graph || dialog.graph.key !== key) {
+          const old = $('eqCanvas'), fresh = old.cloneNode(false);   // (a canvas without the listeners of another block)
+          old.replaceWith(fresh);
+          dialog.graph = attach(fresh, key, dialog.view, eq => renderDialog(eq), () => render());
+          dialog.graph.key = key;
+        }
+        renderDialog();
+        dialog.graph.refresh();
+        $('eqClose').focus();
+        renderSpec();
+        specStart();
+      }
+      function closeDialog() {
+        overlay.hidden = true;
+        dialog.key = '';
+        specStop();
+      }
+
+      // one of the fields below the graph: type the value
+      async function typeValue(what) {
+        const block = state.blocks[dialog.key];
+        const eq = block && eqModel(block);
+        if (!eq) return;
+        const b = selectedBand(eq);
+        if (what === 'freq' && b.moveX) {
+          const entered = await askText('Frequency of ' + b.label + ' in Hz (' + b.range[0] + ' to ' + b.range[1] + ')', String(Math.round(b.f)));
+          const hz = Number(String(entered || '').replace(',', '.').replace(/k$/i, 'e3'));
+          if (entered !== null && Number.isFinite(hz) && hz > 0) setBand(dialog.key, eq, b, { f: hz });
+        } else if (what === 'gain' && b.moveY) {
+          const entered = await askText('Gain of ' + b.label + ' in dB (' + b.p.gain.meta.min + ' to ' + b.p.gain.meta.max + ')', b.gain.toFixed(1));
+          const db = Number(String(entered || '').replace(',', '.').replace('−', '-'));
+          if (entered !== null && Number.isFinite(db)) setBand(dialog.key, eq, b, { gain: db });
+        } else if (what === 'q' && b.hasQ) {
+          const entered = await askText('Q of ' + b.label + ' (' + b.p.q.meta.min + ' to ' + b.p.q.meta.max + ')', b.q.toFixed(2));
+          const q = Number(String(entered || '').replace(',', '.'));
+          if (entered !== null && Number.isFinite(q) && q > 0) setBand(dialog.key, eq, b, { q });
+        } else if (what === 'q' && b.hasSlope) {
+          setBand(dialog.key, eq, b, { order: (b.order + 1) % b.p.slope.meta.options.length });   // next slope
+        } else return;
+        render();
+      }
+
+      $('eqClose').addEventListener('click', closeDialog);
+      overlay.addEventListener('pointerdown', e => { if (e.target === overlay) closeDialog(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden && $('askOverlay').hidden) closeDialog(); });
+      $('eqFreq').addEventListener('click', () => typeValue('freq'));
+      $('eqGain').addEventListener('click', () => typeValue('gain'));
+      $('eqQ').addEventListener('click', () => typeValue('q'));
+      $('eqToggle').addEventListener('click', () => {
+        const block = state.blocks[dialog.key];
+        if (!block) return;
+        block.on = !block.on;
+        render();
+        setFXBlockEnabled(dialog.key, block.on);
+      });
+      $('eqOn').addEventListener('click', () => {
+        const block = state.blocks[dialog.key];
+        const eq = block && eqModel(block);
+        if (!eq) return;
+        const b = selectedBand(eq);
+        setBand(dialog.key, eq, b, { on: !b.on });
+        render();
+      });
+      const output = step => {
+        const block = state.blocks[dialog.key];
+        const eq = block && eqModel(block);
+        if (!eq || !eq.output) return;
+        send(dialog.key, eq.output, clamp(Math.round((eq.outputDb + step) * 2) / 2, eq.output.meta.min, eq.output.meta.max));
+        render();
+      };
+      $('eqOutDown').addEventListener('click', () => output(-0.5));
+      $('eqOutUp').addEventListener('click', () => output(0.5));
+      $('eqScale').querySelectorAll('.seg').forEach(seg => seg.addEventListener('click', () => { store.scale = seg.dataset.scale; save(); render(); }));
+      $('eqSpecToggle').addEventListener('click', () => {
+        store.spectrum = !store.spectrum;
+        save();
+        if (store.spectrum) specStart(); else specStop();
+        renderSpec();
+        if (dialog.graph) dialog.graph.redraw();
+      });
+
+      // ---- for the page: an EQ block shows the curve; its knobs stay one click away ----
+      function decorateBlock(el, key, block) {
+        const eq = FX_BLOCK_KEYS.includes(key) && eqModel(block);
+        const grid = el.querySelector('.param-grid');
+        if (!eq || !grid) return;
+        const knobs = Boolean(store.knobs[block.model]);
+        el.classList.toggle('eq-graph', !knobs);
+        const foot = document.createElement('div');
+        foot.className = 'eq-foot';
+        const text = document.createElement('span');
+        const describe = model => {
+          const cut = id => model.bands.find(b => b.id === id);
+          const short = hz => hzText(hz).replace(' Hz', '').replace(' kHz', 'k');
+          const what = model.model === 'Parametric 3' ? model.bands.filter(b => b.on).length + ' of 3 bands on'
+            : model.model === 'Graphic 9' ? (cut('hpf') && cut('lpf') ? short(cut('hpf').f) + ' – ' + short(cut('lpf').f) + ' Hz' : '9 bands')
+            : (cut('HPF').order ? short(cut('HPF').f) : 'open') + ' – ' + (cut('LPF').order ? short(cut('LPF').f) + ' Hz' : 'open');
+          return what + (Math.abs(model.outputDb) >= 0.05 ? ' · out ' + dbTextSigned(model.outputDb) : '');
+        };
+        text.textContent = describe(eq);
+        const swap = document.createElement('button');
+        swap.textContent = knobs ? 'Curve' : 'Knobs';
+        swap.title = knobs ? 'Show the curve' : 'Show the knobs (they are what MIDI Learn assigns)';
+        swap.addEventListener('click', () => { if (knobs) delete store.knobs[block.model]; else store.knobs[block.model] = true; save(); render(); });
+        foot.appendChild(text);
+        foot.appendChild(swap);
+        if (!knobs) {
+          const mini = document.createElement('div');
+          mini.className = 'eq-mini';
+          const canvas = document.createElement('canvas');
+          const open = document.createElement('button');
+          open.className = 'eq-open';
+          open.title = 'Open the EQ';
+          open.setAttribute('aria-label', 'Open the EQ');
+          open.innerHTML = '<span class="ico" style="--icon: var(--ico-expand)"></span>';
+          open.addEventListener('click', () => openDialog(key));
+          mini.appendChild(canvas);
+          mini.appendChild(open);
+          el.insertBefore(mini, grid);
+          const view = { big: false, selected: null, hover: null, off: !block.on, open: () => openDialog(key) };
+          const graph = attach(canvas, key, view, model => { text.textContent = describe(model); }, () => render());
+          requestAnimationFrame(() => graph.redraw());   // (it has its size once it is in the page)
+        }
+        el.insertBefore(foot, grid);
+      }
+
+      // frequency controls of the EQ models show Hz by the chosen scale, also as knobs and when a value is typed
+      // (paramDisplayValue and promptManualValue ask here first)
+      const eqFreqParam = (blockKey, p) => {
+        const block = blockKey ? state.blocks[blockKey] : Object.values(state.blocks).find(b => b.params && b.params.includes(p));
+        if (!block || !p || p.meta.kind !== 'range') return null;
+        if (block.model === 'Parametric 3' && /^[123] Freq$/i.test(p.name)) return [20, 20000];
+        if (block.model === 'Low-High Cut' && /^[HL]PF Freq$/i.test(p.name)) return [20, 20000];
+        if (block.model === 'Graphic 9' && /^(HPF|LPF)$/i.test(p.name)) return freqRange('Graphic 9', p.name.toUpperCase());
+        return null;
+      };
+      function frequencyText(p) {
+        const range = eqFreqParam('', p);
+        return range ? hzText(toHz(paramValueToNormalized(p), range[0], range[1])) : null;
+      }
+      // true: it was one of these, and is done
+      async function typeFrequency(blockKey, p) {
+        const range = eqFreqParam(blockKey, p);
+        if (!range) return false;
+        const entered = await askText('Enter value for ' + p.name + ' (' + range[0] + ' to ' + range[1] + ' Hz)', String(Math.round(toHz(paramValueToNormalized(p), range[0], range[1]))));
+        const hz = Number(String(entered || '').replace(',', '.'));
+        if (entered === null || !Number.isFinite(hz) || hz <= 0) return true;
+        setFXParam(blockKey, p, valueAt(p, fromHz(clamp(hz, range[0], range[1]), range[0], range[1])));
+        render();
+        return true;
+      }
+
+      // after the page was drawn: the open dialog follows what changed
+      function afterRender() {
+        if (overlay.hidden) return;
+        const block = state.blocks[dialog.key];
+        if (!state.connected || !block || !eqModel(block)) { closeDialog(); return; }
+        renderDialog(dialog.graph.refresh());
+      }
+      window.addEventListener('resize', () => { if (!overlay.hidden && dialog.graph) dialog.graph.redraw(); });
+
+      return { decorateBlock, frequencyText, typeFrequency, afterRender, openDialog, closeDialog, store, eqModel, bandDb, totalDb, toHz, fromHz, dialog, spec };
+    })();
+
     $('heroConnect').addEventListener('click', () => $('connectBtn').click());
     setStatus('Disconnected');
 

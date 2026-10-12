@@ -16,16 +16,20 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   colour – filled when on, outlined when off, dashed when empty. Click a block to make it light up below,
   **double-click** to switch it on or off
 - **Compact top bar**: preset arrows, preset list (a dot marks unsaved changes, and **Save** turns green), save,
-  rename and **A/B**, then icons for export, import, tuner, expression, footswitches, MIDI and MC6 Pro – hover an icon for its name. The
-  **Connect** button shows the connection; when connected it opens refresh, copy log and disconnect (also under **…**).
+  rename and **A/B** in the middle, then icons for tuner, expression, footswitches, MIDI and the jam tracks – hover an
+  icon for its name. The **Connect** button shows the connection. **…** (or a click on the connection) holds the rest:
+  preset files (export, import), the MC6 Pro export, refresh, keyboard shortcuts, copy log and disconnect.
   Until the Nano is connected, the editor shows a short connect screen instead of placeholder values
 - **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
 - **Footswitches of the Nano**: the footswitch icon opens the four slots **1A, 1B, 2A, 2B** – choose the preset each
   one calls up, or put the loaded preset on a slot with one click. The change is stored on the Nano at once and read
   back as a check; the preset list shows the slot next to the name (B slots need the Nano's 4-Preset Mode)
 - **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style).
-  The capture is shown as an amp: its name on the name plate, Gain, Bass, Mid, Treble and Level (0–10) plus the
-  capture **Volume** on the control panel
+  Capture, cab and gate are three slim strips above the effects: symbol, choice and switch on one line, the knobs
+  below – for the capture Gain, Bass, Mid, Treble and Level (0–10) plus the capture **Volume**
+- **EQ view**: the Nano's EQ models (Parametric 3, Graphic 9, Low-High Cut) show a response curve with points to
+  drag in place of rows of knobs – small in the block, large in a dialog; in the Mac app with the spectrum of the
+  Nano's sound behind it
 - **FX presets**: any number of named settings per effect model. Up to four favourites sit as buttons above the knobs
   (as many as the Nano Cortex Controller has places) – click to load, right-click or hold to save over them, rename or
   delete. **All presets** lists every preset of the model: load, star as favourite, rename, overwrite, delete, or save
@@ -46,13 +50,15 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   without touching a volume – the files stay as they are. A track that still sits differently against the guitar
   gets its own correction by ear, which is remembered. Previous, play / pause and next can be assigned with MIDI
   Learn, and the footswitches of the Nano Cortex Controller work them in its looper mode
-- **Preset files**: **Export** saves the current preset as a file (to keep or to share), **Import** – or dropping the
+- **Preset files** (under **…**, or ⌘E / ⌘I): **Export** saves the current preset as a file (to keep or to share), **Import** – or dropping the
   file on the window – loads one into the current preset; **Save** keeps it. Captures and IRs travel by name: the
   import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
   themselves cannot be transferred over Bluetooth.
 - **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
-- **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs the mic (five drawn mic types) and its
-  position 1–6 on a drawn speaker – click a mic or a position; load factory or user IRs from the device library into a slot
+- **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs a small tile shows the mic and its place –
+  a click opens the speaker with the five mic types and the positions 1–6; load factory or user IRs from the device library into a slot
+- **Monitor** (Mac app, under **…**): plays the Nano's USB sound through another audio device – an audio interface,
+  speakers, headphones –, like the audio settings of a standalone plugin
 - **Keyboard shortcuts**: ⌘S save, ← → previous / next preset, ⌘E export, ⌘I import, T tuner, A for A/B, Space for the jam tracks, ? for the overview
   (Ctrl instead of ⌘ on Windows)
 - **Tuner**: note and cents display, reference pitch (400–480 Hz), mute
@@ -111,11 +117,11 @@ Requires [Node.js](https://nodejs.org) on an Apple Silicon Mac.
 cd mac-app
 ./build.sh            # app for yourself, includes your pedal pictures from ../img if present
 ./build.sh --public   # release build without pedal pictures, plus a zip in ../release
-./build.sh --beta     # the separate beta app (see "Beta: Monitor"); with --public as well for its release zip
 ```
 
 The app is a small [Electron](https://www.electronjs.org) shell around `index.html`
-(Safari/WKWebView has no Web Bluetooth), plus a level meter helper written in Swift that `build.sh` compiles – so the
+(Safari/WKWebView has no Web Bluetooth), plus three small helpers written in Swift that `build.sh` compiles – the
+level meter, the monitor and the spectrum, for what a page cannot do with the Nano's USB audio. So the
 build also needs the Swift compiler of Xcode or its command line tools (`xcode-select --install`). It connects to the first Bluetooth device whose name contains
 "Nano" or "Cortex" – the Nano itself or the Nano Cortex Controller. The version in `mac-app/package.json` must match
 `EDITOR_VERSION` in `index.html` (shown next to the title); `build.sh` checks it.
@@ -190,16 +196,57 @@ m4a (AAC), wav, flac and ogg; the Mac app also plays **Apple Lossless** (m4a), A
 How loud a track sits against the guitar in the Nano's output depends on the Nano's own mixing, which the editor
 cannot measure: if all tracks are too loud or too quiet, set the level once with **−** / **+** of *LUFS · all*.
 
-## Beta: Monitor
+## EQ view
 
-> **Beta – a separate app, not part of the normal editor.** Tested with a test tone only so far.
+![EQ view](docs/eq-view.png)
 
-*Nano Cortex Editor Beta* is the normal Mac app plus one thing to try out: the **Monitor**. It plays the sound the
-Nano sends over USB (channels 3/4) through another audio device – an audio interface, the Mac's speakers,
-headphones –, like the audio settings of a standalone plugin: choose input and output, start. The sound passes
-through the Mac, so it arrives a few milliseconds late. The beta installs next to the normal app and keeps its own
-settings. How to install and use it, what to expect and what feedback helps:
-**[docs/beta-monitor.md](docs/beta-monitor.md)**.
+The Nano's three EQ models – **Parametric 3**, **Graphic 9** and **Low-High Cut** – show what they do as a curve:
+
+![EQ blocks](docs/eq-blocks.png)
+
+- **In the block:** a small curve. Its points can be dragged right there; a click beside them, or on the arrows in
+  the corner, opens the large view. **Knobs** below the curve brings the knobs back (they are what MIDI Learn
+  assigns), **Curve** returns.
+- **In the large view:** one point per band, each in its colour with its own soft shape; the bright line is all of
+  them together.
+  - **Drag** a point: frequency and gain. **Scroll** over it: Q (Parametric 3) or the slope (Low-High Cut).
+    **Shift** while dragging: slowly.
+  - **Double-click:** a band on / off (Parametric 3), a fader back to 0 dB (Graphic 9).
+  - Below the graph: choose a band, click **Freq**, **Gain** or **Q** to type a value, pick the band's shape (peak,
+    high pass, low pass, high shelf, low shelf), switch it on or off, and set the **Output** level.
+- **Spectrum** (Mac app): with the Nano on a USB-C cable, the large view shows the spectrum of its sound behind the
+  curve – what comes out of the Nano (USB channels 3/4), after all its effects. It runs while the view is open; the
+  switch *Spectrum* hides it. Its height has a scale of its own (−96 to −12 dBFS), not the curve's dB.
+- Every change goes to the Nano at once, as with the knobs; FX presets, A/B and preset files work as before.
+
+Two things are assumptions. The **curve** is drawn with textbook filters – near what the Nano does, not measured from
+it. And the **frequency scale**: the Nano takes a frequency as the travel of a control (0–1), and how that becomes Hz
+is not documented. A logarithmic control is assumed; *Frequency scale: Log / Linear* at the bottom right switches it
+(what the Nano gets stays the same, only the Hz shown change). To check it, set a steep low pass in *Low-High Cut* and
+play: with the right scale the drop in the spectrum sits at the point.
+
+## Monitor
+
+![Monitor](docs/monitor.png)
+
+Mac app only. The Nano sends its sound to the Mac over USB; the Monitor plays it through **another audio device** – an
+audio interface, the Mac's speakers, headphones –, like the audio settings of a standalone plugin. A USB-C cable from
+the Nano to the Mac is all it needs; no Bluetooth.
+
+1. Connect the Nano with a USB-C cable and open **…** → **Monitor**.
+2. **Input**: *Nano Cortex* and *Ch 3/4* are chosen for you – 3/4 is the Nano's sound, 1/2 the dry guitar signal.
+3. **Output**: the device you want to hear it on. The Nano itself is not offered: it would get its own sound back.
+4. **Start** – with a low volume on speakers.
+
+- **Volume**: 0 dB = as the sound comes from the Nano; the Mac's own volume for that output comes on top.
+  **Buffer** 64 / 128 / 256: smaller is a shorter delay, larger is safer against dropouts.
+- The dialog shows the **delay** through the Mac and counts **dropouts**. Closed, the monitor keeps playing and the
+  **…** button shows a green dot; **Stop** ends it, and so does quitting the app.
+- The sound passes through the Mac, so it arrives late: with the built-in speakers about 8 ms at buffer 64, 11 ms at
+  128 and 18 ms at 256. A display's speakers or Bluetooth headphones add far more. The Nano's own outputs have no such
+  delay – if you hear both ways at once, you hear it as an echo.
+- With the jam tracks: choose the same output in the track list, and guitar and tracks mix on the Mac.
+- Another input than the Nano can be chosen; the editor asks first, because a microphone played through speakers howls.
 
 ## MIDI controller
 
@@ -209,7 +256,7 @@ Assignments are stored in the browser/app. MIDI needs Chrome, Edge or the Mac ap
 
 ## Morningstar MC6 Pro
 
-Click the **MC6 Pro** icon (the controller), tick up to five presets, check the Nano's MIDI channel (read from the Nano automatically)
+Open **…** → **Morningstar MC6 Pro export**, tick up to five presets, check the Nano's MIDI channel (read from the Nano automatically)
 and press **Create bank file**. To read which FX are on in each preset, the editor loads each selected preset on the
 Nano for a moment and then returns to the current one (save unsaved changes first). Load the file in the Morningstar editor (open a bank → *Load from File*) and save it
 to the controller. Connect the MC6 Pro's USB Host port to the Nano's USB port: the Nano only accepts MIDI via USB.
@@ -262,5 +309,7 @@ zeigt die Mac-App seinen Ausgangspegel (USB-Kanäle 3/4) und stellt mit **Auto l
 paar Sekunden Spielen passend für Clean, Drive, Solo oder Fuzz ein. Im Browser kommen am Mac nur die Kanäle 1/2 (DI) an.
 Unten im Fenster lässt sich ein **Jamtrack-Player** einblenden: Ordner wählen, und alle Tracks laufen gleich laut,
 knapp unter deinen Presets; der Nano Cortex Controller schaltet sie im Looper-Modus mit den Fußschaltern.
+Die EQ-Modelle zeigen eine **Kurve mit Punkten zum Ziehen** statt Knopfreihen, in der Mac-App mit dem Spektrum des
+Nano-Tons dahinter. Der **Monitor** (Mac-App, unter **…**) spielt den USB-Ton des Nano über ein anderes Audiogerät ab.
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.
