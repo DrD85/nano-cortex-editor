@@ -27,7 +27,9 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   icon for its name. The **Connect** button shows the connection. **…** (or a click on the connection) holds the rest:
   preset files (export, import), the MC6 Pro export, the two mutes, refresh, keyboard shortcuts, copy log and disconnect.
   Until the Nano is connected, the editor shows a short connect screen instead of placeholder values
-- **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
+- **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal.
+  Unsaved changes show as a dot and a green Save – also for the cab's mic, position, level and filters, which the
+  Nano itself does not report as changes
 - **Copy a preset to another slot**: the last entry of the preset list, **Copy to another slot …**, shows the 64
   presets – choose the one to replace, give the copy a name (the Nano wants every name once) and it is stored there
   as it sounds now, unsaved changes and expression pedal assignments included. The editor reads the Nano's list
@@ -37,7 +39,9 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   back as a check; the preset list shows the slot next to the name (B slots need the Nano's 4-Preset Mode)
 - **Amp, gate and FX blocks**: all knobs with live, lag-free updates, model selection for Pre FX 1–2 and Post FX 1–3, block colours per effect category (Quad Cortex style).
   Capture, cab and gate are three slim strips above the effects: symbol, choice and switch on one line, the knobs
-  below – for the capture Gain, Bass, Mid, Treble and Level (0–10) plus the capture **Volume**
+  below – for the capture Gain, Bass, Mid, Treble and Level (0–10) plus the capture **Volume**. **Level** is the
+  Nano's master output volume (its LEVEL knob): it belongs to the device, not to the preset, so Save does not store
+  it – the loudness of a preset is the capture Volume
 - **EQ view**: the Nano's EQ models (Parametric 3, Graphic 9, Low-High Cut) show a response curve with points to
   drag in place of rows of knobs – small in the block, large in a dialog; in the Mac app with the spectrum of the
   Nano's sound behind it

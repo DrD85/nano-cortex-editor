@@ -992,6 +992,8 @@
       .cabinet { flex-wrap: wrap; }
     }
     .cab-controls .param-name { font-size: 9.5px; color: var(--muted); }
+    /* Level: the Nano's master volume, not part of the preset - the dotted line says "there is more to know" */
+    .knob-param.device-wide .param-name { text-decoration: underline dotted #7b8087; text-underline-offset: 3px; cursor: help; }
     .cab-controls select { font-size: 11px; padding: 4px; }
     .cab-controls .value-text { font-size: 11.5px; text-align: center; color: #e6e6e6; }
 
@@ -2289,7 +2291,8 @@
       tuner: { open: false, live: true, baseFrequency: 440, muted: false, logged: 0 },
       libraryBytes: [],
       libraryTimer: null,
-      presetDirty: false,
+      presetDirty: false,   // the Nano's own mark: the loaded preset has unsaved changes
+      localEdit: false,     // a change the Nano does not mark (the cab's mic, position, level and filters), until Save or another preset
       ab: { active: false, side: 'B', A: null, B: null, preset: 0, busy: false },   // A/B compare
       fs: { busy: false, status: '', error: false },   // footswitch assignment dialog
       fourPresetMode: true,   // the Nano's 4-Preset Mode (footswitch slots B), from its state
@@ -2607,6 +2610,7 @@
       closeDeviceDialogs();
       state.inputMuted = state.outputMuted = null;
       state.settingsAsked = false;
+      clearLocalEdit();
       renderMutes();
       setStatus('Disconnected');
       log('Disconnected.');
@@ -3171,7 +3175,21 @@
       return out;
     }
 
+    // The Nano says itself when the loaded preset has unsaved changes (state field 41, PresetDirtyStateChanged) - but
+    // not for what goes with the cab settings message (mic and position at least). The editor remembers those
+    // changes itself, so that the dot and the green Save show them too.
+    function presetUnsaved() { return state.presetDirty || state.localEdit; }
+    function markLocalEdit() {
+      if (state.localEdit || !state.connected) return;
+      state.localEdit = true;
+      renderPresetSelect();
+    }
+    function clearLocalEdit() {
+      state.localEdit = false;
+    }
+
     async function setCabIRFloatParam(label, paramId, normalized) {
+      markLocalEdit();
       await writeC304(
         'Cab/IR ' + label,
         new Uint8Array([0x09, 0xC0, paramId, ...float32LE(clamp(Number(normalized), 0, 1)), 0x5E, 0x00, 0x00, 0x00]),
@@ -3244,6 +3262,7 @@
       ]);
       payload[0] = payload.length - 2;
 
+      markLocalEdit();
       await writeC304('Cab mic/position ' + micName + ' pos ' + pos, payload);
     }
 
@@ -3740,6 +3759,7 @@ function parseSelectedCaptureState(payload) {
       state.selectedPreset = preset;
       state.capture.lastActiveSlot = null;
       state.cabIR.lastActiveSlot = null;
+      clearLocalEdit();
       renderPresetSelect();
 
       await writeC304('Preset change ' + preset, presetChangeFrame(preset - 1));
@@ -3757,6 +3777,7 @@ function parseSelectedCaptureState(payload) {
         const value = (n, fallback) => fields[n] && fields[n][0] ? fields[n][0].value : fallback;
         state.selectedPreset = value(4, 0) + 1;
         state.presetSlots = { a1: value(5, 0), b1: value(6, 0), a2: value(7, 0), b2: value(8, 0) };
+        clearLocalEdit();
         log('Device preset change: preset ' + state.selectedPreset);
         renderPresetSelect();
         writeC304('Preset change ack', PRESET_CHANGE_ACK);
@@ -3837,6 +3858,7 @@ function parseSelectedCaptureState(payload) {
       if (type === MSG.PresetDirtyStateChanged) {
         const fields = framePayloadFields(data);
         state.presetDirty = Boolean(fields[3] && fields[3][0] && fields[3][0].value);
+        if (!state.presetDirty) clearLocalEdit();   // saved or loaded again on the Nano itself
         renderPresetSelect();
         return true;
       }
@@ -4474,7 +4496,7 @@ function parseSelectedCaptureState(payload) {
 
     async function scanSlotUsage(progress) {
       if (!state.connected) return false;
-      if (state.presetDirty && !(await askConfirm('Discard the unsaved changes?', 'Preset ' + state.selectedPreset + ' has unsaved changes. ' +
+      if (presetUnsaved() && !(await askConfirm('Discard the unsaved changes?', 'Preset ' + state.selectedPreset + ' has unsaved changes. ' +
           'The check loads every preset on the Nano once, which discards them.', { ok: 'Check anyway' }))) return false;
       const original = state.selectedPreset;
       const usage = { capture: {}, cab: {} };
@@ -4706,6 +4728,7 @@ function parseSelectedCaptureState(payload) {
         requestCurrentPresetState();
         if (!await checked) { showSaveResult('Not confirmed', 'error', 'The Nano did not answer the check after saving preset ' + preset + '.'); return; }
         if (state.presetDirty) { showSaveResult('Not confirmed', 'error', 'The Nano still reports unsaved changes in preset ' + preset + '.'); return; }
+        clearLocalEdit();
         levelMarkCheck();   // a levelled mark of this preset counts from now on
         renderPresetSelect();
         showSaveResult('Saved ✓', 'ok', 'Preset ' + preset + ' saved and checked.');
@@ -4763,7 +4786,7 @@ function parseSelectedCaptureState(payload) {
       copyDialog.target = 0;
       copyDialog.busy = false;
       $('copyMessage').innerHTML = '<div class="dlg-title">Copy “' + escapeHTML(name) + '” to another slot</div>' +
-        '<div class="dlg-sub">The preset as it sounds now' + (state.presetDirty ? ' – with your unsaved changes –' : '') +
+        '<div class="dlg-sub">The preset as it sounds now' + (presetUnsaved() ? ' – with your unsaved changes –' : '') +
         ' is stored on the preset you choose. What is on that preset is replaced.</div>';
       $('copyName').value = copyNameSuggestion(name);
       $('copyOverlay').hidden = false;
@@ -5282,8 +5305,8 @@ function parseSelectedCaptureState(payload) {
     function renderPresetSelect() {
       renderAb();
       if (!state.fs.busy) renderFootswitches();
-      $('dirtyDot').hidden = !(state.connected && state.presetDirty);
-      $('saveBtn').classList.toggle('dirty', Boolean(state.connected && state.presetDirty));
+      $('dirtyDot').hidden = !(state.connected && presetUnsaved());
+      $('saveBtn').classList.toggle('dirty', Boolean(state.connected && presetUnsaved()));
       const select = $('presetSelect');
       select.innerHTML = '';
       for (let i = 1; i <= 64; i++) {
@@ -5292,7 +5315,7 @@ function parseSelectedCaptureState(payload) {
         const slots = state.connected ? FS_SLOTS.filter(slot => state.presetSlots[slot.key] === i - 1).map(slot => slot.label) : [];
         const mark = state.connected ? levelMark(i) : null;   // levelled with Auto level: kind and loudness
         option.textContent = i + '  ·  ' + (state.presetNames.get(i) || ('Preset ' + i)) +
-          (i === state.selectedPreset && state.presetDirty ? ' *' : '') + (mark ? '   ' + levelMarkText(mark) : '') +
+          (i === state.selectedPreset && presetUnsaved() ? ' *' : '') + (mark ? '   ' + levelMarkText(mark) : '') +
           (slots.length ? '   [' + slots.join(' ') + ']' : '');
         if (i === state.selectedPreset) option.selected = true;
         select.appendChild(option);
@@ -5900,6 +5923,10 @@ function parseSelectedCaptureState(payload) {
       return p;
     }
 
+    const LEVEL_TIP = 'Level is the master output volume of the Nano (its LEVEL knob). It belongs to the device, not to the preset: ' +
+      'it stays as it is when you change presets, and Save does not store it. For the loudness of one preset use Volume.';
+    let levelTold = false;
+
     function renderAmpKnob(key, label) {
       const p = document.createElement('div');
       p.className = 'knob-param';
@@ -5921,6 +5948,12 @@ function parseSelectedCaptureState(payload) {
       knobEl.style.setProperty('--pct', pct + '%');
       knobEl.style.setProperty('--angle', angle + 'deg');
       knobEl.title = 'Drag for coarse adjustment, scroll for fine adjustment';
+      // Level is the Nano's LEVEL knob: the master output volume of the device. It is not part of the preset - the
+      // Nano does not mark the preset as changed and Save does not store it.
+      if (key === 'level') {
+        p.classList.add('device-wide');
+        name.title = knobEl.title = LEVEL_TIP;
+      }
 
       const value = document.createElement('div');
       value.className = 'value-text';
@@ -5939,6 +5972,10 @@ function parseSelectedCaptureState(payload) {
         state.amp[key] = next;
         updateKnobVisual(knobEl, value, next / 255, ampText(next));
         setAmpKnob(key, next);
+        if (key === 'level' && !levelTold) {   // said once: turning it leaves the preset as it is
+          levelTold = true;
+          toast('Level is the Nano\'s master volume: it is not part of the preset, and Save does not store it. Volume sets how loud a preset is.', 'info', 9000);
+        }
       };
 
       knobEl.addEventListener('wheel', e => {
@@ -6977,7 +7014,7 @@ function parseSelectedCaptureState(payload) {
       if (fs.busy) return;
       if (!state.connected) { toast('Connect to the Nano first.', 'info'); return; }
       const done = (text, error = false) => { fs.status = text; fs.error = error; };
-      if (state.presetDirty && !(await askConfirm('Assign with unsaved changes?', 'Preset ' + state.selectedPreset + ' has unsaved changes. The Nano may load the ' +
+      if (presetUnsaved() && !(await askConfirm('Assign with unsaved changes?', 'Preset ' + state.selectedPreset + ' has unsaved changes. The Nano may load the ' +
           'preset again when its footswitches are assigned, which would discard them. Save first to be safe.', { ok: 'Assign anyway' }))) {
         renderFootswitches();   // the list shows the Nano's assignment again
         return;
@@ -7496,7 +7533,7 @@ function parseSelectedCaptureState(payload) {
     function levelMarkCheck() {
       const preset = state.selectedPreset;
       const mark = levelStore.marks[preset];
-      if (!mark || state.presetDirty) return;
+      if (!mark || presetUnsaved()) return;
       if (mark.raw !== captureRawNow() || state.amp.level !== LEVEL_FULL || mark.name !== (state.presetNames.get(preset) || '')) levelMarkDrop(preset);
       else if (!mark.saved) { mark.saved = true; saveLevelStore(); }
     }
@@ -7597,7 +7634,7 @@ function parseSelectedCaptureState(payload) {
       al.last = { loud, peakDb, kind: al.kind, offerTarget: !al.apply };
       if (levelRaised) al.undo = al.before;
       // the mark of this preset: what it measures now (nothing unsaved and nothing changed: it is the stored preset)
-      const mark = lufsNow => { if (al.before && Number.isFinite(lufsNow)) levelMarkSet(al.preset, al.kind, lufsNow, !levelRaised && !state.presetDirty); };
+      const mark = lufsNow => { if (al.before && Number.isFinite(lufsNow)) levelMarkSet(al.preset, al.kind, lufsNow, !levelRaised && !presetUnsaved()); };
       if (!al.apply) {
         al.text = measured + ' The ' + kind.label + ' target is ' + dbText(target) + ' LUFS (' + dbText(target - loud, true) + ' dB from here).' + levelNote;
         mark(loud);
@@ -8363,7 +8400,7 @@ function parseSelectedCaptureState(payload) {
       const presets = state.mc6.selected.slice().sort((a, b) => a - b);
       if (!presets.length) { $('mc6Status').textContent = 'Select at least one preset.'; return; }
       if (!state.connected) { $('mc6Status').textContent = 'Connect to the Nano first: the FX of each preset are read from the device.'; return; }
-      if (state.presetDirty) { $('mc6Status').textContent = 'Preset ' + state.selectedPreset + ' has unsaved changes. Save or discard them first: the export loads each selected preset on the Nano.'; return; }
+      if (presetUnsaved()) { $('mc6Status').textContent = 'Preset ' + state.selectedPreset + ' has unsaved changes. Save or discard them first: the export loads each selected preset on the Nano.'; return; }
       const original = state.selectedPreset;
       state.mc6.busy = true;
       $('mc6Create').disabled = true;
