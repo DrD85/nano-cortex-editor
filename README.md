@@ -17,18 +17,21 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 - **Signal chain** at the top, as on the Quad Cortex: Gate → Pre FX 1–2 → Capture → Cab → Post FX 1–3, each block in its
   colour – filled when on, outlined when off, dashed when empty. Click a block to make it light up below,
   **double-click** to switch it on or off
-- **Signal chain** – the round **IN** at its start mutes the Nano's input (the device setting *Mute input*): one
-  click and it turns into a red sign with **Muted** below, one more and the input is back. The same is under **…**.
-  The Nano keeps the setting, also after the editor is closed
+- **Mute guitar input / output** – the round **IN** and **OUT** at the two ends of the signal chain are switches
+  for the Nano's settings *Mute Guitar Input* and *Mute Guitar Output*: one click and the end turns into a red sign
+  with **Muted** below, one more and it is back. Both are under **…** as well. With the output muted the guitar is
+  silent at the output jacks, while the sound from USB stays. The Nano keeps both settings, also after the editor
+  is closed
 - **Compact top bar**: preset arrows, preset list (a dot marks unsaved changes, and **Save** turns green), save,
   rename and **A/B** in the middle, then icons for tuner, expression, footswitches, MIDI and the jam tracks – hover an
   icon for its name. The **Connect** button shows the connection. **…** (or a click on the connection) holds the rest:
-  preset files (export, import), the MC6 Pro export, mute input, refresh, keyboard shortcuts, copy log and disconnect.
+  preset files (export, import), the MC6 Pro export, the two mutes, refresh, keyboard shortcuts, copy log and disconnect.
   Until the Nano is connected, the editor shows a short connect screen instead of placeholder values
 - **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
 - **Copy a preset to another slot**: the last entry of the preset list, **Copy to another slot …**, shows the 64
   presets – choose the one to replace, give the copy a name (the Nano wants every name once) and it is stored there
-  as it sounds now, unsaved changes included. The editor reads the Nano's list again and only then says "Copied"
+  as it sounds now, unsaved changes and expression pedal assignments included. The editor reads the Nano's list
+  again and only then says "Copied"
 - **Footswitches of the Nano**: the footswitch icon opens the four slots **1A, 1B, 2A, 2B** – choose the preset each
   one calls up, or put the loaded preset on a slot with one click. The change is stored on the Nano at once and read
   back as a check; the preset list shows the slot next to the name (B slots need the Nano's 4-Preset Mode)
@@ -46,8 +49,8 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   you like, then switch between A and your changes to hear the difference – only what differs is sent, so the switch
   is quick. It covers amp, capture and its volume, cab, gate and all five effects with their models and values.
   **Save** keeps the side you hear; **×** ends the compare
-- **Output level** (Mac app, Nano connected with a USB-C cable as well): a small stereo meter at the end of the signal
-  chain shows the Nano's sound from its USB audio (channels 3/4) – peaks left and right, below them the loudness in
+- **Output level** (Mac app, Nano connected with a USB-C cable as well): a small stereo meter before the **OUT** of the
+  signal chain shows the Nano's sound from its USB audio (channels 3/4) – peaks left and right, below them the loudness in
   LUFS. Click it for the large meter. macOS asks once for the audio input ("microphone"); nothing is recorded
 - **Auto level**: choose **Clean**, **Drive**, **Solo** or **Fuzz**, press **Start** and play for four seconds – with
   Level at 10 (full output), the capture volume is set so that the preset lands on the loudness of its kind (clean
@@ -138,7 +141,7 @@ build also needs the Swift compiler of Xcode or its command line tools (`xcode-s
 
 The Nano Cortex is also an audio interface over USB-C with eight channels: **1/2 carry the dry guitar signal (DI),
 3/4 the sound with capture and effects**. With the cable plugged in (Bluetooth stays the connection for editing),
-click the meter symbol in the Capture card or **OUT** at the end of the signal chain. The first time macOS asks whether
+click the meter symbol in the Capture card or the meter tile before **OUT** in the signal chain. The first time macOS asks whether
 the app may use the "microphone" – that is the Nano's USB audio. The editor only measures the samples: nothing is
 recorded or sent anywhere.
 
@@ -320,6 +323,7 @@ knapp unter deinen Presets; der Nano Cortex Controller schaltet sie im Looper-Mo
 Die EQ-Modelle zeigen eine **Kurve mit Punkten zum Ziehen** statt Knopfreihen, in der Mac-App mit dem Spektrum des
 Nano-Tons dahinter. Der **Monitor** (Mac-App, unter **…**) spielt den USB-Ton des Nano über ein anderes Audiogerät ab.
 Der letzte Eintrag der Preset-Liste **kopiert das geladene Preset auf einen anderen Platz**, und ein Klick auf das
-runde **IN** am Anfang der Signal Chain schaltet den Eingang des Nano stumm (die Geräte-Einstellung „Mute input").
+die runden **IN** und **OUT** an den Enden der Signal Chain schalten den Gitarren-Eingang und -Ausgang des Nano stumm
+(die Geräte-Einstellungen „Mute Guitar Input" und „Mute Guitar Output"); der Pegelmesser sitzt als Kachel vor OUT.
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.

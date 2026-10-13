@@ -783,7 +783,7 @@
     .more-menu button:disabled { opacity: .45; }
     .more-menu button[hidden] { display: none; }
     :root { --ico-mute: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><path d='M6.5 6.5l11 11'/></g></svg>"); }
-    .more-menu #muteBtn.on { color: #ff8c8c; }
+    .more-menu #muteInBtn.on, .more-menu #muteOutBtn.on { color: #ff8c8c; }
     /* copy a preset: the name of the copy below the list of presets */
     .copy-name { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; padding-right: 4px; }
     .copy-name span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8e9297; white-space: nowrap; }
@@ -889,10 +889,10 @@
     .sc-tile.empty { border-style: dashed; color: #4a4f55; }
     .sc-tile.io { width: 38px; height: 38px; margin-top: 11px; border-radius: 50%; font-size: 10px; font-weight: 750; letter-spacing: .08em; color: #8e9297; }
     .sc-node.io { flex: 0 0 44px; cursor: default; }
-    /* IN: a click mutes the Nano's input - muted it is a red "no" sign over the dimmed letters */
-    .sc-node.io.in { cursor: pointer; }
-    .sc-node.io.in:hover .sc-tile { border-color: #8e9297; color: #d6d6d6; }
-    .sc-node.io.in .sc-lbl { margin-top: 11px; }   /* (on the line of the other labels: the round tile is smaller) */
+    /* IN and OUT: a click mutes the Nano's guitar input / output - muted it is a red "no" sign over the dimmed letters */
+    .sc-node.io.sw { cursor: pointer; }
+    .sc-node.io.sw:hover .sc-tile { border-color: #8e9297; color: #d6d6d6; }
+    .sc-node.io.sw .sc-lbl { margin-top: 11px; }   /* (on the line of the other labels: the round tile is smaller) */
     .sc-node.io.muted .sc-tile, .sc-node.io.muted:hover .sc-tile { background: rgba(255, 90, 77, .14); border-color: #ff5a4d; border-width: 2px; color: rgba(255, 140, 140, .55);
       box-shadow: 0 0 16px rgba(255, 90, 77, .35); }
     .sc-node.io.muted .sc-tile::after { content: ""; position: absolute; width: 2px; height: 36px; background: #ff5a4d; transform: rotate(-45deg); }
@@ -1231,14 +1231,14 @@
     .ab-end .ico { width: 13px; height: 13px; }
     .ab-box.busy { opacity: .6; pointer-events: none; }
 
-    /* output level: small meter at the end of the signal chain, the dialog with the bars and Auto level */
-    .sc-node.io.out { cursor: pointer; }
-    .sc-node.io.out:hover .sc-tile { color: #fff; border-color: var(--accent); }
+    /* output level: small meter before the OUT of the signal chain, the dialog with the bars and Auto level */
+    .sc-node.io.level { cursor: pointer; }
+    .sc-node.io.level:hover .sc-tile { color: #fff; border-color: var(--accent); }
     .sc-tile.io.meter { width: 38px; height: 60px; margin-top: 0; border-radius: 12px; display: flex; align-items: stretch; justify-content: center; gap: 5px; padding: 8px 0; }
     .sc-tile.io.meter .vu { position: relative; width: 7px; border-radius: 3px; background: #23272b; overflow: hidden; }
     .sc-tile.io.meter .vu i { position: absolute; inset: 0; background: linear-gradient(to top, #45F862 0, #45F862 70%, #f2d14b 70%, #f2d14b 90%, #ff5a4d 90%);
                               clip-path: inset(calc(100% - var(--v, 0%)) 0 0 0); }
-    .sc-node.io.out .sc-sub { min-height: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sc-node.io.level .sc-sub { min-height: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .level-panel { width: min(580px, calc(100vw - 32px)); gap: 14px; max-height: calc(100vh - 32px); overflow: auto; }
     .lv-source { display: flex; align-items: center; gap: 12px; }
     .lv-source #levelInput { flex: 1 1 auto; min-width: 0; }
@@ -1435,7 +1435,8 @@
           <button id="importBtn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="ico" style="--icon: var(--ico-import)"></span>Import preset file…<span class="menu-key"></span></button>
           <div class="menu-sep"></div>
           <button id="mc6Btn" title="A bank for the Morningstar MC6 Pro from up to five presets"><span class="ico" style="--icon: var(--ico-controller)"></span>Morningstar MC6 Pro export…</button>
-          <button id="muteBtn" title="The Nano's setting “Mute input”: no sound from the guitar input until it is switched back" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteLabel">Mute input</span></button>
+          <button id="muteInBtn" title="The Nano's setting “Mute Guitar Input”: no sound from the guitar input until it is switched back" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteInLabel">Mute guitar input</span></button>
+          <button id="muteOutBtn" title="The Nano's setting “Mute Guitar Output”: no guitar at the output jacks until it is switched back – the sound from USB stays" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteOutLabel">Mute guitar output</span></button>
           <button id="monitorBtn" title="Hear the Nano from USB through another audio device (Mac app)" hidden><span class="ico" style="--icon: var(--ico-monitor)"></span>Monitor…</button>
           <div class="menu-sep"></div>
           <button id="refreshBtn"><span class="ico" style="--icon: var(--ico-refresh)"></span>Refresh from the Nano</button>
@@ -2292,7 +2293,8 @@
       ab: { active: false, side: 'B', A: null, B: null, preset: 0, busy: false },   // A/B compare
       fs: { busy: false, status: '', error: false },   // footswitch assignment dialog
       fourPresetMode: true,   // the Nano's 4-Preset Mode (footswitch slots B), from its state
-      inputMuted: null,   // the Nano's setting "Mute input"; null = not read yet
+      inputMuted: null,   // the Nano's settings "Mute Guitar Input" / "Mute Guitar Output"; null = not read yet
+      outputMuted: null,
       settingsAsked: false,
       muteBusy: false,
       connected: false,
@@ -2603,9 +2605,9 @@
       resetExpRequests();
       abEnd();
       closeDeviceDialogs();
-      state.inputMuted = null;
+      state.inputMuted = state.outputMuted = null;
       state.settingsAsked = false;
-      renderInputMute();
+      renderMutes();
       setStatus('Disconnected');
       log('Disconnected.');
     }
@@ -2820,7 +2822,7 @@
       levelMarkCheck();
       render();
       presetStateWaiters.slice().forEach(waiter => waiter());
-      if (state.inputMuted === null && !state.settingsAsked) { state.settingsAsked = true; setTimeout(requestSettings, 700); }   // the input mute
+      if (state.inputMuted === null && !state.settingsAsked) { state.settingsAsked = true; setTimeout(requestSettings, 700); }   // the two mutes
 
       log('CURRENT STATE BUFFER len=' + bytes.length);
       log('CURRENT STATE capture=' + (state.currentCapture.name || 'unknown') + ', ir=' + (state.currentIR.shortName || 'unknown'));
@@ -3787,12 +3789,13 @@ function parseSelectedCaptureState(payload) {
         // 17 usbReturnGain (float32, dB): how loud the computer's sound is mixed in; left out = 0 dB
         const usb = fields[17] && fields[17][0] && fields[17][0].wire === 5 ? new DataView(Uint8Array.from(fields[17][0].raw).buffer).getFloat32(0, true) : 0;
         state.usbReturnDb = Number.isFinite(usb) ? clamp(usb, -60, 12) : 0;
-        // 15 muteIn1: the input is muted (left out = not muted)
+        // 15 muteIn1, 16 muteProcessingChain: the guitar input / output is muted (left out = not muted)
         state.inputMuted = Boolean(fields[15] && fields[15][0] && fields[15][0].value);
+        state.outputMuted = Boolean(fields[16] && fields[16][0] && fields[16][0].value);
         settingsWaiters.splice(0).forEach(resolve => resolve(true));
         jamApplyGain();
         renderJam();
-        renderInputMute();
+        renderMutes();
         if (!$('mc6Overlay').hidden) renderMc6Panel();
         return true;
       }
@@ -4829,11 +4832,18 @@ function parseSelectedCaptureState(payload) {
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('copyOverlay').hidden) closeCopyPreset(); });
 
     // ---- Mute input ----
-    // The Nano's setting "Mute input" (UpdateSettingsRequest 67 { 12: muteIn1 }; read with the settings, reply field
-    // 15). One setting is sent alone, as the app does it, and a zero is written out - it is the value meant. Shown on
-    // the chain's IN, where a click switches it, and in the "..." menu. It is a setting of the device: it stays muted
-    // until it is switched back, also after the editor is closed.
+    // The Nano's two monitoring settings, "Mute Guitar Input" and "Mute Guitar Output" (UpdateSettingsRequest 67
+    // { 12: muteIn1, 13: muteProcessingChain }; read with the settings, reply fields 15 and 16). One setting is sent
+    // alone, as the app does it, and a zero is written out - it is the value meant. Shown on the two ends of the
+    // signal chain, IN and OUT, where a click switches them, and in the "..." menu. They are settings of the device:
+    // muted stays muted until it is switched back, also after the editor is closed.
     const settingsWaiters = [];
+    const MUTES = {
+      in: { key: 'inputMuted', tag: 0x60, what: 'guitar input', end: 'IN', button: 'muteInBtn', label: 'muteInLabel',
+        tip: 'Guitar input – click to mute it (the Nano\'s setting “Mute Guitar Input”)' },
+      out: { key: 'outputMuted', tag: 0x68, what: 'guitar output', end: 'OUT', button: 'muteOutBtn', label: 'muteOutLabel',
+        tip: 'Guitar output – click to mute it (the Nano\'s setting “Mute Guitar Output”: no guitar at the output jacks, the sound from USB stays)' }
+    };
 
     function requestSettings(tries = 40) {
       if (!state.connected) return;
@@ -4841,38 +4851,51 @@ function parseSelectedCaptureState(payload) {
       writeC304('Retrieve settings', buildFrame([0x08, 0x03], MSG.RetrieveSettingsRequest));
     }
 
-    function renderInputMute() {
-      const muted = state.connected && state.inputMuted === true;
-      $('muteBtn').hidden = !state.connected;
-      $('muteBtn').classList.toggle('on', muted);
-      $('muteLabel').textContent = muted ? 'Unmute input' : 'Mute input';
+    function renderMutes() {
+      Object.values(MUTES).forEach(m => {
+        const muted = state.connected && state[m.key] === true;
+        $(m.button).hidden = !state.connected;
+        $(m.button).classList.toggle('on', muted);
+        $(m.label).textContent = (muted ? 'Unmute ' : 'Mute ') + m.what;
+      });
       renderSignalChain();
     }
 
-    async function setInputMute(muted) {
+    // IN and OUT of the signal chain: a click mutes, muted they are a red sign with "Muted" below.
+    function renderMuteNode(node, which) {
+      const m = MUTES[which], muted = state[m.key] === true;
+      node.classList.add('sw');
+      node.classList.toggle('muted', muted);
+      node.title = muted ? 'The ' + m.what + ' is muted – click to bring it back' : m.tip;
+      if (muted) node.insertAdjacentHTML('beforeend', '<span class="sc-lbl">Muted</span>');
+      node.addEventListener('click', () => setMute(which, !muted));
+    }
+
+    async function setMute(which, muted) {
+      const m = MUTES[which];
       if (!state.connected || state.muteBusy) return;
       state.muteBusy = true;
-      state.inputMuted = muted;
-      renderInputMute();
+      state[m.key] = muted;
+      renderMutes();
       try {
-        if (!await writeC304('Mute input ' + (muted ? 'on' : 'off'), buildFrame([0x60, muted ? 1 : 0], MSG.UpdateSettingsRequest))) {
-          toast('The Bluetooth write failed: the input is ' + (muted ? 'not muted.' : 'still muted.'), 'error');
-          state.inputMuted = !muted;
+        if (!await writeC304('Mute ' + m.what + (muted ? ' on' : ' off'), buildFrame([m.tag, muted ? 1 : 0], MSG.UpdateSettingsRequest))) {
+          toast('The Bluetooth write failed: the ' + m.what + ' is ' + (muted ? 'not muted.' : 'still muted.'), 'error');
+          state[m.key] = !muted;
           return;
         }
         // the check: the settings read back must say the same
         await new Promise(r => setTimeout(r, 350));
         const answered = new Promise(resolve => { settingsWaiters.push(resolve); setTimeout(() => resolve(false), 3000); });
         requestSettings();
-        if (!await answered) toast('The Nano did not answer the check - listen whether the input is ' + (muted ? 'muted.' : 'back.'), 'error', 6000);
-        else if (state.inputMuted !== muted) toast('The Nano did not take it: the input is ' + (state.inputMuted ? 'still muted.' : 'not muted.'), 'error', 6000);
-        else toast(muted ? 'Input muted - a click on IN brings it back.' : 'Input on again.', muted ? 'info' : 'ok');
+        if (!await answered) toast('The Nano did not answer the check - listen whether the ' + m.what + ' is ' + (muted ? 'muted.' : 'back.'), 'error', 6000);
+        else if (state[m.key] !== muted) toast('The Nano did not take it: the ' + m.what + ' is ' + (state[m.key] ? 'still muted.' : 'not muted.'), 'error', 6000);
+        else toast(muted ? 'The ' + m.what + ' is muted - a click on ' + m.end + ' brings it back.' : 'The ' + m.what + ' is on again.', muted ? 'info' : 'ok');
       } finally {
         state.muteBusy = false;
-        renderInputMute();
+        renderMutes();
       }
     }
-    $('muteBtn').addEventListener('click', () => setInputMute(state.inputMuted !== true));
+    Object.entries(MUTES).forEach(([which, m]) => $(m.button).addEventListener('click', () => setMute(which, state[m.key] !== true)));
 
     // Shows the save result on the Save button for a few seconds (details in its tooltip and in the log).
     function showSaveResult(text, kind, detail) {
@@ -7307,18 +7330,17 @@ function parseSelectedCaptureState(payload) {
       $('lvClip').hidden = !(m.clipAt && performance.now() - m.clipAt < 2000);
     }
 
-    // The OUT end of the signal chain: with the meter on a small stereo meter with the loudness below.
-    function renderOutNode(node) {
-      node.id = 'outNode';
-      node.classList.add('out');
+    // The meter's place in the signal chain, before OUT (which mutes the guitar output): a small stereo meter, with
+    // the meter on the loudness below it.
+    function renderMeterNode(node) {
+      node.id = 'meterNode';
+      node.classList.add('level');
       node.classList.toggle('metering', meter.on);
       node.title = meter.on ? 'Output level over USB (' + meter.label + ', channel' + (meter.channels > 1 ? 's ' : ' ') + pairText(meter.first, meter.total) +
           '): peaks left / right, below the loudness of the last three seconds – click for the meter and Auto level'
         : 'Output level: shows the level of the Nano over its USB audio and sets the capture volume from your playing';
-      if (meter.on) {
-        node.innerHTML = '<div class="sc-tile io meter"><span class="vu"><i id="outBarL"></i></span><span class="vu"><i id="outBarR"></i></span></div>' +
-          '<span class="sc-lbl">LUFS</span><span class="sc-sub" id="outRead">–</span>';
-      }
+      node.innerHTML = '<div class="sc-tile io meter"><span class="vu"><i id="outBarL"></i></span><span class="vu"><i id="outBarR"></i></span></div>' +
+        (meter.on ? '<span class="sc-lbl">LUFS</span><span class="sc-sub" id="outRead">–</span>' : '<span class="sc-lbl">Meter</span>');
       node.addEventListener('click', openLevel);
     }
 
@@ -7904,22 +7926,18 @@ function parseSelectedCaptureState(payload) {
           name: state.cabIR.on ? state.currentIR.shortName || 'Cab / IR' : 'Bypassed', icon: 'cab', color: '#F2F2F2',
           state: state.cabIR.on ? 'on' : 'off', target: 'cabCard', toggle: () => $('cabIRToggle').click() },
         fx('post1'), fx('post2'), fx('post3'),
+        { meter: true },
         { io: 'OUT' }
       ];
       box.innerHTML = '';
       nodes.forEach(n => {
         const node = document.createElement('div');
-        if (n.io) {
+        if (n.io || n.meter) {
           node.className = 'sc-node io';
-          node.innerHTML = '<div class="sc-tile io">' + n.io + '</div>';
-          if (n.io === 'OUT') renderOutNode(node);
-          else if (state.connected) {   // IN: a click mutes the input (the Nano's setting)
-            const muted = state.inputMuted === true;
-            node.classList.add('in');
-            node.classList.toggle('muted', muted);
-            node.title = muted ? 'The input is muted – click to bring it back' : 'Input – click to mute it (the Nano\'s setting “Mute input”)';
-            if (muted) node.insertAdjacentHTML('beforeend', '<span class="sc-lbl">Muted</span>');
-            node.addEventListener('click', () => setInputMute(!muted));
+          if (n.meter) renderMeterNode(node);
+          else {
+            node.innerHTML = '<div class="sc-tile io">' + n.io + '</div>';
+            if (state.connected) renderMuteNode(node, n.io === 'IN' ? 'in' : 'out');
           }
           box.appendChild(node);
           return;
