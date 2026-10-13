@@ -782,6 +782,16 @@
     .more-menu .menu-key:empty { display: none; }
     .more-menu button:disabled { opacity: .45; }
     .more-menu button[hidden] { display: none; }
+    :root { --ico-mute: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><path d='M6.5 6.5l11 11'/></g></svg>"); }
+    .more-menu #muteBtn.on { color: #ff8c8c; }
+    /* copy a preset: the name of the copy below the list of presets */
+    .copy-name { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; padding-right: 4px; }
+    .copy-name span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8e9297; white-space: nowrap; }
+    .copy-name input { box-sizing: border-box; min-width: 0; }
+    .slot-row:disabled { opacity: .45; cursor: default; }
+    #copyMessage { white-space: normal; }
+    #copyOverlay .ask-buttons { align-items: center; }
+    #copyStatus { margin-right: auto; }
 
     /* monitor: the Nano's USB sound through another audio device (Mac app) */
     :root { --ico-monitor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9.5h3l4.5-4v13L7 14.5H4z'/><path d='M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11'/></g></svg>"); }
@@ -879,6 +889,14 @@
     .sc-tile.empty { border-style: dashed; color: #4a4f55; }
     .sc-tile.io { width: 38px; height: 38px; margin-top: 11px; border-radius: 50%; font-size: 10px; font-weight: 750; letter-spacing: .08em; color: #8e9297; }
     .sc-node.io { flex: 0 0 44px; cursor: default; }
+    /* IN: a click mutes the Nano's input - muted it is a red "no" sign over the dimmed letters */
+    .sc-node.io.in { cursor: pointer; }
+    .sc-node.io.in:hover .sc-tile { border-color: #8e9297; color: #d6d6d6; }
+    .sc-node.io.in .sc-lbl { margin-top: 11px; }   /* (on the line of the other labels: the round tile is smaller) */
+    .sc-node.io.muted .sc-tile, .sc-node.io.muted:hover .sc-tile { background: rgba(255, 90, 77, .14); border-color: #ff5a4d; border-width: 2px; color: rgba(255, 140, 140, .55);
+      box-shadow: 0 0 16px rgba(255, 90, 77, .35); }
+    .sc-node.io.muted .sc-tile::after { content: ""; position: absolute; width: 2px; height: 36px; background: #ff5a4d; transform: rotate(-45deg); }
+    .sc-node.io.muted .sc-lbl { color: #ff8c8c; }
     .sc-lbl { font-size: 10px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
     .sc-sub { font-size: 11.5px; line-height: 1.25; color: #c9cdd1; max-width: 100%; min-height: 2.5em; text-align: center; overflow: hidden;
               display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
@@ -1417,6 +1435,7 @@
           <button id="importBtn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="ico" style="--icon: var(--ico-import)"></span>Import preset file…<span class="menu-key"></span></button>
           <div class="menu-sep"></div>
           <button id="mc6Btn" title="A bank for the Morningstar MC6 Pro from up to five presets"><span class="ico" style="--icon: var(--ico-controller)"></span>Morningstar MC6 Pro export…</button>
+          <button id="muteBtn" title="The Nano's setting “Mute input”: no sound from the guitar input until it is switched back" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteLabel">Mute input</span></button>
           <button id="monitorBtn" title="Hear the Nano from USB through another audio device (Mac app)" hidden><span class="ico" style="--icon: var(--ico-monitor)"></span>Monitor…</button>
           <div class="menu-sep"></div>
           <button id="refreshBtn"><span class="ico" style="--icon: var(--ico-refresh)"></span>Refresh from the Nano</button>
@@ -1698,6 +1717,19 @@
         <button type="button" id="slotScan" class="push-left">Check usage (1 min)</button>
         <button type="button" id="slotCancel">Cancel</button>
         <button type="button" id="slotOk" class="primary">Load</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="copyOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel slot-panel" role="dialog" aria-modal="true" aria-label="Copy the preset to another slot">
+      <div id="copyMessage" class="ask-message"></div>
+      <div id="copyList" class="slot-list"></div>
+      <label class="copy-name"><span>Name of the copy</span><input id="copyName" class="lib-search" type="text" maxlength="48" autocomplete="off" spellcheck="false"></label>
+      <div class="ask-buttons">
+        <span id="copyStatus" class="slot-status"></span>
+        <button type="button" id="copyCancel">Cancel</button>
+        <button type="button" id="copyOk" class="primary">Copy</button>
       </div>
     </div>
   </div>
@@ -2260,6 +2292,9 @@
       ab: { active: false, side: 'B', A: null, B: null, preset: 0, busy: false },   // A/B compare
       fs: { busy: false, status: '', error: false },   // footswitch assignment dialog
       fourPresetMode: true,   // the Nano's 4-Preset Mode (footswitch slots B), from its state
+      inputMuted: null,   // the Nano's setting "Mute input"; null = not read yet
+      settingsAsked: false,
+      muteBusy: false,
       connected: false,
       selectedPreset: 1,
       presetNames: new Map(),
@@ -2315,7 +2350,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.9.0';
+    const EDITOR_VERSION = '1.10.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2568,6 +2603,9 @@
       resetExpRequests();
       abEnd();
       closeDeviceDialogs();
+      state.inputMuted = null;
+      state.settingsAsked = false;
+      renderInputMute();
       setStatus('Disconnected');
       log('Disconnected.');
     }
@@ -2580,6 +2618,8 @@
       closeFootswitches();
       closeLibraryBrowser();
       closeMic();
+      copyDialog.busy = false;
+      closeCopyPreset();
       if (eqView) eqView.closeDialog();
       $('mc6Overlay').hidden = true;
       if (!$('slotOverlay').hidden && $('slotCancel').onclick) $('slotCancel').onclick();
@@ -2780,6 +2820,7 @@
       levelMarkCheck();
       render();
       presetStateWaiters.slice().forEach(waiter => waiter());
+      if (state.inputMuted === null && !state.settingsAsked) { state.settingsAsked = true; setTimeout(requestSettings, 700); }   // the input mute
 
       log('CURRENT STATE BUFFER len=' + bytes.length);
       log('CURRENT STATE capture=' + (state.currentCapture.name || 'unknown') + ', ir=' + (state.currentIR.shortName || 'unknown'));
@@ -3607,6 +3648,8 @@ function parseSelectedCaptureState(payload) {
       TunerMetering: 128,
       RetrieveSettingsRequest: 65,
       RetrieveSettingsResponse: 66,
+      UpdateSettingsRequest: 67,
+      UpdateSettingsResponse: 68,
       RenamePresetRequest: 111,
       RenamePresetResponse: 112,
       PresetDirtyStateChanged: 115,
@@ -3744,9 +3787,19 @@ function parseSelectedCaptureState(payload) {
         // 17 usbReturnGain (float32, dB): how loud the computer's sound is mixed in; left out = 0 dB
         const usb = fields[17] && fields[17][0] && fields[17][0].wire === 5 ? new DataView(Uint8Array.from(fields[17][0].raw).buffer).getFloat32(0, true) : 0;
         state.usbReturnDb = Number.isFinite(usb) ? clamp(usb, -60, 12) : 0;
+        // 15 muteIn1: the input is muted (left out = not muted)
+        state.inputMuted = Boolean(fields[15] && fields[15][0] && fields[15][0].value);
+        settingsWaiters.splice(0).forEach(resolve => resolve(true));
         jamApplyGain();
         renderJam();
+        renderInputMute();
         if (!$('mc6Overlay').hidden) renderMc6Panel();
+        return true;
+      }
+
+      if (type === MSG.UpdateSettingsResponse) {
+        const fields = framePayloadFields(data);
+        log('Settings update ' + (fields[3] && fields[3][0] && fields[3][0].value === 1 ? 'confirmed' : 'not confirmed'));
         return true;
       }
 
@@ -4624,8 +4677,15 @@ function parseSelectedCaptureState(payload) {
       setTimeout(requestCurrentPresetState, 300);
     }
 
-    // SavePresetRequestMessage { 1: action, 3: presetIndex, 5: name }. "Saved" is only shown when the write went
-    // through and a fresh state read afterwards reports this preset without unsaved changes.
+    // SavePresetRequestMessage { 1: action = UPDATE, 3: presetIndex, 5: name }: the Nano stores what is loaded now on
+    // that preset, under that name.
+    function savePresetFrame(preset, name) {
+      const nameBytes = Array.from(new TextEncoder().encode(name));
+      return buildFrame([0x08, 0x01, 0x18, ...encodeVarint(preset - 1), 0x2A, nameBytes.length, ...nameBytes], 3);
+    }
+
+    // "Saved" is only shown when the write went through and a fresh state read afterwards reports this preset
+    // without unsaved changes.
     async function savePreset() {
       if (!state.connected) { showSaveResult('Not connected', 'error', 'Connect to the Nano first.'); return; }
       if (state.saveBusy) return;
@@ -4634,24 +4694,7 @@ function parseSelectedCaptureState(payload) {
       showSaveResult('Saving…', '', 'Saving preset ' + preset);
       try {
         const name = state.presetNames.get(preset) || ('Preset ' + preset);
-        const nameBytes = new TextEncoder().encode(name);
-        const packet = new Uint8Array(12 + nameBytes.length);
-        let i = 0;
-        packet[i++] = nameBytes.length + 10;
-        packet[i++] = 0xC0;
-        packet[i++] = 0x08;
-        packet[i++] = 0x01;
-        packet[i++] = 0x18;
-        packet[i++] = preset - 1;
-        packet[i++] = 0x2A;
-        packet[i++] = nameBytes.length;
-        packet.set(nameBytes, i);
-        i += nameBytes.length;
-        packet[i++] = 0x03;
-        packet[i++] = 0x00;
-        packet[i++] = 0x00;
-        packet[i++] = 0x00;
-        if (!await writeC304('save preset ' + preset, packet)) {
+        if (!await writeC304('save preset ' + preset, savePresetFrame(preset, name))) {
           showSaveResult('Save failed', 'error', 'The Bluetooth write failed: preset ' + preset + ' was not saved.');
           return;
         }
@@ -4667,6 +4710,169 @@ function parseSelectedCaptureState(payload) {
         state.saveBusy = false;
       }
     }
+
+    // ---- Copy the loaded preset to another slot ----
+    // The same message as Save, with another preset number: the Nano stores what is loaded now (also what is not
+    // saved yet) on the chosen preset, and what was there is replaced. From the last entry of the preset list.
+    // Why a name: the Nano wants every preset name once, with four characters at least.
+    const copyDialog = { target: 0, busy: false };
+
+    function copyNameProblem(name, target) {
+      if (name.length < 4) return 'The name needs at least 4 characters.';
+      if (new TextEncoder().encode(name).length > 64) return 'The name is too long.';
+      const taken = Array.from(state.presetNames.entries()).some(([i, n]) => i !== target && String(n).trim().toLowerCase() === name.toLowerCase());
+      return taken ? 'Another preset has this name - the Nano wants every name once.' : '';
+    }
+
+    // "Name 2", "Name 3" ...: the first that no preset carries
+    function copyNameSuggestion(name) {
+      const base = String(name).replace(/\s+\d+$/, '').slice(0, 28) || 'Preset';
+      for (let n = 2; n < 99; n++) if (!copyNameProblem(base + ' ' + n, 0)) return base + ' ' + n;
+      return base + ' copy';
+    }
+
+    function renderCopyPreset() {
+      const source = state.selectedPreset, name = $('copyName').value.trim();
+      const list = $('copyList');
+      list.innerHTML = '';
+      for (let i = 1; i <= 64; i++) {
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'slot-row' + (i === copyDialog.target ? ' sel' : '');
+        row.disabled = i === source || copyDialog.busy;
+        row.innerHTML = '<span class="no">Preset ' + i + '</span><span>' + escapeHTML(state.presetNames.get(i) || 'Preset ' + i) +
+          (i === source ? ' <span class="no">· this preset</span>' : '') + '</span>' +
+          (i === copyDialog.target ? '<span class="use busy">is replaced by the copy</span>' : '');
+        row.addEventListener('click', () => { copyDialog.target = i; renderCopyPreset(); });
+        list.appendChild(row);
+      }
+      const target = copyDialog.target;
+      const problem = !target ? 'Choose the preset to copy to.' : copyNameProblem(name, target);
+      $('copyStatus').textContent = copyDialog.busy ? 'Copying and checking …' : problem;
+      $('copyOk').textContent = target ? 'Copy to preset ' + target : 'Copy';
+      $('copyOk').disabled = Boolean(problem) || copyDialog.busy;
+      $('copyCancel').disabled = $('copyName').disabled = copyDialog.busy;
+    }
+
+    function openCopyPreset() {
+      if (!state.connected || state.saveBusy) return;
+      const source = state.selectedPreset, name = state.presetNames.get(source) || 'Preset ' + source;
+      copyDialog.target = 0;
+      copyDialog.busy = false;
+      $('copyMessage').innerHTML = '<div class="dlg-title">Copy “' + escapeHTML(name) + '” to another slot</div>' +
+        '<div class="dlg-sub">The preset as it sounds now' + (state.presetDirty ? ' – with your unsaved changes –' : '') +
+        ' is stored on the preset you choose. What is on that preset is replaced.</div>';
+      $('copyName').value = copyNameSuggestion(name);
+      $('copyOverlay').hidden = false;
+      renderCopyPreset();
+      const here = $('copyList').children[source - 1];   // the list opens around the loaded preset
+      if (here) here.scrollIntoView({ block: 'center' });
+    }
+
+    function closeCopyPreset() {
+      if (copyDialog.busy) return;
+      $('copyOverlay').hidden = true;
+    }
+
+    // Reads the list of preset names again; false if the Nano did not send it.
+    async function reloadPresetNames() {
+      state.protocol.metadataLoaded = false;
+      await syncMetadataAndState();
+      const end = Date.now() + 9000;
+      while (state.connected && !state.protocol.feSyncComplete && Date.now() < end) await new Promise(r => setTimeout(r, 100));
+      return Boolean(state.connected && state.protocol.feSyncComplete);
+    }
+
+    async function copyPreset() {
+      const source = state.selectedPreset, target = copyDialog.target, name = $('copyName').value.trim();
+      if (!state.connected || copyDialog.busy || state.saveBusy || !target || target === source || copyNameProblem(name, target)) return;
+      const replaced = state.presetNames.get(target) || 'Preset ' + target;
+      const mark = levelMark(source);   // what is loaded now is levelled
+      copyDialog.busy = state.saveBusy = true;
+      renderCopyPreset();
+      let result = '', kind = 'error';
+      try {
+        if (!await writeC304('copy preset ' + source + ' to ' + target + ' as "' + name + '"', savePresetFrame(target, name))) {
+          result = 'The Bluetooth write failed: nothing was copied.';
+        } else {
+          await new Promise(r => setTimeout(r, 400));
+          // the check: the Nano's own list must name the preset as it was sent
+          if (!await reloadPresetNames()) result = 'The Nano did not answer the check: look at preset ' + target + ' before you rely on the copy.';
+          else if (String(state.presetNames.get(target) || '').trim() !== name) {
+            result = 'Not copied: preset ' + target + ' is still called “' + (state.presetNames.get(target) || '?') + '” on the Nano.';
+          } else {
+            kind = 'ok';
+            result = 'Copied to preset ' + target + ' as “' + name + '” (it replaced “' + replaced + '”).';
+            // levelled with Auto level: the copy is as loud; without a mark the one of the replaced preset goes
+            if (mark) levelStore.marks[target] = { ...mark, name, saved: true }; else delete levelStore.marks[target];
+            saveLevelStore();
+            // the list is followed by a read of the loaded preset: say so if the Nano went over to the copy
+            await waitUntil(() => state.stateMode === 'idle' && !state.protocol.presetLoad, 6000);
+            if (state.selectedPreset === target) result += ' The Nano is on the copy now.';
+          }
+        }
+      } finally {
+        copyDialog.busy = state.saveBusy = false;
+      }
+      log('Copy: ' + result);
+      toast(result, kind, kind === 'ok' ? 4500 : 8000);
+      if (kind === 'ok') $('copyOverlay').hidden = true;
+      renderPresetSelect();
+      if (!$('copyOverlay').hidden) renderCopyPreset();
+    }
+
+    $('copyOk').addEventListener('click', copyPreset);
+    $('copyCancel').addEventListener('click', closeCopyPreset);
+    $('copyName').addEventListener('input', renderCopyPreset);
+    $('copyName').addEventListener('keydown', e => { if (e.key === 'Enter' && !$('copyOk').disabled) copyPreset(); });
+    $('copyOverlay').addEventListener('click', e => { if (e.target === $('copyOverlay')) closeCopyPreset(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('copyOverlay').hidden) closeCopyPreset(); });
+
+    // ---- Mute input ----
+    // The Nano's setting "Mute input" (UpdateSettingsRequest 67 { 12: muteIn1 }; read with the settings, reply field
+    // 15). One setting is sent alone, as the app does it, and a zero is written out - it is the value meant. Shown on
+    // the chain's IN, where a click switches it, and in the "..." menu. It is a setting of the device: it stays muted
+    // until it is switched back, also after the editor is closed.
+    const settingsWaiters = [];
+
+    function requestSettings(tries = 40) {
+      if (!state.connected) return;
+      if (state.stateMode !== 'idle' && tries > 0) { setTimeout(() => requestSettings(tries - 1), 300); return; }   // not into a list that is being read
+      writeC304('Retrieve settings', buildFrame([0x08, 0x03], MSG.RetrieveSettingsRequest));
+    }
+
+    function renderInputMute() {
+      const muted = state.connected && state.inputMuted === true;
+      $('muteBtn').hidden = !state.connected;
+      $('muteBtn').classList.toggle('on', muted);
+      $('muteLabel').textContent = muted ? 'Unmute input' : 'Mute input';
+      renderSignalChain();
+    }
+
+    async function setInputMute(muted) {
+      if (!state.connected || state.muteBusy) return;
+      state.muteBusy = true;
+      state.inputMuted = muted;
+      renderInputMute();
+      try {
+        if (!await writeC304('Mute input ' + (muted ? 'on' : 'off'), buildFrame([0x60, muted ? 1 : 0], MSG.UpdateSettingsRequest))) {
+          toast('The Bluetooth write failed: the input is ' + (muted ? 'not muted.' : 'still muted.'), 'error');
+          state.inputMuted = !muted;
+          return;
+        }
+        // the check: the settings read back must say the same
+        await new Promise(r => setTimeout(r, 350));
+        const answered = new Promise(resolve => { settingsWaiters.push(resolve); setTimeout(() => resolve(false), 3000); });
+        requestSettings();
+        if (!await answered) toast('The Nano did not answer the check - listen whether the input is ' + (muted ? 'muted.' : 'back.'), 'error', 6000);
+        else if (state.inputMuted !== muted) toast('The Nano did not take it: the input is ' + (state.inputMuted ? 'still muted.' : 'not muted.'), 'error', 6000);
+        else toast(muted ? 'Input muted - a click on IN brings it back.' : 'Input on again.', muted ? 'info' : 'ok');
+      } finally {
+        state.muteBusy = false;
+        renderInputMute();
+      }
+    }
+    $('muteBtn').addEventListener('click', () => setInputMute(state.inputMuted !== true));
 
     // Shows the save result on the Save button for a few seconds (details in its tooltip and in the log).
     function showSaveResult(text, kind, detail) {
@@ -5068,6 +5274,13 @@ function parseSelectedCaptureState(payload) {
         if (i === state.selectedPreset) option.selected = true;
         select.appendChild(option);
       }
+      // the last entry is not a preset: it copies the loaded one to another slot
+      const actions = document.createElement('optgroup');
+      actions.label = 'This preset';
+      const copy = new Option('Copy to another slot …', 'copy');
+      copy.disabled = !state.connected;
+      actions.appendChild(copy);
+      select.appendChild(actions);
       if (state.connected && !$('levelOverlay').hidden && !autoLevel.running && !autoLevel.preparing) renderAutoLevel();
     }
 
@@ -7700,6 +7913,14 @@ function parseSelectedCaptureState(payload) {
           node.className = 'sc-node io';
           node.innerHTML = '<div class="sc-tile io">' + n.io + '</div>';
           if (n.io === 'OUT') renderOutNode(node);
+          else if (state.connected) {   // IN: a click mutes the input (the Nano's setting)
+            const muted = state.inputMuted === true;
+            node.classList.add('in');
+            node.classList.toggle('muted', muted);
+            node.title = muted ? 'The input is muted – click to bring it back' : 'Input – click to mute it (the Nano\'s setting “Mute input”)';
+            if (muted) node.insertAdjacentHTML('beforeend', '<span class="sc-lbl">Muted</span>');
+            node.addEventListener('click', () => setInputMute(!muted));
+          }
           box.appendChild(node);
           return;
         }
@@ -7795,7 +8016,10 @@ function parseSelectedCaptureState(payload) {
     $('presetPrev').addEventListener('click', () => selectPreset(Math.max(1, state.selectedPreset - 1)));
     $('presetNext').addEventListener('click', () => selectPreset(Math.min(64, state.selectedPreset + 1)));
     $('copyLogBtn').addEventListener('click', copyLog);
-    $('presetSelect').addEventListener('change', e => selectPreset(Number(e.target.value)));
+    $('presetSelect').addEventListener('change', e => {
+      if (e.target.value === 'copy') { renderPresetSelect(); openCopyPreset(); return; }   // (the list shows the loaded preset again)
+      selectPreset(Number(e.target.value));
+    });
 
     // ---- Morningstar MC6 Pro bank export ----
     // Bank file format (Morningstar editor "singleBank" dump): 24 presets (4 pages x A-F), 32 messages each.

@@ -15,12 +15,18 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 - **Signal chain** at the top, as on the Quad Cortex: Gate → Pre FX 1–2 → Capture → Cab → Post FX 1–3, each block in its
   colour – filled when on, outlined when off, dashed when empty. Click a block to make it light up below,
   **double-click** to switch it on or off
+- **Signal chain** – the round **IN** at its start mutes the Nano's input (the device setting *Mute input*): one
+  click and it turns into a red sign with **Muted** below, one more and the input is back. The same is under **…**.
+  The Nano keeps the setting, also after the editor is closed
 - **Compact top bar**: preset arrows, preset list (a dot marks unsaved changes, and **Save** turns green), save,
   rename and **A/B** in the middle, then icons for tuner, expression, footswitches, MIDI and the jam tracks – hover an
   icon for its name. The **Connect** button shows the connection. **…** (or a click on the connection) holds the rest:
-  preset files (export, import), the MC6 Pro export, refresh, keyboard shortcuts, copy log and disconnect.
+  preset files (export, import), the MC6 Pro export, mute input, refresh, keyboard shortcuts, copy log and disconnect.
   Until the Nano is connected, the editor shows a short connect screen instead of placeholder values
 - **Presets**: switch presets over Bluetooth (no USB cable needed), rename, save (the Save button only shows "Saved" after reading the preset back); follows preset changes made on the pedal
+- **Copy a preset to another slot**: the last entry of the preset list, **Copy to another slot …**, shows the 64
+  presets – choose the one to replace, give the copy a name (the Nano wants every name once) and it is stored there
+  as it sounds now, unsaved changes included. The editor reads the Nano's list again and only then says "Copied"
 - **Footswitches of the Nano**: the footswitch icon opens the four slots **1A, 1B, 2A, 2B** – choose the preset each
   one calls up, or put the loaded preset on a slot with one click. The change is stored on the Nano at once and read
   back as a check; the preset list shows the slot next to the name (B slots need the Nano's 4-Preset Mode)
@@ -311,5 +317,7 @@ Unten im Fenster lässt sich ein **Jamtrack-Player** einblenden: Ordner wählen,
 knapp unter deinen Presets; der Nano Cortex Controller schaltet sie im Looper-Modus mit den Fußschaltern.
 Die EQ-Modelle zeigen eine **Kurve mit Punkten zum Ziehen** statt Knopfreihen, in der Mac-App mit dem Spektrum des
 Nano-Tons dahinter. Der **Monitor** (Mac-App, unter **…**) spielt den USB-Ton des Nano über ein anderes Audiogerät ab.
+Der letzte Eintrag der Preset-Liste **kopiert das geladene Preset auf einen anderen Platz**, und ein Klick auf das
+runde **IN** am Anfang der Signal Chain schaltet den Eingang des Nano stumm (die Geräte-Einstellung „Mute input").
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.
