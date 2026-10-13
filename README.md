@@ -7,6 +7,8 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 > "Nano Cortex", "Quad Cortex" and "Neural DSP" are trademarks of Neural DSP Technologies.
 > The editor writes to your device. Use it at your own risk and keep backups of your presets
 > (for example with the official Cortex Cloud app).
+>
+> The whole Project is done with the help of Claude Code. 
 
 ![Screenshot](docs/screenshot.png)
 
