@@ -71,7 +71,8 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   themselves cannot be transferred over Bluetooth.
 - **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
 - **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs a small tile shows the mic and its place –
-  a click opens the speaker with the five mic types and the positions 1–6; load factory or user IRs from the device library into a slot
+  a click opens the speaker with the five mic types and the positions 1–6 – you hear the choice at once, and **Save**
+  writes it into the preset's cab slot and then stores the preset; load factory or user IRs from the device library into a slot
 - **Monitor** (Mac app, under **…**): plays the Nano's USB sound through another audio device – an audio interface,
   speakers, headphones –, like the audio settings of a standalone plugin
 - **Keyboard shortcuts**: ⌘S save, ← → previous / next preset, ⌘E export, ⌘I import, T tuner, A for A/B, Space for the jam tracks, ? for the overview

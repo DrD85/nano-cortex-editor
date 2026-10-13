@@ -2321,7 +2321,8 @@
         levelDb: 0,
         highPassHz: 20,
         lowPassHz: 20000,
-        paramsLoaded: false
+        paramsLoaded: false,
+        micPending: null   // { cab, mic, position }: a mic that was chosen and is not in the cab slot yet (storeCabMic)
       },
       feBytes: [],
       feTimer: null,
@@ -3041,6 +3042,7 @@
 
       state.cabIR.selectedSlot = slot;
       state.cabIR.on = slot !== 0;
+      state.cabIR.micPending = null;
 
       if (slot > 0) {
         state.cabIR.lastActiveSlot = slot;
@@ -3186,6 +3188,7 @@
     }
     function clearLocalEdit() {
       state.localEdit = false;
+      state.cabIR.micPending = null;
     }
 
     async function setCabIRFloatParam(label, paramId, normalized) {
@@ -3263,7 +3266,53 @@
       payload[0] = payload.length - 2;
 
       markLocalEdit();
+      state.cabIR.micPending = { cab: cabName, mic: micName, position: pos };   // goes into the cab slot with the next save
       await writeC304('Cab mic/position ' + micName + ' pos ' + pos, payload);
+    }
+
+    // The mic and its position are not a value of the preset: they say WHICH factory IR the cab is. The message above
+    // only lets it be heard - a Save after it did not keep it (tried on a Nano, 2026-10-13). What a preset keeps is the
+    // IR of its cab slot. So right before a save the slot gets the IR with this mic, the way a cab is loaded from the
+    // library - SetCabinetSlotContentRequest { 3: cabinetSlot, 4: factory IR { 1: index, 2: name, 3: position, 4: mic } }
+    // -, and the slot is selected again. Resolves with { slot } when it is in the slot, { problem } when not, null when
+    // there was nothing to do. Other presets that use the slot keep their own IR (the Nano takes it from the library).
+    async function storeCabMic() {
+      const want = state.cabIR.micPending;
+      if (!want) return null;
+      if (!state.cabIR.on || !isFactoryCabIR() || !sameName(state.currentIR.shortName, want.cab)) { state.cabIR.micPending = null; return null; }
+      const what = want.mic + ', position ' + want.position;
+      const item = await findInLibrary(['irFactory'], [want.cab]);
+      if (!item) return { problem: 'the cab “' + want.cab + '” was not found in the Nano\'s library, so ' + what + ' was not stored' };
+      // the slot of this preset if it holds this cab - else the cab comes from the library and needs a slot
+      let slot = state.cabIR.stateSlot;
+      if (!(slot >= 1 && slot <= 5) || !sameName(state.irNames.get(slot), want.cab)) slot = await chooseSlot('cab', want.cab + ' (' + what + ')');
+      if (!slot) return { problem: 'no cab slot was chosen, so ' + what + ' was not stored' };
+
+      const nameBytes = Array.from(new TextEncoder().encode(want.cab)), micBytes = Array.from(new TextEncoder().encode(want.mic));
+      const identifier = [0x08, ...encodeVarint(item.index), 0x12, ...encodeVarint(nameBytes.length), ...nameBytes,
+        0x18, want.position - 1, 0x22, ...encodeVarint(micBytes.length), ...micBytes];
+      const frame = buildFrame([0x18, ...encodeVarint(slot - 1), 0x22, ...encodeVarint(identifier.length), ...identifier], MSG.SetCabinetSlotContentRequest);
+      if (frame.length - 2 > 255) return { problem: 'the cab name is too long, so ' + what + ' was not stored' };
+
+      const answer = new Promise(resolve => {
+        state.pendingCabAssignment = { slot, name: want.cab, resolve };
+        setTimeout(() => resolve({ ok: false, message: 'the Nano did not answer' }), 6000);
+      });
+      if (!await writeC304('Cab slot ' + slot + ': "' + want.cab + '" with ' + what, frame)) {
+        state.pendingCabAssignment = null;
+        return { problem: 'the Bluetooth write failed, so ' + what + ' was not stored' };
+      }
+      const result = await answer;
+      if (state.pendingCabAssignment && state.pendingCabAssignment.resolve) state.pendingCabAssignment = null;
+      if (!result.ok) return { problem: 'the Nano did not take ' + what + ' into cab slot ' + slot + ' (' + result.message + ')' };
+
+      // the slot again, so that the preset has what is in it now (as after loading a cab from the library)
+      state.irNames.set(slot, want.cab);
+      state.cabIR.stateSlot = state.cabIR.selectedSlot = state.cabIR.lastActiveSlot = slot;
+      await writeC304('Cab/IR slot select ' + slot, new Uint8Array([0x08, 0xC0, 0x18, 0x03, 0x20, slot, 0x1C, 0x00, 0x00, 0x00]));
+      await new Promise(r => setTimeout(r, 500));
+      state.cabIR.micPending = null;
+      return { slot, text: 'Cab slot ' + slot + ' now holds ' + want.cab + ' with ' + what + '.' };
     }
 
     function setBlockToNone(blockKey) {
@@ -4599,6 +4648,12 @@ function parseSelectedCaptureState(payload) {
       const ok = fields[3] && fields[3][0] && fields[3][0].value === 1;
       const pending = state.pendingCabAssignment;
       state.pendingCabAssignment = null;
+      if (pending && pending.resolve) {   // the mic written into the slot before a save (storeCabMic)
+        const message = ok ? '' : fields[4] && fields[4][0] ? utf8(fields[4][0].raw) : 'refused';
+        log('Cab slot ' + pending.slot + (ok ? ' written' : ' NOT written: ' + message));
+        pending.resolve({ ok, message });
+        return;
+      }
 
       if (!ok) {
         const message = fields[4] && fields[4][0] ? utf8(fields[4][0].raw) : hex(data);
@@ -4719,6 +4774,8 @@ function parseSelectedCaptureState(payload) {
       showSaveResult('Saving…', '', 'Saving preset ' + preset);
       try {
         const name = state.presetNames.get(preset) || ('Preset ' + preset);
+        const mic = await storeCabMic();   // a mic that was tried out goes into the cab slot first
+        if (!state.connected) return;
         if (!await writeC304('save preset ' + preset, savePresetFrame(preset, name))) {
           showSaveResult('Save failed', 'error', 'The Bluetooth write failed: preset ' + preset + ' was not saved.');
           return;
@@ -4728,10 +4785,13 @@ function parseSelectedCaptureState(payload) {
         requestCurrentPresetState();
         if (!await checked) { showSaveResult('Not confirmed', 'error', 'The Nano did not answer the check after saving preset ' + preset + '.'); return; }
         if (state.presetDirty) { showSaveResult('Not confirmed', 'error', 'The Nano still reports unsaved changes in preset ' + preset + '.'); return; }
+        const micLeft = mic && mic.problem ? state.cabIR.micPending : null;
         clearLocalEdit();
+        if (micLeft) { state.cabIR.micPending = micLeft; state.localEdit = true; }   // the mic is still to be saved: Save tries it again
         levelMarkCheck();   // a levelled mark of this preset counts from now on
         renderPresetSelect();
-        showSaveResult('Saved ✓', 'ok', 'Preset ' + preset + ' saved and checked.');
+        if (mic && mic.problem) showSaveResult('Mic not saved', 'error', 'Preset ' + preset + ' is saved, but without the new mic: ' + mic.problem + '.');
+        else showSaveResult('Saved ✓', 'ok', 'Preset ' + preset + ' saved and checked.' + (mic ? ' ' + mic.text : ''));
       } finally {
         state.saveBusy = false;
       }
@@ -4818,6 +4878,8 @@ function parseSelectedCaptureState(payload) {
       renderCopyPreset();
       let result = '', kind = 'error';
       try {
+        const mic = await storeCabMic();   // a mic that was tried out goes into the cab slot first
+        if (mic && mic.problem) toast('The copy gets the mic as it was stored before: ' + mic.problem + '.', 'error', 8000);
         if (!await writeC304('copy preset ' + source + ' to ' + target + ' as "' + name + '"', savePresetFrame(target, name))) {
           result = 'The Bluetooth write failed: nothing was copied.';
         } else {
