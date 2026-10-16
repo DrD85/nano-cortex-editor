@@ -2356,7 +2356,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.10.0';
+    const EDITOR_VERSION = '1.11.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2922,6 +2922,11 @@
       });
     }
 
+    // What an effect was last switched to (here or on the controller) while the Nano's report has not followed it.
+    // The Nano reports an effect whose on/off is on the expression pedal (heel-toe) as the pedal has it, not as it
+    // was switched over Bluetooth - the effect sounds anyway. Going by the report, the next click sent "on" again.
+    const fxSwitch = { switched: {}, reported: {}, preset: 0 };
+
     function applyFXEnabledStatesFromCurrentState(fields) {
       const entry = fields[31] && fields[31][0] ? fields[31][0] : null;
       if (!entry || !entry.raw || entry.raw.length < 5) {
@@ -2930,9 +2935,21 @@
       }
 
       const keys = ['pre1', 'pre2', 'post1', 'post2', 'post3'];
+      const otherPreset = fxSwitch.preset !== state.selectedPreset;
+      fxSwitch.preset = state.selectedPreset;
 
       keys.forEach((key, index) => {
-        state.blocks[key].on = entry.raw[index] === 0;
+        const reported = entry.raw[index] === 0, switched = fxSwitch.switched[key];
+        if (otherPreset || reported !== fxSwitch.reported[key] || reported === switched) {
+          delete fxSwitch.switched[key];   // the report moved or agrees: it counts
+          state.blocks[key].on = reported;
+        } else if (switched !== undefined) {
+          log(state.blocks[key].title + ' reported ' + (reported ? 'on' : 'off') + ', switched ' + (switched ? 'on' : 'off') + ' - stays (expression pedal?)');
+          state.blocks[key].on = switched;
+        } else {
+          state.blocks[key].on = reported;
+        }
+        fxSwitch.reported[key] = reported;
       });
 
       log('FX bypass states: ' + keys.map((key, i) => key + '=' + (entry.raw[i] === 0 ? 'on' : 'off')).join(', '));
@@ -3787,6 +3804,7 @@ function parseSelectedCaptureState(payload) {
       RenamePresetRequest: 111,
       RenamePresetResponse: 112,
       PresetDirtyStateChanged: 115,
+      BypassControl: 31,
       // not the Nano's: the Nano Cortex Controller tells the editor which of its footswitches was pressed in looper mode
       ControllerSwitch: 0x4E430001
     };
@@ -3895,6 +3913,24 @@ function parseSelectedCaptureState(payload) {
         renderPresetSelect();
         writeC304('Preset change ack', PRESET_CHANGE_ACK);
         beginPresetLoad();
+        return true;
+      }
+
+      if (type === MSG.BypassControl) {
+        // The controller switched an effect (footswitch): BypassControl { 1: 1, 3: slot 4-8, 4: 0 = on }. The Nano's
+        // own short type-31 messages carry no slot and are left alone.
+        const fields = framePayloadFields(data);
+        const value = n => fields[n] && fields[n][0] ? fields[n][0].value : 0;
+        const key = FX_BLOCK_KEYS[value(3) - 4];
+        if (value(1) !== 1 || !key) return false;
+        const block = state.blocks[key], on = value(4) === 0;
+        fxSwitch.switched[key] = on;
+        log('Controller: ' + block.title + ' ' + (on ? 'on' : 'off'));
+        if (block.on !== on) {
+          block.on = on;
+          render();
+          if (on && !state.fileBusy) readAfterEnable(key);
+        }
         return true;
       }
 
@@ -4029,8 +4065,14 @@ function parseSelectedCaptureState(payload) {
       // { 3: includeFactoryCaptures, 4: includeFactoryImpulseResponses, 5: includeUserCaptures, 6: includeUserImpulseResponses }
       writeC304('Library content request', buildFrame([0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x30, 0x01], MSG.RetrieveLibraryContentRequest));
 
-      // Give up waiting if nothing arrives.
-      setTimeout(() => { if (state.stateMode === 'library' && state.libraryBytes.length === 0) state.stateMode = 'idle'; }, 4000);
+      // Give up waiting if nothing arrives (opening the library browser asks again). Through the controller the first
+      // packet comes only once the Nano has sent the whole reply (about 3.3 s for 27 KB) - after 4 s the reply was
+      // taken for something else and lost.
+      setTimeout(() => {
+        if (state.stateMode !== 'library' || state.libraryBytes.length !== 0) return;
+        state.stateMode = 'idle';
+        log('Library content: no reply');
+      }, state.viaController ? 15000 : 4000);
     }
 
     function utf8(bytes) {
@@ -4459,9 +4501,16 @@ function parseSelectedCaptureState(payload) {
       return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
     }
 
+    // The tag a capture is grouped by: the first two words of its name ("FNDR BFPRO VB Clean" -> "FNDR BFPRO"), which
+    // name the amp or pedal. Compared without case.
+    function captureGroup(name) {
+      return String(name || '').trim().split(/\s+/).slice(0, 2).join(' ');
+    }
+
     function libraryEntries() {
       return state.library.factory.map(item => ({ ...item, kind: 'factory' }))
         .concat(state.library.user.map(item => ({ ...item, kind: 'user' })))
+        .map(item => ({ ...item, group: captureGroup(item.name), groupKey: captureGroup(item.name).toUpperCase() }))
         .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
     }
 
@@ -4473,7 +4522,7 @@ function parseSelectedCaptureState(payload) {
         (skip === 'source' || f.source === 'all' || item.kind === f.source) &&
         (skip === 'type' || f.type === 'all' || captureTypeInfo(item.type).key === f.type) &&
         (skip === 'instrument' || f.instrument === 'all' || item.instrument === f.instrument) &&
-        (skip === 'tags' || Array.from(f.tags).every(tag => item.tags.includes(tag))) &&
+        (skip === 'tags' || !f.tags.size || f.tags.has(item.groupKey)) &&
         (!q || [item.name, item.author, item.instrument, item.description, ...item.tags].some(v => String(v).toLowerCase().includes(q)))
       );
     }
@@ -4515,14 +4564,19 @@ function parseSelectedCaptureState(payload) {
       renderChipRow('libInstruments', 'Instrument', [{ text: 'All', count: byInstrument.length, active: f.instrument === 'all', onClick: () => set({ instrument: 'all' }) }]
         .concat(instruments.map(inst => ({ text: capitalize(inst), count: byInstrument.filter(i => i.instrument === inst).length, active: f.instrument === inst, onClick: () => set({ instrument: f.instrument === inst ? 'all' : inst }) }))));
 
-      // Most frequent tags among the current results (selected tags always shown).
-      const tagCounts = new Map();
-      filterLibrary(entries, 'tags').forEach(item => item.tags.forEach(tag => tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)));
-      const tags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 30).map(([tag]) => tag);
-      f.tags.forEach(tag => { if (!tags.includes(tag)) tags.unshift(tag); });
-      const toggleTag = tag => { if (f.tags.has(tag)) f.tags.delete(tag); else f.tags.add(tag); renderLibraryBrowser(); };
-      renderChipRow('libTags', 'Tags', tags.length
-        ? tags.map(tag => ({ text: tag, count: tagCounts.get(tag) || 0, active: f.tags.has(tag), onClick: () => toggleTag(tag) }))
+      // The groups (first two words of the name) among the current results, alphabetically; several can be chosen
+      // (either of them). The Nano's own tags are only searched, not shown.
+      const groups = new Map();   // key -> { text, count }
+      filterLibrary(entries, 'tags').forEach(item => {
+        const group = groups.get(item.groupKey) || { text: item.group, count: 0 };
+        group.count++;
+        groups.set(item.groupKey, group);
+      });
+      entries.forEach(item => { if (f.tags.has(item.groupKey) && !groups.has(item.groupKey)) groups.set(item.groupKey, { text: item.group, count: 0 }); });
+      const toggleTag = key => { if (f.tags.has(key)) f.tags.delete(key); else f.tags.add(key); renderLibraryBrowser(); };
+      renderChipRow('libTags', 'Tags', groups.size
+        ? Array.from(groups.entries()).sort((a, b) => a[1].text.localeCompare(b[1].text, undefined, { numeric: true, sensitivity: 'base' }))
+          .map(([key, group]) => ({ text: group.text, count: group.count, active: f.tags.has(key), onClick: () => toggleTag(key) }))
         : [{ text: 'No tags', active: false, onClick: () => {} }]);
 
       const results = filterLibrary(entries);
@@ -4550,7 +4604,7 @@ function parseSelectedCaptureState(payload) {
         const type = captureTypeInfo(item.type);
         const meta = [item.author, capitalize(item.instrument), type.label, item.kind === 'user' ? 'User' : 'Factory'].filter(Boolean)
           .map(v => '<span>' + escapeHTML(v) + '</span>').join('<span>·</span>');
-        const tagsHTML = item.tags.map(tag => '<span class="lib-tag' + (f.tags.has(tag) ? ' hit' : '') + '">' + escapeHTML(tag) + '</span>').join('');
+        const tagsHTML = '<span class="lib-tag' + (f.tags.has(item.groupKey) ? ' hit' : '') + '">' + escapeHTML(item.group) + '</span>';
         const row = document.createElement('button');
         row.className = 'lib-item' + (item.name.trim().toLowerCase() === currentName ? ' current' : '');
         row.title = item.description || item.name;
@@ -4566,6 +4620,7 @@ function parseSelectedCaptureState(payload) {
 
     function openLibraryBrowser() {
       $('libraryOverlay').hidden = false;
+      if (state.connected && !state.library.loaded && state.stateMode !== 'library') requestLibraryContent();   // the first request got no reply
       $('librarySearch').value = state.libBrowser.q;
       renderLibraryBrowser();
       $('librarySearch').focus();
@@ -5183,6 +5238,7 @@ function parseSelectedCaptureState(payload) {
       }
 
       const value = enabled ? 0x00 : 0x01;
+      fxSwitch.switched[blockKey] = enabled;
 
       const sent = await writeC304(
         cfg.label + ' ' + (enabled ? 'ON' : 'OFF'),
