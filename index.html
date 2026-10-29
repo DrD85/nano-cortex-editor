@@ -1859,6 +1859,7 @@
       <div class="tuner-head">
         <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-list)"></span><h2 class="dlg-title">Shared presets</h2></div>
         <div class="head-actions">
+          <button id="sharedRefresh" class="btn-small" title="Ask GitHub again – for a preset that was just shared">Refresh</button>
           <button id="sharedShare" class="btn-small" title="Share the current preset on GitHub">Share this preset…</button>
           <button id="sharedClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
         </div>
@@ -7060,13 +7061,13 @@ function parseSelectedCaptureState(payload) {
 
     // ---- Shared presets (GitHub) ----
     // Presets are shared as issues of the editor's project on GitHub, written with the form
-    // .github/ISSUE_TEMPLATE/preset.yml (label "preset"): name, short description, the exact name of the capture and
-    // where to get it, and the preset file. The editor lists the open ones (GitHub's API without login: 60 requests an
-    // hour) and checks for each whether its capture and cab are on this Nano - in a slot, in its library (the import
-    // loads them), or missing, with the exact name to look for. Closing an issue (or taking its label away) takes a
-    // preset off the list.
+    // .github/ISSUE_TEMPLATE/preset.yml: name, short description, the exact name of the capture and where to get it,
+    // and the preset file. The editor lists every open issue that holds a preset - with or without the label
+    // "preset", which GitHub only gives when the label exists (the first two presets came without it) - through
+    // GitHub's API without login (60 requests an hour), and checks for each whether its capture and cab are on this
+    // Nano: in a slot, in its library (the import loads them), or missing, with the exact name to look for. Closing an
+    // issue takes a preset off the list.
     const SHARE_REPO = 'DrD85/nano-cortex-editor';
-    const SHARE_LABEL = 'preset';
     const SHARE_FIELDS = { 'Preset name': 'name', 'Short description': 'description', 'Capture – exact name': 'capture',
       'Where to get the capture': 'source', 'Cab / IR': 'cab', 'Guitar or bass': 'instrument', 'Preset file': 'file' };
     const SHARE_URL_MAX = 6000;   // a longer form link goes without the preset (it is on the clipboard)
@@ -7127,7 +7128,7 @@ function parseSelectedCaptureState(payload) {
       shared.error = '';
       renderShared();
       try {
-        const res = await fetch('https://api.github.com/repos/' + SHARE_REPO + '/issues?labels=' + SHARE_LABEL + '&state=open&per_page=100',
+        const res = await fetch('https://api.github.com/repos/' + SHARE_REPO + '/issues?state=open&per_page=100',
           { headers: { Accept: 'application/vnd.github+json' } });
         if (res.status === 403 || res.status === 429) throw new Error('GitHub lets a computer without login ask 60 times an hour – try again in a while.');
         if (!res.ok) throw new Error('GitHub answered with ' + res.status + '.');
@@ -7218,7 +7219,8 @@ function parseSelectedCaptureState(payload) {
       const items = (shared.items || []).filter(item => !q || [item.name, item.description, item.captureText, item.source, item.instrument, item.user,
         item.data.capture && item.data.capture.name, item.data.cab && item.data.cab.name,
         ...FX_BLOCK_KEYS.map(key => item.data.fx && item.data.fx[key] && item.data.fx[key].model)].join(' ').toLowerCase().includes(q));
-      if (shared.loading && !shared.items) count.textContent = 'Loading the shared presets from GitHub …';
+      $('sharedRefresh').disabled = shared.loading;
+      if (shared.loading) count.textContent = 'Loading the shared presets from GitHub …';
       else if (shared.error) count.textContent = shared.error;
       else if (shared.items) count.textContent = items.length + (q ? ' of ' + shared.items.length : '') + ' shared preset' + (shared.items.length === 1 ? '' : 's') +
         ' – what each needs is checked against your Nano' + (state.connected ? '.' : ' once it is connected.');
@@ -7256,6 +7258,7 @@ function parseSelectedCaptureState(payload) {
     });
     $('sharedSearch').addEventListener('input', e => { shared.q = e.target.value; renderShared(); });
     $('sharedClose').addEventListener('click', closeShared);
+    $('sharedRefresh').addEventListener('click', () => loadShared(true));
     $('sharedShare').addEventListener('click', () => { closeShared(); openShare(); });
     $('sharedOverlay').addEventListener('click', e => { if (e.target === $('sharedOverlay')) closeShared(); });
     $('sharedBtn').addEventListener('click', openShared);

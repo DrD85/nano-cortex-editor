@@ -56,10 +56,12 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 - **Output level** (Mac app, Nano connected with a USB-C cable as well): a small stereo meter before the **OUT** of the
   signal chain shows the Nano's sound from its USB audio (channels 3/4) – peaks left and right, below them the loudness in
   LUFS. Click it for the large meter. macOS asks once for the audio input ("microphone"); nothing is recorded
-- **Auto level**: choose **Clean**, **Drive**, **Solo** or **Fuzz**, press **Start** and play for four seconds – with
-  Level at 10 (full output), the capture volume is set so that the preset lands on the loudness of its kind (clean
-  lowest, solo about 3 dB above drive) and its peaks stay below full scale. The four targets can be changed;
-  **Only measure** reads a preset you like and can take it as the target
+- **Auto level**: choose **Clean**, **Edge**, **Drive**, **Fuzz** or **Lead**, press **Start** and play for four
+  seconds – with Level at 10 (full output), the capture volume is set so that the preset lands on the loudness of its
+  kind and its peaks stay below full scale. The targets follow the dynamics of a band: Clean is the quietest, Edge,
+  Drive and Fuzz sound a little louder, Lead stands out over Drive. **Quiet** (at home) or **Rehearsal** (loud with the
+  band) corrects for how the ear hears at that volume. **Only measure** reads a preset you like and can take it as
+  the target
 - **Jam tracks**: a player along the bottom of the window (the note symbol). Choose the folder with your backing
   tracks once: every track is measured and played at one loudness just below your presets, so you can play along
   without touching a volume – the files stay as they are. A track that still sits differently against the guitar
@@ -164,16 +166,27 @@ recorded or sent anywhere.
   of playing (pauses do not count) the capture volume moves by the distance to the target, at most so far that the
   peaks stay 1 dB below full scale. **Undo** takes it back, **Save** keeps it. If the capture volume reaches the end of
   its range (−24 to +12 dB), the note says how much is missing.
-- **Level at 10**: the signal on USB follows the preset's Level (the LEVEL knob on the Nano). So Auto level first reads
+- **Level at 10**: the signal on USB follows the Nano's Level (its LEVEL knob, the master volume). So Auto level first reads
   the preset from the Nano and measures with Level at 10, the full output, and leaves it there – the capture volume
   alone sets how loud a preset is, and all presets compare. If Level is lower, the first press says so and the second
   sets it: that gets louder, so turn your monitors down first. Auto level changes nothing else.
 - **Levelled presets**: the editor remembers for each preset what it was levelled as and how loud it measured. The
-  preset list shows it behind the name – `✓ Drive −19.0` on target, `Drive −21.3 (−2.3)` beside it – once the preset
+  preset list shows it behind the name – `✓ Drive −17.5` on target, `Drive −19.8 (−2.3)` beside it – once the preset
   is saved. The note goes when the saved preset no longer fits it (another capture volume, Level off 10) or with
   **Forget** in the dialog. It is kept in this browser or app, not on the Nano.
-- **Targets**: Clean −20, Drive −19, Solo −16 and Fuzz −19 LUFS are a starting point. They can be typed in; with
-  **Only measure** on a preset you like and *Take … as the target* all four move by the same amount.
+- **Targets**: made the same way as in the LUFS Meter, of three parts:
+  - **Clean**, the quietest sound, at **−20 LUFS**;
+  - **steps** – how much louder a sound should *sound* than Clean: Edge **+1.5 dB**, Drive and Fuzz **+3 dB**, Lead
+    **+3 dB over Drive**;
+  - the **profile** of where you play. At equal LUFS the mid-heavy sounds seem louder than Clean, at low volume more
+    than at high volume (equal-loudness contours, ISO 226). **Quiet** – at home, about 60–75 dB at your ears – takes
+    2 dB off Drive and Lead, 1 dB off Fuzz and 0.5 dB off Edge; **Rehearsal** – with the band, about 95–105 dB – takes
+    0.5 dB off each of them.
+
+  In Rehearsal that gives Clean −20, Edge −19, Drive −17.5, Fuzz −17.5 and Lead −14.5 LUFS; in Quiet Clean −20, Edge
+  −19, Drive −19, Fuzz −18 and Lead −16. The level of Clean and the steps can be typed in; *Take … as the target* after
+  **Only measure** moves the level of Clean and all others with it. Presets levelled as *Solo* before 1.12.0 count as
+  *Lead*. The jam tracks follow the Drive target.
 
 **Mac app or browser?** Channels 3/4 need the Mac app: it reads the input with a small helper
 (`mac-app/native/nano-meter.swift`). A browser on the Mac opens every input with more than two channels as stereo, so
@@ -192,7 +205,8 @@ m4a (AAC), wav, flac and ogg; the Mac app also plays **Apple Lossless** (m4a), A
 
 - **One level for all tracks:** each track is measured once (integrated loudness, ITU-R BS.1770, the same scale as
   the output meter) and then played with the gain that brings it to the level shown in the player. That level is
-  counted from the **Drive** target of Auto level, 2 LU below it to begin with (−21 LUFS); **−** and **+** of
+  counted from the **Drive** target of Auto level, 2 LU below it to begin with (−19.5 LUFS with the Rehearsal targets, −21 with
+  Quiet); **−** and **+** of
   *LUFS · all* move all tracks together. The files are not changed, and the measurements are remembered.
 - **The bass counts less:** of two tracks at the same LUFS, the one with less bass has more of its sound where the
   guitar plays, and seems louder against it. The tracks are therefore matched on their loudness without the bass
@@ -270,21 +284,25 @@ the Nano to the Mac is all it needs; no Bluetooth.
 
 ## Shared presets
 
-Presets are shared on GitHub, as issues of this project with the label `preset` – a small upload platform without a
-server of its own. Sharing needs a free GitHub account; looking and loading does not.
+Presets are shared on GitHub, as issues of this project made with the form *Share a preset* – a small upload platform
+without a server of its own. Sharing needs a free GitHub account; looking and loading does not.
+
+![Shared presets](docs/shared-presets.png)
 
 - **Load one:** **…** → **Shared presets**. Each card shows the description, who shared it, the capture with its exact
   name and where to get it (factory capture or Cortex Cloud and who made it), the cab, the effects – and whether your
   Nano has what the preset needs: *✓ On your Nano*, *In your Nano's library* (the import puts it into a slot) or
   *Missing on your Nano* (with **Copy name**, to look for it in Cortex Cloud). **Load into preset N** works like
-  importing a file: nothing is stored until you press **Save**. Questions and 👍 go to **On GitHub**.
+  importing a file: nothing is stored until you press **Save**. Questions and 👍 go to **On GitHub**; **Refresh** asks
+  GitHub again (for a preset that was just shared).
 - **Share one:** **…** → **Share this preset**. The editor reads the preset like for an export, puts it on the
   clipboard and opens the form [Share a preset](https://github.com/DrD85/nano-cortex-editor/issues/new?template=preset.yml)
   in the browser with the name, the capture, where to get it and the cab filled in. Paste the preset into *Preset
   file* if it is not filled in already, write a short description and submit.
-- **For the project:** the label `preset` must exist (Issues → Labels), else the form cannot set it and the editor
-  does not list the preset. Closing an issue, or taking its label away, takes a preset off the list. Without login,
-  GitHub answers a computer 60 times an hour; the editor asks once when the list opens and keeps it for ten minutes.
+- **For the project:** the editor lists every open issue that holds a preset; closing an issue takes it off the list.
+  The form also gives the label `preset` once that label exists (Issues → Labels) – handy for filtering on GitHub,
+  not needed by the editor. Without login, GitHub answers a computer 60 times an hour; the editor asks once when the
+  list opens and keeps it for ten minutes, unless you press **Refresh**.
 
 ## MIDI controller
 
@@ -344,7 +362,8 @@ Captures und Cabs lädst du aus der Library des Geräts. Dazu gibt es einen Tune
 für das Expression-Pedal und die Steuerung per MIDI-Controller mit MIDI Learn.
 Mit **A | B** vergleichst du den gemerkten Stand mit deinen Änderungen. Ist der Nano zusätzlich per USB-C verbunden,
 zeigt die Mac-App seinen Ausgangspegel (USB-Kanäle 3/4) und stellt mit **Auto level** die Capture-Lautstärke nach ein
-paar Sekunden Spielen passend für Clean, Drive, Solo oder Fuzz ein. Im Browser kommen am Mac nur die Kanäle 1/2 (DI) an.
+paar Sekunden Spielen passend für Clean, Edge, Drive, Fuzz oder Lead ein – für leise zu Hause (Quiet) oder laut mit
+der Band (Rehearsal). Im Browser kommen am Mac nur die Kanäle 1/2 (DI) an.
 Unten im Fenster lässt sich ein **Jamtrack-Player** einblenden: Ordner wählen, und alle Tracks laufen gleich laut,
 knapp unter deinen Presets; der Nano Cortex Controller schaltet sie im Looper-Modus mit den Fußschaltern.
 Die EQ-Modelle zeigen eine **Kurve mit Punkten zum Ziehen** statt Knopfreihen, in der Mac-App mit dem Spektrum des
