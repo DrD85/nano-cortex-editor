@@ -1,0 +1,69 @@
+name: Share a preset
+description: Share a Nano Cortex preset made with the editor – with a short description and the exact capture it needs.
+title: "[Preset] "
+labels: ["preset"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Shared presets appear in the editor under **… → Shared presets**, where anyone can load them into their Nano.
+        The easiest way is **… → Share this preset** in the editor: it fills in this form and puts the preset on the clipboard.
+
+        Captures cannot travel with a preset – only their name does. So please give the **exact name** of the capture, as the
+        Nano and Cortex Cloud show it, and where others can get it.
+  - type: input
+    id: name
+    attributes:
+      label: Preset name
+      placeholder: e.g. Glass Lead
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Short description
+      description: The sound, what it is good for, the guitar and pickups you used, tips (two or three sentences are enough).
+      placeholder: Bright lead with a short delay – made for single coils on the neck pickup. Turn the gain down for rhythm.
+    validations:
+      required: true
+  - type: input
+    id: capture
+    attributes:
+      label: Capture – exact name
+      description: Exactly as the Nano and Cortex Cloud show it – others search for it by this name.
+      placeholder: e.g. Brit 800 Crunch
+    validations:
+      required: true
+  - type: input
+    id: capture_source
+    attributes:
+      label: Where to get the capture
+      description: Factory capture (comes with the Nano), or Cortex Cloud and who made it.
+      placeholder: e.g. Factory capture – comes with the Nano / Cortex Cloud – by username
+    validations:
+      required: true
+  - type: input
+    id: cab
+    attributes:
+      label: Cab / IR
+      placeholder: e.g. 412 Brit Green · Ribbon 160, position 5
+  - type: input
+    id: instrument
+    attributes:
+      label: Guitar or bass
+      placeholder: e.g. Strat, single coils
+  - type: textarea
+    id: preset
+    attributes:
+      label: Preset file
+      description: Paste the preset here (⌘V / Ctrl+V) – the editor's "Share this preset" put it on the clipboard. Or open an exported .nano-preset.json file in a text editor and paste its content.
+      render: json
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Sharing
+      options:
+        - label: I made this preset or may share it. It holds no Neural DSP files – captures and IRs go by name only.
+          required: true

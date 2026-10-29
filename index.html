@@ -598,6 +598,41 @@
     .lib-tag.hit { background: #f2f2f2; color: #000; border-color: #f2f2f2; }
     .lib-empty { color: var(--muted); padding: 30px 0; text-align: center; }
 
+    /* shared presets: cards from GitHub, the capture and cab of each checked against the Nano */
+    .shared-panel { grid-template-rows: auto auto auto minmax(0, 1fr); }
+    .shared-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)); gap: 12px; align-content: start;
+      overflow-y: auto; padding: 2px 4px 2px 0; }
+    .shared-list .lib-empty { grid-column: 1 / -1; }
+    .shared-card { display: grid; gap: 11px; align-content: start; padding: 15px 16px; border: 1px solid #262626; border-radius: 12px; background: #121212; }
+    .shared-top h3 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: 0; text-transform: none; color: #f2f2f2; overflow-wrap: anywhere; }
+    .shared-by { margin-top: 3px; color: #8e9297; font-size: 12px; }
+    .shared-desc { color: #c9cdd2; font-size: 13px; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+    .shared-need { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 9px 10px; align-items: start; font-size: 13px; }
+    .shared-need .k { color: #8e9297; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; padding-top: 3px; }
+    .shared-need .v { min-width: 0; overflow-wrap: anywhere; }
+    .shared-need .v strong { color: #f2f2f2; font-weight: 600; }
+    .shared-need .src { display: block; margin-top: 2px; color: #8e9297; font-size: 12px; }
+    .shared-state { display: flex; width: fit-content; max-width: 100%; align-items: center; gap: 6px; margin-top: 5px; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; }
+    .shared-state.ok { background: rgba(69, 248, 98, .12); color: #7ff593; }
+    .shared-state.load { background: rgba(10, 116, 224, .2); color: #8cc2ff; }
+    .shared-state.missing { background: rgba(255, 176, 46, .15); color: #ffc560; }
+    .shared-state.unknown, .shared-state.none { background: #1c1c1c; color: #9aa0a6; }
+    .shared-copy { margin-left: 8px; padding: 1px 8px; height: auto; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+    .shared-fx { display: flex; flex-wrap: wrap; gap: 6px; }
+    .shared-fx span { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; border: 1px solid #2a2a2a; background: #171717;
+      color: #d6d6d6; font-size: 11.5px; }
+    .shared-fx span i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+    .shared-fx span.off { color: #80858b; }
+    .shared-fx span.off i { background: none; box-shadow: inset 0 0 0 1.5px var(--c); }
+    .shared-actions { display: flex; align-items: center; gap: 8px; }
+    .shared-actions .likes { margin-right: auto; color: #8e9297; font-size: 12px; }
+    .shared-actions button { padding: 7px 13px; font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+    #shareMessage { white-space: normal; }
+    .share-steps { margin: 10px 0 0; padding-left: 20px; color: #c9cdd2; font-size: 13px; font-weight: 400; line-height: 1.55; }
+    .share-warn { padding: 10px 12px; border-radius: 9px; background: rgba(255, 176, 46, .1); color: #ffc560; font-size: 12.5px; line-height: 1.45; }
+    .share-warn[hidden] { display: none; }
+
     .exp-btn .fx-icon { --block-color: #f2f2f2; }
     .exp-panel { width: min(1080px, calc(100vw - 32px)); grid-template-rows: auto auto minmax(0, 1fr) auto; }
     .exp-list { overflow-y: auto; padding-right: 4px; display: grid; gap: 8px; align-content: start; }
@@ -784,6 +819,7 @@
     .more-menu button[hidden] { display: none; }
     :root { --ico-mute: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><path d='M6.5 6.5l11 11'/></g></svg>"); }
     .more-menu #muteInBtn.on, .more-menu #muteOutBtn.on { color: #ff8c8c; }
+    :root { --ico-share: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3.5v11'/><path d='M7.5 8 12 3.5 16.5 8'/><path d='M5 12.5V19a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-6.5'/></g></svg>"); }
     /* copy a preset: the name of the copy below the list of presets */
     .copy-name { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; padding-right: 4px; }
     .copy-name span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8e9297; white-space: nowrap; }
@@ -1241,7 +1277,7 @@
     .sc-tile.io.meter .vu i { position: absolute; inset: 0; background: linear-gradient(to top, #45F862 0, #45F862 70%, #f2d14b 70%, #f2d14b 90%, #ff5a4d 90%);
                               clip-path: inset(calc(100% - var(--v, 0%)) 0 0 0); }
     .sc-node.io.level .sc-sub { min-height: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .level-panel { width: min(580px, calc(100vw - 32px)); gap: 14px; max-height: calc(100vh - 32px); overflow: auto; }
+    .level-panel { width: min(640px, calc(100vw - 32px)); gap: 14px; max-height: calc(100vh - 32px); overflow: auto; }
     .lv-source { display: flex; align-items: center; gap: 12px; }
     .lv-source #levelInput { flex: 1 1 auto; min-width: 0; }
     .lv-source #levelPair { flex: 0 0 auto; width: auto; }
@@ -1268,20 +1304,24 @@
     .lv-clip { justify-self: end; padding: 1px 7px; border-radius: 999px; background: #ff5a4d; color: #1a0503; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     .lv-clip[hidden] { display: none; }
     .al { display: grid; gap: 12px; padding-top: 14px; border-top: 1px solid #24282c; }
-    .al-head { display: flex; align-items: baseline; justify-content: space-between; }
-    .al-head h3 { margin: 0; font-size: 15px; font-weight: 650; color: #f2f2f2; }
+    .al-head { display: flex; align-items: center; gap: 12px; }
+    .al-head h3 { margin: 0 auto 0 0; font-size: 15px; font-weight: 650; color: #f2f2f2; }
+    .al-head .seg-box { height: 30px; }
+    .al-head .seg-box .seg { width: auto; padding: 0 12px; font-size: 12.5px; font-weight: 600; }
     .al-link { padding: 0; border: 0; background: none; color: #8e9297; font-size: 12px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
     .al-link:hover { color: #fff; }
     .al-mark { display: flex; align-items: baseline; gap: 10px; color: #9aa0a6; font-size: 12.5px; font-variant-numeric: tabular-nums; }
     .al-mark.on { color: #45F862; }
     .al-mark:empty { display: none; }
     .al-mark .al-link { font-size: 12px; }
-    .al-kinds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .al-kinds { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
     .al-kind { display: grid; gap: 6px; padding: 10px 10px 9px; border: 1px solid #2c3035; border-radius: 11px; background: #17191c; cursor: pointer; text-align: left; }
     .al-kind:hover { border-color: #4a4f55; }
     .al-kind.sel { border-color: #45F862; background: #12261a; }
     .al-kind .nm { font-size: 13.5px; font-weight: 650; color: #f2f2f2; }
-    .al-kind .tg { display: flex; align-items: baseline; gap: 5px; font-size: 10px; letter-spacing: .06em; color: #8e9297; }
+    .al-kind .tg { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 10px; letter-spacing: .06em; color: #8e9297; }
+    .al-kind .tg span { white-space: nowrap; }
+    .al-kind .off { font-size: 11px; color: #6f747a; min-height: 15px; }
     .al-kind input { width: 100%; min-width: 0; padding: 4px 6px; border: 1px solid #33383e; border-radius: 7px; background: #0c0d0f; color: #f2f2f2; font-size: 12.5px;
                      font-variant-numeric: tabular-nums; outline: none; }
     .al-kind input:focus { border-color: #8a8a8a; }
@@ -1435,6 +1475,8 @@
         <div id="moreMenu" class="more-menu" hidden>
           <button id="exportBtn" title="Save the current preset as a file (to keep or to share)"><span class="ico" style="--icon: var(--ico-export)"></span>Export preset file…<span class="menu-key"></span></button>
           <button id="importBtn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="ico" style="--icon: var(--ico-import)"></span>Import preset file…<span class="menu-key"></span></button>
+          <button id="sharedBtn" title="Presets others have shared on GitHub – each with the capture it needs, checked against your Nano"><span class="ico" style="--icon: var(--ico-list)"></span>Shared presets…</button>
+          <button id="shareBtn" title="Share the current preset on GitHub, with a short description and the exact name of its capture"><span class="ico" style="--icon: var(--ico-share)"></span>Share this preset…</button>
           <div class="menu-sep"></div>
           <button id="mc6Btn" title="A bank for the Morningstar MC6 Pro from up to five presets"><span class="ico" style="--icon: var(--ico-controller)"></span>Morningstar MC6 Pro export…</button>
           <button id="muteInBtn" title="The Nano's setting “Mute Guitar Input”: no sound from the guitar input until it is switched back" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteInLabel">Mute guitar input</span></button>
@@ -1565,10 +1607,15 @@
         <div class="lv-row"><span></span><div id="lvScale" class="lv-scale"></div><span id="lvClip" class="lv-clip" hidden>Clip</span></div>
       </div>
       <div class="al">
-        <div class="al-head"><h3>Auto level</h3><button id="alReset" class="al-link" title="Back to the suggested targets">Reset targets</button></div>
+        <div class="al-head"><h3>Auto level</h3><button id="alReset" class="al-link" title="Back to the suggested targets">Reset targets</button>
+          <div id="alProfileBox" class="seg-box" role="group" aria-label="Where you play">
+            <button class="seg" data-profile="quiet" title="Quiet: at home, about 60–75 dB at your ears">Quiet</button>
+            <button class="seg" data-profile="rehearsal" title="Rehearsal: loud with the band, about 95–105 dB at your ears">Rehearsal</button>
+          </div></div>
         <div class="lv-hint">Choose the kind of sound, press Start and play for a few seconds. Level goes to 10 – the Nano's full output, which
-          the signal on USB follows – and only the capture volume is set, so that the preset lands on its target: a clean sound lowest, a solo
-          on top, with room to full scale for all of them.</div>
+          the signal on USB follows – and only the capture volume is set, so that the preset lands on its target, with room to full scale for
+          all of them.</div>
+        <div id="alProfileText" class="lv-hint"></div>
         <div id="alMark" class="al-mark"></div>
         <div id="alKinds" class="al-kinds"></div>
         <div class="al-progress"><i id="alBar"></i></div>
@@ -1804,6 +1851,33 @@
       <div class="exp-status" id="expHint">Changes are saved directly into this preset on the Nano.</div>
       <div id="expList" class="exp-list"></div>
       <div id="expStatus" class="exp-status"></div>
+    </div>
+  </div>
+
+  <div id="sharedOverlay" class="lib-overlay" hidden>
+    <div class="lib-panel shared-panel" role="dialog" aria-label="Shared presets">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-list)"></span><h2 class="dlg-title">Shared presets</h2></div>
+        <div class="head-actions">
+          <button id="sharedShare" class="btn-small" title="Share the current preset on GitHub">Share this preset…</button>
+          <button id="sharedClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+        </div>
+      </div>
+      <input id="sharedSearch" class="lib-search" type="search" placeholder="Search name, description, capture, effect, player …" autocomplete="off">
+      <div id="sharedCount" class="lib-count"></div>
+      <div id="sharedList" class="shared-list"></div>
+    </div>
+  </div>
+
+  <div id="shareOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel slot-panel" role="dialog" aria-modal="true" aria-label="Share this preset">
+      <div id="shareMessage" class="ask-message"></div>
+      <div id="shareFacts" class="shared-need"></div>
+      <div id="shareWarn" class="share-warn" hidden></div>
+      <div class="ask-buttons">
+        <button type="button" id="shareCancel">Cancel</button>
+        <button type="button" id="shareOk" class="primary">Open the form on GitHub</button>
+      </div>
     </div>
   </div>
 
@@ -2356,7 +2430,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.11.0';
+    const EDITOR_VERSION = '1.12.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2629,6 +2703,8 @@
       closeCopyPreset();
       if (eqView) eqView.closeDialog();
       $('mc6Overlay').hidden = true;
+      $('shareOverlay').hidden = true;
+      renderShared();   // the shared presets stay open: without the Nano they show what they need
       if (!$('slotOverlay').hidden && $('slotCancel').onclick) $('slotCancel').onclick();
       if (!$('askOverlay').hidden && $('askCancel').onclick) $('askCancel').onclick();
     }
@@ -4129,6 +4205,7 @@ function parseSelectedCaptureState(payload) {
       state.libraryBytes = [];
       log('Capture library: ' + state.library.factory.length + ' factory, ' + state.library.user.length + ' user captures');
       log('Cab/IR library: ' + state.library.irFactory.length + ' factory, ' + state.library.irUser.length + ' user IRs');
+      renderShared();   // what each shared preset needs: on the Nano or not
       renderCaptureIR();
       if (!$('libraryOverlay').hidden) renderLibraryBrowser();
     }
@@ -6753,26 +6830,7 @@ function parseSelectedCaptureState(payload) {
       state.fileBusy = true;
       $('exportBtn').disabled = true;
       try {
-        cancelFXParamRefresh();
-        const unread = FX_BLOCK_KEYS.filter(key => !fxValuesKnown(state.blocks[key]));
-        const off = unread.filter(key => !state.blocks[key].on);
-        let toRead = unread.filter(key => state.blocks[key].on);
-        if (off.length) {
-          const names = off.map(key => state.blocks[key].title + ' (' + state.blocks[key].model + ')').join(', ');
-          if (await askConfirm('Read the switched-off ' + (off.length > 1 ? 'effects' : 'effect') + '?', 'Switched off: ' + names + '.' + NL + NL +
-              'The Nano gives the settings of an effect only while it is on. Switch ' + (off.length > 1 ? 'them' : 'it') +
-              ' on for a moment to read ' + (off.length > 1 ? 'them' : 'it') + '? You may hear it, and the preset then shows unsaved changes.' + NL + NL +
-              'Otherwise the file has no settings for ' + (off.length > 1 ? 'them' : 'it') + ' (default values on import).',
-              { ok: 'Switch on and read', cancel: 'Export without' })) {
-            toRead = toRead.concat(off);
-          }
-        }
-        for (const key of toRead) {
-          if (!await readFxValues(key)) log('Preset export: the values of ' + state.blocks[key].title + ' did not come');
-        }
-        if (!(state.exp.loaded && state.exp.preset === state.selectedPreset)) await readExpAssignments(6000);
-
-        const data = presetFileData();
+        const data = await readPresetForFile();
         const fileName = (String(data.name).replace(/[\\/:*?"<>|]+/g, '_').trim() || 'Preset') + '.nano-preset.json';
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
@@ -6792,6 +6850,34 @@ function parseSelectedCaptureState(payload) {
         $('exportBtn').disabled = false;
         render();
       }
+    }
+
+    // The preset as a file (export and "Share this preset"): the values of the effects are read first - the switched-off
+    // ones only if the player agrees - and the capture says where it comes from: a factory capture, or one from Cortex
+    // Cloud and who made it, so that others know what they need.
+    async function readPresetForFile(verb = 'Export') {
+      cancelFXParamRefresh();
+      const unread = FX_BLOCK_KEYS.filter(key => !fxValuesKnown(state.blocks[key]));
+      const off = unread.filter(key => !state.blocks[key].on);
+      let toRead = unread.filter(key => state.blocks[key].on);
+      if (off.length) {
+        const names = off.map(key => state.blocks[key].title + ' (' + state.blocks[key].model + ')').join(', ');
+        if (await askConfirm('Read the switched-off ' + (off.length > 1 ? 'effects' : 'effect') + '?', 'Switched off: ' + names + '.' + NL + NL +
+            'The Nano gives the settings of an effect only while it is on. Switch ' + (off.length > 1 ? 'them' : 'it') +
+            ' on for a moment to read ' + (off.length > 1 ? 'them' : 'it') + '? You may hear it, and the preset then shows unsaved changes.' + NL + NL +
+            'Otherwise the file has no settings for ' + (off.length > 1 ? 'them' : 'it') + ' (default values on import).',
+            { ok: 'Switch on and read', cancel: verb + ' without' })) {
+          toRead = toRead.concat(off);
+        }
+      }
+      for (const key of toRead) {
+        if (!await readFxValues(key)) log('Preset export: the values of ' + state.blocks[key].title + ' did not come');
+      }
+      if (!(state.exp.loaded && state.exp.preset === state.selectedPreset)) await readExpAssignments(6000);
+      const data = presetFileData();
+      const origin = captureOrigin(data.capture.name);
+      if (origin) Object.assign(data.capture, origin);
+      return data;
     }
 
     // A capture or IR from the library of the Nano (it is loaded once, as for the Library browser).
@@ -6911,7 +6997,12 @@ function parseSelectedCaptureState(payload) {
       let data = null;
       try { data = JSON.parse(await file.text()); } catch (e) { data = null; }
       if (!data || data.format !== PRESET_FILE_FORMAT) { toast('"' + file.name + '" is not a Nano Cortex preset file.', 'error'); return; }
+      await importPresetData(data);
+    }
 
+    async function importPresetData(data) {
+      if (!state.connected) { toast('Connect to the Nano first.', 'info'); return; }
+      if (state.fileBusy) return;
       const preset = state.selectedPreset;
       const current = state.presetNames.get(preset) || 'Preset ' + preset;
       if (!(await askConfirm('Load "' + data.name + '" into preset ' + preset + '?', 'Its settings replace those of "' + current + '". ' +
@@ -6966,6 +7057,275 @@ function parseSelectedCaptureState(payload) {
       if (notes.length) showNotice('"' + data.name + '" imported into preset ' + preset, notes.join(NL) + NL + NL + 'Press Save to keep it.');
       else toast('"' + data.name + '" imported into preset ' + preset + ' – press Save to keep it.', 'ok', 5000);
     }
+
+    // ---- Shared presets (GitHub) ----
+    // Presets are shared as issues of the editor's project on GitHub, written with the form
+    // .github/ISSUE_TEMPLATE/preset.yml (label "preset"): name, short description, the exact name of the capture and
+    // where to get it, and the preset file. The editor lists the open ones (GitHub's API without login: 60 requests an
+    // hour) and checks for each whether its capture and cab are on this Nano - in a slot, in its library (the import
+    // loads them), or missing, with the exact name to look for. Closing an issue (or taking its label away) takes a
+    // preset off the list.
+    const SHARE_REPO = 'DrD85/nano-cortex-editor';
+    const SHARE_LABEL = 'preset';
+    const SHARE_FIELDS = { 'Preset name': 'name', 'Short description': 'description', 'Capture – exact name': 'capture',
+      'Where to get the capture': 'source', 'Cab / IR': 'cab', 'Guitar or bass': 'instrument', 'Preset file': 'file' };
+    const SHARE_URL_MAX = 6000;   // a longer form link goes without the preset (it is on the clipboard)
+    const shared = { items: null, loading: false, error: '', at: 0, q: '' };
+    const shareDialog = { data: null };
+
+    // A factory capture, or one of the Nano's library (Cortex Cloud) and who made it; null when it is not known.
+    function captureOrigin(name) {
+      if (!name || !state.library.loaded) return null;
+      if (state.library.factory.some(item => sameName(item.name, name))) return { source: 'factory' };
+      const item = state.library.user.find(x => sameName(x.name, name));
+      return item ? (item.author ? { source: 'cloud', author: item.author } : { source: 'cloud' }) : null;
+    }
+    function captureSourceText(capture) {
+      if (!capture) return '';
+      if (capture.source === 'factory') return 'Factory capture – comes with the Nano';
+      if (capture.source === 'cloud') return 'Cortex Cloud' + (capture.author ? ' – by ' + capture.author : '');
+      return '';
+    }
+    const cabText = cab => !cab || cab.on === false || !cab.name ? 'None – bypassed' :
+      cab.name + (cab.mic ? ' · ' + cab.mic + (cab.position ? ', position ' + cab.position : '') : '');
+
+    // An issue of the form: its sections "### Label" with the answers, the preset file as a json block.
+    function parseSharedIssue(issue) {
+      const fields = {};
+      String(issue.body || '').replace(/\r\n/g, '\n').split(/^###[ \t]+/m).slice(1).forEach(section => {
+        const nl = section.indexOf('\n');
+        const key = SHARE_FIELDS[(nl < 0 ? section : section.slice(0, nl)).trim()];
+        if (!key) return;
+        const value = (nl < 0 ? '' : section.slice(nl + 1)).trim();
+        fields[key] = value === '_No response_' ? '' : value;
+      });
+      const raw = String(fields.file || '');
+      const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+      let data = null;
+      try { data = JSON.parse(fenced ? fenced[1] : raw); } catch (e) { data = null; }
+      if (!data || typeof data !== 'object' || data.format !== PRESET_FILE_FORMAT) return null;
+      const url = String(issue.html_url || '');
+      return {
+        number: issue.number,
+        url: url.startsWith('https://github.com/') ? url : '',
+        user: (issue.user && issue.user.login) || '',
+        created: issue.created_at || '',
+        likes: (issue.reactions && issue.reactions['+1']) || 0,
+        name: fields.name || String(data.name || '') || String(issue.title || '').replace(/^\[preset\]\s*/i, ''),
+        description: fields.description || '',
+        captureText: fields.capture || '',
+        source: fields.source && fields.source !== '–' ? fields.source : '',
+        instrument: fields.instrument || '',
+        data
+      };
+    }
+
+    async function loadShared(force = false) {
+      if (shared.loading) return;
+      if (!force && shared.items && Date.now() - shared.at < 10 * 60 * 1000) { renderShared(); return; }
+      shared.loading = true;
+      shared.error = '';
+      renderShared();
+      try {
+        const res = await fetch('https://api.github.com/repos/' + SHARE_REPO + '/issues?labels=' + SHARE_LABEL + '&state=open&per_page=100',
+          { headers: { Accept: 'application/vnd.github+json' } });
+        if (res.status === 403 || res.status === 429) throw new Error('GitHub lets a computer without login ask 60 times an hour – try again in a while.');
+        if (!res.ok) throw new Error('GitHub answered with ' + res.status + '.');
+        const list = await res.json();
+        shared.items = (Array.isArray(list) ? list : []).filter(issue => !issue.pull_request).map(parseSharedIssue).filter(Boolean);
+        shared.at = Date.now();
+        log('Shared presets: ' + shared.items.length + ' from GitHub');
+      } catch (err) {
+        const text = err && err.message ? err.message : '';
+        shared.error = text && !/fetch|network|load failed/i.test(text) ? text : 'GitHub could not be reached – are you online?';
+        log('Shared presets: ' + shared.error);
+      } finally {
+        shared.loading = false;
+      }
+      renderShared();
+    }
+
+    const sharedSlotName = slot => Math.floor((slot - 1) / 5) + 1 + '-' + ((slot - 1) % 5 + 1);
+
+    // Is the capture of a shared preset on this Nano? ok = in a slot, load = in its library (the import puts it into a
+    // slot), missing = not on it.
+    function sharedCaptureState(capture) {
+      if (!capture || capture.on === false || !capture.name) return { kind: 'none', text: 'None – the capture is bypassed' };
+      if (!state.connected) return { kind: 'unknown', text: 'Connect the Nano to see whether you have it' };
+      for (let slot = 1; slot <= 25; slot++) {
+        if (sameName(state.captureNames.get(slot), capture.name)) return { kind: 'ok', text: '✓ On your Nano – slot ' + sharedSlotName(slot) };
+      }
+      if (!state.library.loaded) return { kind: 'unknown', text: 'Looking in your Nano’s library …' };
+      if (state.library.factory.concat(state.library.user).some(item => sameName(item.name, capture.name))) {
+        return { kind: 'load', text: 'In your Nano’s library – the import puts it into a slot' };
+      }
+      return { kind: 'missing', text: 'Missing on your Nano' };
+    }
+    function sharedCabState(cab) {
+      if (!cab || cab.on === false || !cab.name || !state.connected) return null;
+      const names = [cab.name, cab.fullName].filter(Boolean);
+      for (let slot = 1; slot <= 5; slot++) {
+        if (names.some(name => sameName(state.irNames.get(slot), name))) return { kind: 'ok', text: '✓ On your Nano – cab slot ' + slot };
+      }
+      if (!state.library.loaded) return null;
+      if (state.library.irFactory.concat(state.library.irUser).some(item => names.some(name => sameName(item.name, name)))) {
+        return { kind: 'load', text: 'In your Nano’s library – the import puts it into a slot' };
+      }
+      return { kind: 'missing', text: 'Missing on your Nano' };
+    }
+
+    function sharedCard(item) {
+      const d = item.data, capture = d.capture || {}, cab = d.cab || {};
+      const cs = sharedCaptureState(capture), ks = sharedCabState(cab);
+      const date = item.created ? new Date(item.created).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+      const source = item.source || captureSourceText(capture);
+      const captureName = capture.name || item.captureText;
+      const fx = FX_BLOCK_KEYS.map(key => {
+        const f = d.fx && d.fx[key];
+        if (!f || !f.model || f.model === 'None') return '';
+        const model = state.blocks[key].models.find(m => m.name === f.model);
+        const color = model ? fxStyle(model).color : '#9aa0a6';
+        return '<span class="' + (f.on ? '' : 'off') + '" style="--c:' + color + '" title="' + escapeHTML(state.blocks[key].title + (f.on ? '' : ' – off')) + '"><i></i>' +
+          escapeHTML(f.model) + '</span>';
+      }).join('');
+      const captureCell = cs.kind === 'none' ? '<span class="src">' + escapeHTML(cs.text) + '</span>' :
+        '<strong>' + escapeHTML(captureName) + '</strong>' +
+        (cs.kind === 'missing' ? '<button class="shared-copy" data-act="copy" data-name="' + escapeHTML(captureName) + '" title="Copy the exact name">Copy name</button>' : '') +
+        (source ? '<span class="src">' + escapeHTML(source) + '</span>' : '') +
+        '<span class="shared-state ' + cs.kind + '">' + escapeHTML(cs.text) + '</span>';
+      const cabCell = cab.on === false || !cab.name ? '<span class="src">None – bypassed</span>' :
+        '<strong>' + escapeHTML(cabText(cab)) + '</strong>' + (ks ? '<span class="shared-state ' + ks.kind + '">' + escapeHTML(ks.text) + '</span>' : '');
+      return '<article class="shared-card">' +
+        '<div class="shared-top"><h3>' + escapeHTML(item.name) + '</h3><div class="shared-by">' +
+          escapeHTML([item.user ? 'by ' + item.user : '', date].filter(Boolean).join(' · ')) + '</div></div>' +
+        (item.description ? '<div class="shared-desc">' + escapeHTML(item.description) + '</div>' : '') +
+        '<div class="shared-need"><span class="k">Capture</span><span class="v">' + captureCell + '</span>' +
+          '<span class="k">Cab</span><span class="v">' + cabCell + '</span>' +
+          (item.instrument ? '<span class="k">Played</span><span class="v">' + escapeHTML(item.instrument) + '</span>' : '') + '</div>' +
+        (fx ? '<div class="shared-fx">' + fx + '</div>' : '') +
+        '<div class="shared-actions"><span class="likes">' + (item.likes ? '👍 ' + item.likes : '') + '</span>' +
+          (item.url ? '<button data-act="github" data-n="' + item.number + '" title="The preset on GitHub – questions, comments and 👍 go there">On GitHub</button>' : '') +
+          '<button class="primary" data-act="import" data-n="' + item.number + '"' + (state.connected ? '' : ' disabled') + ' title="' +
+            (state.connected ? 'Load it into the preset that is loaded now – nothing is stored until you press Save' : 'Connect to the Nano first') +
+            '">Load into preset ' + state.selectedPreset + '</button></div>' +
+        '</article>';
+    }
+
+    function renderShared() {
+      if ($('sharedOverlay').hidden) return;
+      const list = $('sharedList'), count = $('sharedCount');
+      const q = shared.q.trim().toLowerCase();
+      const items = (shared.items || []).filter(item => !q || [item.name, item.description, item.captureText, item.source, item.instrument, item.user,
+        item.data.capture && item.data.capture.name, item.data.cab && item.data.cab.name,
+        ...FX_BLOCK_KEYS.map(key => item.data.fx && item.data.fx[key] && item.data.fx[key].model)].join(' ').toLowerCase().includes(q));
+      if (shared.loading && !shared.items) count.textContent = 'Loading the shared presets from GitHub …';
+      else if (shared.error) count.textContent = shared.error;
+      else if (shared.items) count.textContent = items.length + (q ? ' of ' + shared.items.length : '') + ' shared preset' + (shared.items.length === 1 ? '' : 's') +
+        ' – what each needs is checked against your Nano' + (state.connected ? '.' : ' once it is connected.');
+      if (!shared.items) { list.innerHTML = shared.error ? '<div class="lib-empty">' + escapeHTML(shared.error) + '</div>' : ''; return; }
+      list.innerHTML = items.length ? items.map(sharedCard).join('') :
+        '<div class="lib-empty">' + (q ? 'No shared preset fits “' + escapeHTML(shared.q.trim()) + '”.' :
+          'No presets are shared yet – be the first: “Share this preset”.') + '</div>';
+    }
+
+    function openShared() {
+      $('sharedOverlay').hidden = false;
+      $('sharedSearch').value = shared.q;
+      if (state.connected && !state.library.loaded) requestLibraryContent();   // to see which captures the Nano has
+      renderShared();
+      loadShared();
+      $('sharedSearch').focus();
+    }
+    function closeShared() {
+      $('sharedOverlay').hidden = true;
+    }
+
+    $('sharedList').addEventListener('click', async e => {
+      const button = e.target.closest('button[data-act]');
+      if (!button) return;
+      const item = (shared.items || []).find(x => x.number === Number(button.dataset.n));
+      if (button.dataset.act === 'copy') {
+        try { await navigator.clipboard.writeText(button.dataset.name); toast('“' + button.dataset.name + '” copied – look for it in Cortex Cloud.', 'ok'); }
+        catch (err) { toast('Copying did not work – the name is: ' + button.dataset.name, 'info', 8000); }
+      } else if (button.dataset.act === 'github' && item && item.url) {
+        window.open(item.url, '_blank', 'noopener');
+      } else if (button.dataset.act === 'import' && item) {
+        closeShared();
+        await importPresetData(item.data);
+      }
+    });
+    $('sharedSearch').addEventListener('input', e => { shared.q = e.target.value; renderShared(); });
+    $('sharedClose').addEventListener('click', closeShared);
+    $('sharedShare').addEventListener('click', () => { closeShared(); openShare(); });
+    $('sharedOverlay').addEventListener('click', e => { if (e.target === $('sharedOverlay')) closeShared(); });
+    $('sharedBtn').addEventListener('click', openShared);
+
+    // ---- Share this preset ----
+    // The preset is read as for a file and put on the clipboard, and GitHub's form opens in the browser with the name,
+    // the exact capture, where to get it and the cab filled in - and the preset itself when the link stays short.
+    async function openShare() {
+      if (!state.connected) { toast('Connect to the Nano first: the preset is read from it.', 'info'); return; }
+      if (state.fileBusy) return;
+      state.fileBusy = true;
+      let data = null;
+      try { data = await readPresetForFile('Share'); } finally { state.fileBusy = false; render(); }
+      if (!data) return;
+      shareDialog.data = data;
+      const capture = data.capture || {};
+      const inUrl = shareFormUrl(data, true).length <= SHARE_URL_MAX;
+      $('shareMessage').innerHTML = '<div class="dlg-title">Share “' + escapeHTML(data.name) + '”</div>' +
+        '<div class="dlg-sub">Shared presets are kept on GitHub, in the editor’s project – you need a GitHub account (free). Everyone can then find the ' +
+          'preset under “Shared presets” and load it into their Nano.</div>' +
+        '<ol class="share-steps"><li>The form opens in your browser, with the name, the capture and the cab filled in.</li>' +
+        '<li>' + (inUrl ? 'The preset is filled in too (and on the clipboard).' : 'The preset is on the clipboard: paste it into “Preset file” (' + CMD_KEY + 'V).') + '</li>' +
+        '<li>Write a short description – the sound, what it is for, your guitar – and submit.</li></ol>';
+      const source = captureSourceText(capture);
+      $('shareFacts').innerHTML =
+        '<span class="k">Capture</span><span class="v">' + (capture.on === false || !capture.name ? '<span class="src">None – bypassed</span>' :
+          '<strong>' + escapeHTML(capture.name) + '</strong>' + (source ? '<span class="src">' + escapeHTML(source) + '</span>' : '')) + '</span>' +
+        '<span class="k">Cab</span><span class="v"><strong>' + escapeHTML(cabText(data.cab)) + '</strong></span>';
+      const warn = capture.on !== false && capture.name && !source ?
+        'Where this capture comes from is not known – please say in the form where others can get it (Cortex Cloud and who made it). Captures cannot travel with a preset, only their name.' :
+        capture.source === 'cloud' ? 'Others need this capture from Cortex Cloud. The form names it exactly as your Nano does.' : '';
+      $('shareWarn').textContent = warn;
+      $('shareWarn').hidden = !warn;
+      $('shareOverlay').hidden = false;
+      $('shareOk').focus();
+    }
+
+    function shareFormUrl(data, withFile) {
+      const capture = data.capture || {};
+      const off = capture.on === false || !capture.name;
+      const params = new URLSearchParams({
+        template: 'preset.yml', title: '[Preset] ' + data.name, name: data.name,
+        capture: off ? 'None – the capture is bypassed' : capture.name,
+        capture_source: off ? '–' : captureSourceText(capture),
+        cab: cabText(data.cab)
+      });
+      if (withFile) params.set('preset', JSON.stringify(data));
+      return 'https://github.com/' + SHARE_REPO + '/issues/new?' + params.toString();
+    }
+
+    async function confirmShare() {
+      const data = shareDialog.data;
+      if (!data) return;
+      $('shareOverlay').hidden = true;
+      let copied = true;
+      try { await navigator.clipboard.writeText(JSON.stringify(data, null, 2)); } catch (err) { copied = false; }
+      const full = shareFormUrl(data, true);
+      window.open(full.length <= SHARE_URL_MAX ? full : shareFormUrl(data, false), '_blank', 'noopener');
+      log('Share: form opened for "' + data.name + '"' + (copied ? ', preset on the clipboard' : ''));
+      if (!copied) toast('The preset could not be put on the clipboard – export it (… → Export) and paste the file’s content into the form.', 'info', 9000);
+    }
+    $('shareOk').addEventListener('click', confirmShare);
+    $('shareCancel').addEventListener('click', () => { $('shareOverlay').hidden = true; });
+    $('shareOverlay').addEventListener('click', e => { if (e.target === $('shareOverlay')) $('shareOverlay').hidden = true; });
+    $('shareBtn').addEventListener('click', openShare);
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (!$('shareOverlay').hidden) $('shareOverlay').hidden = true;
+      else if (!$('sharedOverlay').hidden) closeShared();
+    });
 
     function pickPresetFile() {
       if (!state.connected) { toast('Connect to the Nano first.', 'info'); return; }
@@ -7250,28 +7610,57 @@ function parseSelectedCaptureState(payload) {
     // - Mac app: a small helper reads the input with Core Audio (window.nanoMeter, see mac-app/meter.js) - any pair.
     // - Browser: getUserMedia. Chromium opens an input with more than two channels as stereo, so on a Mac only 1/2
     //   arrive (the Nano's DI); where a browser passes on more, the pair can be chosen as well.
-    const LEVEL_STORE = 'nanoCortexLevel';   // { input: label of the audio input, pairs: { label: first channel }, kind, targets, marks }
+    const LEVEL_STORE = 'nanoCortexLevel';   // { input: label of the audio input, pairs: { label: first channel }, kind, profile, base, steps, marks }
+    // The targets as in the LUFS Meter, made of three parts:
+    // - the level of Clean (the quietest sound; "Take as target" moves it, and all others with it),
+    // - the steps of the dynamics: how much louder each sound should SOUND than Clean (Lead: than Drive) - the same
+    //   in both profiles,
+    // - the correction of the profile: at equal LUFS the mid-heavy sounds seem louder than Clean, at low volume more
+    //   than at high volume (ISO 226). Quiet: at home, about 60-75 dB at your ears. Rehearsal: with the band, about 95-105 dB.
     const AL_KINDS = [
-      { key: 'clean', label: 'Clean', lufs: -20 },
-      { key: 'drive', label: 'Drive', lufs: -19 },
-      { key: 'solo', label: 'Solo', lufs: -16 },
-      { key: 'fuzz', label: 'Fuzz', lufs: -19 }
+      { key: 'clean', label: 'Clean' },
+      { key: 'edge', label: 'Edge' },
+      { key: 'drive', label: 'Drive' },
+      { key: 'fuzz', label: 'Fuzz' },
+      { key: 'lead', label: 'Lead' }
     ];
+    const AL_BASE = -20;                                       // Clean, LUFS
+    const AL_STEPS = { edge: 1.5, drive: 3, fuzz: 3, lead: 3 };   // dB over Clean; Lead over Drive
+    const AL_CORRECTION = {   // dB each sound needs against Clean to sound as loud at equal LUFS (model of the LUFS Meter)
+      quiet: { clean: 0, edge: -0.5, drive: -2, fuzz: -1, lead: -2 },
+      rehearsal: { clean: 0, edge: -0.5, drive: -0.5, fuzz: -0.5, lead: -0.5 }
+    };
+    const AL_PROFILES = {
+      quiet: { label: 'Quiet', text: 'Quiet – at home, about 60–75 dB at your ears. At low volume the ear hears little bass, so the mid-heavy sounds seem louder than their LUFS: Drive and Lead get 2 dB less, Fuzz 1 dB, Edge 0.5 dB less than their steps say.' },
+      rehearsal: { label: 'Rehearsal', text: 'Rehearsal – with the band, about 95–105 dB at your ears. The ear is flatter at high volume: Edge, Drive, Fuzz and Lead get only 0.5 dB less than their steps say.' }
+    };
     const AL_SECONDS = 4;           // of played signal
     const AL_PLAY_LUFS = -50;       // louder than this counts as playing
     const AL_CEILING_DB = -1;       // the peaks stay below it
     const METER_FLOOR_DB = -60;
     const NANO_AUDIO = /nano\s*cortex|neural\s*dsp/i;
 
-    const levelStore = { input: '', pairs: {}, kind: 'clean', targets: Object.fromEntries(AL_KINDS.map(k => [k.key, k.lufs])), marks: {} };
+    const levelStore = { input: '', pairs: {}, kind: 'clean', profile: 'rehearsal', base: AL_BASE, steps: { ...AL_STEPS }, marks: {} };
     try {
       const saved = JSON.parse(localStorage.getItem(LEVEL_STORE) || '{}');
+      const lead = key => (key === 'solo' ? 'lead' : key);   // before 1.12.0: Solo
       if (typeof saved.input === 'string') levelStore.input = saved.input;
       if (saved.pairs && typeof saved.pairs === 'object') levelStore.pairs = saved.pairs;
-      if (saved.marks && typeof saved.marks === 'object') levelStore.marks = saved.marks;
-      if (AL_KINDS.some(k => k.key === saved.kind)) levelStore.kind = saved.kind;
-      AL_KINDS.forEach(k => { if (saved.targets && Number.isFinite(saved.targets[k.key])) levelStore.targets[k.key] = saved.targets[k.key]; });
+      if (saved.marks && typeof saved.marks === 'object') {
+        levelStore.marks = saved.marks;
+        Object.values(levelStore.marks).forEach(mark => { if (mark && mark.kind) mark.kind = lead(mark.kind); });
+      }
+      if (AL_KINDS.some(k => k.key === lead(saved.kind))) levelStore.kind = lead(saved.kind);
+      if (AL_PROFILES[saved.profile]) levelStore.profile = saved.profile;
+      // before 1.12.0 one target per kind: its Clean target becomes the level of Clean, the steps start as suggested
+      const oldClean = saved.targets && Number(saved.targets.clean);
+      if (Number.isFinite(saved.base)) levelStore.base = saved.base;
+      else if (Number.isFinite(oldClean)) levelStore.base = Math.round(clamp(oldClean, -40, -8) * 10) / 10;
+      Object.keys(AL_STEPS).forEach(key => { if (saved.steps && Number.isFinite(saved.steps[key])) levelStore.steps[key] = saved.steps[key]; });
     } catch (e) { /* storage unavailable */ }
+    // how much louder a sound should sound than Clean, and its target in LUFS in the chosen profile
+    const alIntent = kind => (kind === 'clean' ? 0 : kind === 'lead' ? levelStore.steps.drive + levelStore.steps.lead : levelStore.steps[kind]);
+    const alTarget = (kind = levelStore.kind) => Math.round((levelStore.base + alIntent(kind) + AL_CORRECTION[levelStore.profile][kind]) * 10) / 10;
     function saveLevelStore() {
       try { localStorage.setItem(LEVEL_STORE, JSON.stringify(levelStore)); } catch (e) { /* storage unavailable */ }
     }
@@ -7600,19 +7989,21 @@ function parseSelectedCaptureState(payload) {
 
     function renderAutoLevel() {
       const al = autoLevel;
-      $('lvTarget').style.setProperty('--v', meterPos(levelStore.targets[levelStore.kind]));
+      $('lvTarget').style.setProperty('--v', meterPos(alTarget()));
       document.querySelectorAll('#alKinds .al-kind').forEach(el => {
         el.classList.toggle('sel', el.dataset.kind === levelStore.kind);
         const input = el.querySelector('input');
-        if (document.activeElement !== input) input.value = levelStore.targets[el.dataset.kind].toFixed(1);
+        const key = el.dataset.kind;
+        if (document.activeElement !== input) input.value = key === 'clean' ? levelStore.base.toFixed(1) : (levelStore.steps[key] > 0 ? '+' : '') + levelStore.steps[key].toFixed(1);
+        el.querySelector('.off').textContent = key === 'clean' ? 'the quietest sound' : 'target ' + dbText(alTarget(key)) + ' LUFS';
         input.disabled = al.running;
       });
       const kind = AL_KINDS.find(k => k.key === levelStore.kind);
       // what is remembered for the loaded preset
       const mark = state.connected ? levelMark(state.selectedPreset) : null;
       const line = $('alMark');
-      line.classList.toggle('on', Boolean(mark && Math.abs(mark.lufs - levelStore.targets[mark.kind]) <= MARK_TOLERANCE));
-      const markOff = mark ? mark.lufs - levelStore.targets[mark.kind] : 0;
+      line.classList.toggle('on', Boolean(mark && Math.abs(mark.lufs - alTarget(mark.kind)) <= MARK_TOLERANCE));
+      const markOff = mark ? mark.lufs - alTarget(mark.kind) : 0;
       line.textContent = !state.connected ? '' : !mark ? 'Preset ' + state.selectedPreset + ' is not levelled yet.'
         : 'Preset ' + state.selectedPreset + ': ' + AL_KINDS.find(k => k.key === mark.kind).label + ', ' + dbText(mark.lufs) + ' LUFS' +
           (Math.abs(markOff) <= MARK_TOLERANCE ? ' ✓' : ' (' + dbText(markOff, true) + ' LU from its target)') + ' · ' + new Date(mark.at).toLocaleDateString() +
@@ -7645,7 +8036,12 @@ function parseSelectedCaptureState(payload) {
       $('alOnly').disabled = al.preparing;
       $('alUndo').hidden = al.running || al.preparing || !al.undo;
       $('alUndo').title = al.undo && al.undo.level < LEVEL_FULL ? 'Back to the capture volume and the Level from before' : 'Back to the capture volume from before';
-      $('alReset').hidden = AL_KINDS.every(k => levelStore.targets[k.key] === k.lufs);
+      $('alReset').hidden = levelStore.base === AL_BASE && Object.keys(AL_STEPS).every(key => levelStore.steps[key] === AL_STEPS[key]);
+      document.querySelectorAll('#alProfileBox .seg').forEach(b => {
+        b.classList.toggle('on', b.dataset.profile === levelStore.profile);
+        b.disabled = al.running;
+      });
+      $('alProfileText').textContent = AL_PROFILES[levelStore.profile].text;
     }
 
     async function openLevel() {
@@ -7695,7 +8091,7 @@ function parseSelectedCaptureState(payload) {
     // "✓ Drive −19.0" on target, "Drive −21.3 (−2.3)" beside it
     function levelMarkText(mark) {
       const label = AL_KINDS.find(k => k.key === mark.kind).label;
-      const off = mark.lufs - levelStore.targets[mark.kind];
+      const off = mark.lufs - alTarget(mark.kind);
       return Math.abs(off) <= MARK_TOLERANCE ? '✓ ' + label + ' ' + dbText(mark.lufs) : label + ' ' + dbText(mark.lufs) + ' (' + dbText(off, true) + ')';
     }
 
@@ -7807,7 +8203,7 @@ function parseSelectedCaptureState(payload) {
       const al = autoLevel;
       al.running = false;
       const kind = AL_KINDS.find(k => k.key === al.kind);
-      const target = levelStore.targets[al.kind];
+      const target = alTarget(al.kind);
       const loud = gatedLoudness(al.blocks);
       const peakDb = toDb(al.peak);
       const levelRaised = Boolean(al.before && al.before.level < LEVEL_FULL);
@@ -7878,14 +8274,13 @@ function parseSelectedCaptureState(payload) {
       renderPresetSelect();
     }
 
-    // The measured loudness becomes the target of its kind; the other kinds keep their distance to it.
+    // The measured loudness becomes the target of its kind: the level of Clean moves, the steps stay.
     function autoLevelTakeTarget() {
       const al = autoLevel;
       if (!al.last || !Number.isFinite(al.last.loud)) return;
-      const shift = al.last.loud - levelStore.targets[al.last.kind];
-      AL_KINDS.forEach(k => { levelStore.targets[k.key] = Math.round(clamp(levelStore.targets[k.key] + shift, -40, -6) * 10) / 10; });
+      levelStore.base = Math.round(clamp(levelStore.base + al.last.loud - alTarget(al.last.kind), -40, -8) * 10) / 10;
       saveLevelStore();
-      al.text = 'Targets: ' + AL_KINDS.map(k => k.label + ' ' + dbText(levelStore.targets[k.key])).join(', ') + ' LUFS.';
+      al.text = AL_PROFILES[levelStore.profile].label + ' targets: ' + AL_KINDS.map(k => k.label + ' ' + dbText(alTarget(k.key))).join(', ') + ' LUFS.';
       al.last = null;
       renderLevel();
     }
@@ -7894,8 +8289,12 @@ function parseSelectedCaptureState(payload) {
       const el = document.createElement('div');
       el.className = 'al-kind';
       el.dataset.kind = k.key;
-      el.innerHTML = '<span class="nm">' + k.label + '</span><span class="tg"><input type="number" step="0.5" min="-40" max="-6" aria-label="' + k.label +
-        ' target in LUFS"><span>LUFS</span></span>';
+      const clean = k.key === 'clean';
+      const unit = clean ? 'LUFS' : k.key === 'lead' ? 'dB over Drive' : 'dB over Clean';
+      el.innerHTML = '<span class="nm">' + k.label + '</span><span class="tg"><input type="text" inputmode="decimal" aria-label="' + k.label +
+        (clean ? ' level in LUFS' : ' step in dB') + '"><span>' + unit + '</span></span><span class="off"></span>';
+      el.title = clean ? 'Clean is the quietest sound: its level in LUFS'
+        : k.key === 'lead' ? 'How much louder Lead should sound than Drive' : 'How much louder ' + k.label + ' should sound than Clean';
       el.addEventListener('click', () => {
         if (autoLevel.running) return;
         levelStore.kind = k.key;
@@ -7903,8 +8302,11 @@ function parseSelectedCaptureState(payload) {
         renderLevel();
       });
       el.querySelector('input').addEventListener('change', e => {
-        const value = Number(String(e.target.value).replace(',', '.'));
-        if (Number.isFinite(value)) levelStore.targets[k.key] = Math.round(clamp(value, -40, -6) * 10) / 10;
+        const value = Number(String(e.target.value).replace(',', '.').replace('−', '-'));
+        if (Number.isFinite(value)) {
+          if (clean) levelStore.base = Math.round(clamp(value, -40, -8) * 10) / 10;
+          else levelStore.steps[k.key] = Math.round(clamp(value, -12, 12) * 10) / 10;
+        }
         saveLevelStore();
         e.target.blur();
         renderLevel();
@@ -7951,10 +8353,18 @@ function parseSelectedCaptureState(payload) {
     $('alOnly').addEventListener('click', () => autoLevelStart(false));
     $('alUndo').addEventListener('click', autoLevelUndo);
     $('alReset').addEventListener('click', () => {
-      AL_KINDS.forEach(k => { levelStore.targets[k.key] = k.lufs; });
+      levelStore.base = AL_BASE;
+      levelStore.steps = { ...AL_STEPS };
       saveLevelStore();
       renderLevel();
     });
+    document.querySelectorAll('#alProfileBox .seg').forEach(b => b.addEventListener('click', () => {
+      if (autoLevel.running || levelStore.profile === b.dataset.profile) return;
+      levelStore.profile = b.dataset.profile;
+      saveLevelStore();
+      renderLevel();
+      renderPresetSelect();   // the levelled marks are measured against the targets of this profile
+    }));
 
     // ---- Effect info ("i" in each effect block, or a click on the pedal picture) ----
     // basedOn: only where Neural DSP names the original (NanOS 2.0.0 notes and the Quad Cortex device list);
@@ -9096,7 +9506,7 @@ function parseSelectedCaptureState(payload) {
     state.usbReturnDb = null;   // the Nano's USB playback volume in dB (its settings), null = not read
 
     // The loudness the tracks are played at: so far below (or above) the Drive target of Auto level.
-    const jamTarget = () => levelStore.targets.drive + jamStore.offset;
+    const jamTarget = () => alTarget('drive') + jamStore.offset;
     const jamUsbDb = () => (state.connected && Number.isFinite(state.usbReturnDb) ? state.usbReturnDb : 0);
     const jamTrack = () => jam.tracks[jam.index] || null;
 
@@ -9432,7 +9842,7 @@ function parseSelectedCaptureState(payload) {
       const offset = jamStore.offset;
       $('jamLevel').textContent = dbText(jamTarget());
       $('jamLevelBox').title = 'How loud the tracks play: ' + (Math.abs(offset) < 0.05 ? 'as loud as' : dbText(Math.abs(offset)) + ' LU ' + (offset < 0 ? 'below' : 'above')) +
-        ' your Drive presets (Auto level: ' + dbText(levelStore.targets.drive) + ' LUFS). A track\'s bass counts less in this' +
+        ' your Drive presets (Auto level: ' + dbText(alTarget('drive')) + ' LUFS). A track\'s bass counts less in this' +
         (state.connected && Number.isFinite(state.usbReturnDb) && Math.abs(state.usbReturnDb) > 0.05 ? '. The Nano\'s USB playback volume of ' + dbText(state.usbReturnDb, true) + ' dB is made up for' : '');
       renderJamTime();
 

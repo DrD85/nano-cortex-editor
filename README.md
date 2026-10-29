@@ -69,6 +69,10 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   file on the window – loads one into the current preset; **Save** keeps it. Captures and IRs travel by name: the
   import finds them in your slots or loads them from the Nano's library (factory and Cortex Cloud ones). The captures
   themselves cannot be transferred over Bluetooth.
+- **Shared presets** (under **…**): presets other players have shared, each with a short description and the **exact
+  name of the capture** it needs – checked against your Nano: on it, in its library (the import loads it), or
+  missing, with the name to look for in Cortex Cloud. **Share this preset** puts your own preset there (see *Shared
+  presets* below)
 - **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags by amp or pedal (the first two words of the name) and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
 - **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs a small tile shows the mic and its place –
   a click opens the speaker with the five mic types and the positions 1–6 – you hear the choice at once, and **Save**
@@ -264,6 +268,24 @@ the Nano to the Mac is all it needs; no Bluetooth.
 - With the jam tracks: choose the same output in the track list, and guitar and tracks mix on the Mac.
 - Another input than the Nano can be chosen; the editor asks first, because a microphone played through speakers howls.
 
+## Shared presets
+
+Presets are shared on GitHub, as issues of this project with the label `preset` – a small upload platform without a
+server of its own. Sharing needs a free GitHub account; looking and loading does not.
+
+- **Load one:** **…** → **Shared presets**. Each card shows the description, who shared it, the capture with its exact
+  name and where to get it (factory capture or Cortex Cloud and who made it), the cab, the effects – and whether your
+  Nano has what the preset needs: *✓ On your Nano*, *In your Nano's library* (the import puts it into a slot) or
+  *Missing on your Nano* (with **Copy name**, to look for it in Cortex Cloud). **Load into preset N** works like
+  importing a file: nothing is stored until you press **Save**. Questions and 👍 go to **On GitHub**.
+- **Share one:** **…** → **Share this preset**. The editor reads the preset like for an export, puts it on the
+  clipboard and opens the form [Share a preset](https://github.com/DrD85/nano-cortex-editor/issues/new?template=preset.yml)
+  in the browser with the name, the capture, where to get it and the cab filled in. Paste the preset into *Preset
+  file* if it is not filled in already, write a short description and submit.
+- **For the project:** the label `preset` must exist (Issues → Labels), else the form cannot set it and the editor
+  does not list the preset. Closing an issue, or taking its label away, takes a preset off the list. Without login,
+  GitHub answers a computer 60 times an hour; the editor asks once when the list opens and keeps it for ten minutes.
+
 ## MIDI controller
 
 Click the **MIDI** icon → **Start MIDI Learn**, click a knob, slider or switch in the editor and move a control on your
@@ -327,8 +349,10 @@ Unten im Fenster lässt sich ein **Jamtrack-Player** einblenden: Ordner wählen,
 knapp unter deinen Presets; der Nano Cortex Controller schaltet sie im Looper-Modus mit den Fußschaltern.
 Die EQ-Modelle zeigen eine **Kurve mit Punkten zum Ziehen** statt Knopfreihen, in der Mac-App mit dem Spektrum des
 Nano-Tons dahinter. Der **Monitor** (Mac-App, unter **…**) spielt den USB-Ton des Nano über ein anderes Audiogerät ab.
-Der letzte Eintrag der Preset-Liste **kopiert das geladene Preset auf einen anderen Platz**, und ein Klick auf das
-die runden **IN** und **OUT** an den Enden der Signal Chain schalten den Gitarren-Eingang und -Ausgang des Nano stumm
+Der letzte Eintrag der Preset-Liste **kopiert das geladene Preset auf einen anderen Platz**, und die runden **IN** und **OUT** an den Enden der Signal Chain schalten den Gitarren-Eingang und -Ausgang des Nano stumm
 (die Geräte-Einstellungen „Mute Guitar Input" und „Mute Guitar Output"); der Pegelmesser sitzt als Kachel vor OUT.
+Unter **…** → **Shared presets** findest du Presets anderer Spieler, jeweils mit Kurzbeschreibung und dem **genauen
+Namen des Captures** – der Editor zeigt, ob dein Nano es hat oder es fehlt. **Share this preset** stellt dein eigenes
+Preset dazu (über ein Formular auf GitHub, dafür braucht es ein kostenloses GitHub-Konto).
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.
