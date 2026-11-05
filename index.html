@@ -2397,7 +2397,9 @@
         highPassHz: 20,
         lowPassHz: 20000,
         paramsLoaded: false,
-        micPending: null   // { cab, mic, position }: a mic that was chosen and is not in the cab slot yet (storeCabMic)
+        micPending: null,   // { cab, mic, position }: a mic that was chosen and is not in the cab slot yet (storeCabMic)
+        micsByCab: {},      // cab name (lower case) -> the mics the Nano offers for it (cab settings reply, field 7)
+        micFromState: false   // mic and position of the loaded cab came with the Nano's state ("cab/mic/position")
       },
       feBytes: [],
       feTimer: null,
@@ -2431,7 +2433,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.12.0';
+    const EDITOR_VERSION = '1.12.1';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2610,6 +2612,15 @@
       } catch (err) {
         log('Connect failed: ' + err.message);
         setStatus('Disconnected');
+        // The list was closed without a device - often because the Nano was not in it: it only shows while nothing
+        // else holds its one Bluetooth connection.
+        if (err && err.name === 'NotFoundError') {
+          showNotice('Nano not in the list?', 'The Nano shows up only while nothing else is connected to it.' + NL + NL +
+            '• Close the Cortex Cloud app on your phone (or switch the phone’s Bluetooth off).' + NL +
+            '• Close other tabs or windows with the editor, and the Nano Cortex Controller if it is on.' + NL +
+            '• Wait about ten seconds and click Connect again.' + NL + NL +
+            'If it still does not appear, switch the Nano off and on.');
+        }
       }
     }
 
@@ -2885,9 +2896,24 @@
           };
 
         const parsedCabIR = parseCabIRNameParts(state.currentIR.fullName || state.currentIR.shortName);
+        state.cabIR.micFromState = Boolean(parsedCabIR.mic);
         if (!state.protocol.skipFXModelApply || state.protocol.presetLoad) {
           if (parsedCabIR.mic) state.cabIR.mic = parsedCabIR.mic;
           if (parsedCabIR.position !== null) state.cabIR.position = parsedCabIR.position;
+        }
+        // After a mic change: the state names the IR the preset plays now ("cab/mic/position"), the reliable check.
+        // (The cab settings reply is not: it can name another position than the preset plays - seen in a log.)
+        const micCheck = cabMicLive.check;
+        if (micCheck && parsedCabIR.mic && !cabMicLiveActive()) {
+          cabMicLive.check = null;
+          const pos = parsedCabIR.position !== null ? parsedCabIR.position : 1;
+          const took = sameName(parsedCabIR.mic, micCheck.mic) && pos === micCheck.position;
+          log('Cab mic in the state: ' + parsedCabIR.mic + ', position ' + pos + (took ? ' - as chosen' : ' - chosen was ' + micCheck.mic + ', position ' + micCheck.position));
+          if (!took) {
+            state.cabIR.mic = parsedCabIR.mic;
+            state.cabIR.position = pos;
+            toast('The Nano plays ' + parsedCabIR.mic + ', position ' + pos + ' – it did not take ' + micCheck.mic + ', position ' + micCheck.position + '.', 'error', 8000);
+          }
         }
         state.cabIR.selectedSlot = currentIRSlotIndex();
 
@@ -3185,35 +3211,30 @@
     }
 
     function handleCabIRParamRefreshResponse(data) {
-      const text = printableASCII(data);
-
-      const parts = parseCabIRNameParts(text);
-      let mic = parts.mic, position = parts.position;
-
-      // Replies without a "cab/mic/pos" string carry mic and zero-based position
-      // in the first nested field 5: { 2: cab, 3: posZero, 4: mic }.
-      if (!parts.mic) {
-        const top = parseProtoFields(data.slice(2, data.length - 4));
-        const cabEntry = top[5] && top[5].find(entry => entry.wire === 2);
-        if (cabEntry) {
-          const cab = parseProtoFields(cabEntry.raw);
-          mic = firstString(cab, 4);
-          // a left-out position is 0 (protobuf default) - when the mic is there
-          if (mic) position = cab[3] && cab[3][0] && cab[3][0].wire === 0 ? cab[3][0].value + 1 : 1;
-        }
+      // The reply: 5 the factory IR { 1: index, 2: cab, 3: position (0-based, left out = 0), 4: mic }, 7 the mics this
+      // cab offers (repeated - they differ from cab to cab: a bass cab had Condenser U47, Dynamic 421, Dynamic 52,
+      // Dynamic 57, Ribbon 10), 8 level / high pass / low pass.
+      const top = parseProtoFields(data.slice(2, data.length - 4));
+      let cabName = '', mic = null, position = null;
+      const cabEntry = top[5] && top[5].find(entry => entry.wire === 2);
+      if (cabEntry) {
+        const cab = parseProtoFields(cabEntry.raw);
+        cabName = firstString(cab, 2) || '';
+        mic = firstString(cab, 4) || null;
+        if (mic) position = cab[3] && cab[3][0] && cab[3][0].wire === 0 ? cab[3][0].value + 1 : 1;
       }
-
-      // A newer choice is on its way to the Nano: this reply is older than what the dialog shows.
-      if (!cabMicLiveActive()) {
+      const mics = (top[7] || []).filter(entry => entry.wire === 2).map(entry => decodeText(entry.raw).trim()).filter(Boolean);
+      if (cabName && mics.length) state.cabIR.micsByCab[cabName.trim().toLowerCase()] = mics;
+      if (!mic) {   // replies that carry it as a "cab/mic/pos" string
+        const parts = parseCabIRNameParts(printableASCII(data));
+        mic = parts.mic;
+        position = parts.position;
+      }
+      // Mic and position of the loaded cab come from the state (what the preset plays); this reply only fills in when
+      // the state had none, and not while a newer choice is on its way to the Nano.
+      if (!state.cabIR.micFromState && !cabMicLiveActive() && (!cabName || sameName(cabName, state.currentIR.shortName))) {
         if (mic) state.cabIR.mic = mic;
         if (position !== null) state.cabIR.position = position;
-      }
-      const check = cabMicLive.check;
-      cabMicLive.check = null;
-      if (check && !cabMicLiveActive() && mic) {
-        const took = sameName(mic, check.mic) && position === check.position;
-        log('Cab mic read back: ' + mic + ', position ' + position + (took ? ' - as chosen' : ' - chosen was ' + check.mic + ', position ' + check.position));
-        if (!took) toast('The Nano reports ' + mic + ', position ' + position + ' instead of ' + check.mic + ', position ' + check.position + '.', 'error', 8000);
       }
 
       const paramBlob = extractCabIRParamBlob(data);
@@ -5771,6 +5792,10 @@ function parseSelectedCaptureState(payload) {
     function isFactoryCabIR() {
       const full = String(state.currentIR.fullName || '');
       const short = String(state.currentIR.shortName || '');
+      // the Nano names a factory IR "cab/mic/position"; the factory cabs are in its library; their mics it names
+      if (/^[^/]+\/[^/]+\/\d+$/.test(full.trim())) return true;
+      if (short && state.library.loaded && state.library.irFactory.some(item => sameName(item.name, short))) return true;
+      if (short && state.cabIR.micsByCab[short.trim().toLowerCase()]) return true;
     
       const micNames = [
         'Condenser 184',
@@ -5837,7 +5862,23 @@ function parseSelectedCaptureState(payload) {
           '<circle cx="' + x(pos) + '" cy="50" r="1.9" class="spk-mic-core"/>' +
         '</svg>';
     }
-    const micNow = () => ({ pos: clamp(Math.round(Number(state.cabIR.position) || 1), 1, 6), mic: CAB_MICS.find(m => m.name === state.cabIR.mic) || CAB_MICS[0] });
+    // Any mic name with its drawing: a known one, else by its kind (condenser, ribbon, dynamic).
+    function micInfo(name) {
+      const known = CAB_MICS.find(m => sameName(m.name, name));
+      if (known) return known;
+      const text = String(name || '').trim();
+      const icon = /^condenser/i.test(text) ? 'mic-414' : /^ribbon/i.test(text) ? 'mic-160' : /421/.test(text) ? 'mic-421' : 'mic-57';
+      return { name: text, short: text.replace(/^(dynamic|condenser|ribbon)\s+/i, '') || text, icon };
+    }
+    // The mics of the loaded cab as the Nano names them (they differ from cab to cab); until it has named them, the
+    // five of the guitar cabs - and always the mic that is on now.
+    function cabMics() {
+      const named = state.cabIR.micsByCab[String(state.currentIR.shortName || '').trim().toLowerCase()];
+      const names = named && named.length ? named.slice() : CAB_MICS.map(m => m.name);
+      if (state.cabIR.mic && !names.some(n => sameName(n, state.cabIR.mic))) names.push(state.cabIR.mic);
+      return names.map(micInfo);
+    }
+    const micNow = () => ({ pos: clamp(Math.round(Number(state.cabIR.position) || 1), 1, 6), mic: micInfo(state.cabIR.mic || cabMics()[0].name) });
 
     // The small tile in the cab's strip: the speaker with the mic's place, the mic's name and position.
     function renderMicMini(show) {
@@ -5851,6 +5892,8 @@ function parseSelectedCaptureState(payload) {
 
     function openMic() {
       if (!state.cabIR.on || !isFactoryCabIR()) return;
+      // the mics of this cab: the Nano names them with the cab's settings
+      if (state.connected && !state.cabIR.micsByCab[String(state.currentIR.shortName || '').trim().toLowerCase()]) requestCabIRParamRefresh();
       $('micOverlay').hidden = false;
       renderMicStage();
       $('micClose').focus();
@@ -5867,8 +5910,8 @@ function parseSelectedCaptureState(payload) {
       stage.innerHTML = micSpeaker(pos, true, 'spkCone') +
         '<div class="mic-side">' +
           '<div class="mic-label">Mic <span>' + escapeHTML(mic.name) + '</span></div>' +
-          '<div class="mic-choice">' + CAB_MICS.map(m => '<button class="' + (m === mic ? 'on' : '') + '" data-mic="' + m.name + '" title="' + m.name + '">' +
-            '<span class="ico" style="--icon: var(--ico-' + m.icon + ')"></span>' + m.short + '</button>').join('') + '</div>' +
+          '<div class="mic-choice">' + cabMics().map(m => '<button class="' + (sameName(m.name, mic.name) ? 'on' : '') + '" data-mic="' + escapeHTML(m.name) + '" title="' + escapeHTML(m.name) + '">' +
+            '<span class="ico" style="--icon: var(--ico-' + m.icon + ')"></span>' + escapeHTML(m.short) + '</button>').join('') + '</div>' +
           '<div class="mic-label">Position</div>' +
           '<div class="mic-pos">' + [1, 2, 3, 4, 5, 6].map(p => '<button class="' + (p === pos ? 'on' : '') + '" data-pos="' + p + '" title="Position ' + p +
             (p === 1 ? ' (centre)' : p === 6 ? ' (edge)' : '') + '">' + p + '</button>').join('') + '</div>' +
@@ -8608,6 +8651,12 @@ function parseSelectedCaptureState(payload) {
       renderSignalChain();
       if (eqView) eqView.afterRender();
     }
+
+    // The page goes (reload, closed tab): end the connection now, so the Nano advertises again at once - a link left
+    // to time out kept it out of the browser's list until it was switched off and on (reported with Edge).
+    window.addEventListener('pagehide', () => {
+      try { if (state.device && state.device.gatt.connected) state.device.gatt.disconnect(); } catch (e) {}
+    });
 
     function disconnect() {
       if (state.device && state.device.gatt.connected) {

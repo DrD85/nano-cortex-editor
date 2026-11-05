@@ -77,7 +77,8 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   presets* below)
 - **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags by amp or pedal (the first two words of the name) and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
 - **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs a small tile shows the mic and its place –
-  a click opens the speaker with the five mic types and the positions 1–6 – you hear the choice at once, and **Save**
+  a click opens the speaker with the cab's mics (as the Nano names them – they differ from cab to cab, a bass cab
+  has others than a guitar cab) and the positions 1–6 – you hear the choice at once, and **Save**
   writes it into the preset's cab slot and then stores the preset; load factory or user IRs from the device library into a slot
 - **Monitor** (Mac app, under **…**): plays the Nano's USB sound through another audio device – an audio interface,
   speakers, headphones –, like the audio settings of a standalone plugin
@@ -109,7 +110,10 @@ on macOS, Windows, ChromeOS or Android, click **Connect** and choose your Nano C
 | Safari, Firefox | no Web Bluetooth – not possible |
 
 The Nano takes one Bluetooth connection at a time: close the Cortex Cloud app (also on your phone) and switch off a
-Nano Cortex Controller board before connecting directly.
+Nano Cortex Controller board before connecting directly. While something holds that connection, the Nano is missing
+from the browser's list of devices – wait about ten seconds after closing the other app and try again; if it still
+does not appear, switch the Nano off and on. The editor ends its connection itself when the page is closed or
+reloaded.
 
 ### Mac app
 
