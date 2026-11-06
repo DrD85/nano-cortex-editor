@@ -2719,7 +2719,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.12.1';
+    const EDITOR_VERSION = '1.12.2';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2844,20 +2844,48 @@
       }
     }
 
+    // The Nano this browser connected last: tried directly, without the list. The list only shows a Nano that is
+    // advertising - one the computer still holds from before (a reload, a closed tab, a laptop that slept) is not, and
+    // was then missing until the Nano was switched off and on. Short, so that the list can still open from the same
+    // click (a browser allows that only for a few seconds). After Disconnect the list opens, to choose another device.
+    let chooseNext = false;
+    async function knownNano() {
+      if (chooseNext || !navigator.bluetooth || typeof navigator.bluetooth.getDevices !== 'function') return null;
+      let last = '';
+      try { last = localStorage.getItem('nanoLastDevice') || ''; } catch (err) { /* no storage */ }
+      if (!last) return null;
+      let device = null;
+      try { device = (await navigator.bluetooth.getDevices()).find(d => d.id === last) || null; } catch (err) { return null; }
+      if (!device) return null;
+      setStatus('Connecting...');
+      log('Connecting the known device ' + (device.name || '(unnamed)') + ' directly...');
+      try {
+        const server = await Promise.race([device.gatt.connect(),
+          new Promise((resolve, reject) => setTimeout(() => reject(new Error('no answer within 2.5 s')), 2500))]);
+        if (server && server.connected) return { device, server };
+      } catch (err) {
+        log('Known device not reached (' + err.message + ') - opening the list.');
+      }
+      try { device.gatt.disconnect(); } catch (err) { /* nothing to end */ }
+      return null;
+    }
+
     async function connectNano() {
       try {
         if (!navigator.bluetooth) throw new Error('Web Bluetooth is not available. Use Chrome or Edge.');
         setStatus('Requesting device...');
         log('Requesting Nano Cortex...');
 
-        const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: SERVICE_UUIDS });
+        const known = await knownNano();
+        chooseNext = false;
+        const device = known ? known.device : await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: SERVICE_UUIDS });
         state.device = device;
         device.addEventListener('gattserverdisconnected', onDisconnected);
 
         setStatus('Connecting...');
-        log('Selected device: ' + (device.name || '(unnamed)'));
+        log('Selected device: ' + (device.name || '(unnamed)') + (known ? ' (known, connected directly)' : ''));
 
-        const server = await device.gatt.connect();
+        const server = known ? known.server : await device.gatt.connect();
         state.server = server;
         log('Connected. Searching A002/A003 for C304/C305...');
 
@@ -2897,6 +2925,7 @@
         state.c305.addEventListener('characteristicvaluechanged', onC305);
 
         state.connected = true;
+        try { localStorage.setItem('nanoLastDevice', device.id); } catch (err) { /* no storage */ }
         // "Nano Cortex Controller": the hardware controller passes everything on to the Nano.
         state.viaController = /controller/i.test(device.name || '');
         setStatus(state.viaController ? 'Connected via controller' : 'Connected', true);
@@ -2912,6 +2941,11 @@
             '• Close other tabs or windows with the editor, and the Nano Cortex Controller if it is on.' + NL +
             '• Wait about ten seconds and click Connect again.' + NL + NL +
             'If it still does not appear, switch the Nano off and on.');
+        }
+        // the direct try took the few seconds in which a click may open the list
+        if (err && err.name === 'SecurityError') {
+          chooseNext = true;
+          showNotice('Choose the Nano', 'The Nano did not answer directly. Click Connect again to choose it from the list.');
         }
       }
     }
@@ -3197,11 +3231,19 @@
         // (The cab settings reply is not: it can name another position than the preset plays - seen in a log.)
         const micCheck = cabMicLive.check;
         if (micCheck && parsedCabIR.mic && !cabMicLiveActive()) {
-          cabMicLive.check = null;
           const pos = parsedCabIR.position !== null ? parsedCabIR.position : 1;
           const took = sameName(parsedCabIR.mic, micCheck.mic) && pos === micCheck.position;
-          log('Cab mic in the state: ' + parsedCabIR.mic + ', position ' + pos + (took ? ' - as chosen' : ' - chosen was ' + micCheck.mic + ', position ' + micCheck.position));
-          if (!took) {
+          log('Cab mic in the state (' + state.currentIR.fullName + ', slot ' + state.cabIR.stateSlot + '): ' + parsedCabIR.mic + ', position ' + pos +
+            (took ? ' - as chosen' : ' - chosen was ' + micCheck.mic + ', position ' + micCheck.position));
+          // the Nano may still be switching the IR: read twice more before saying it did not take it, and keep
+          // showing the choice meanwhile
+          if (!took && (micCheck.reads || 0) < 2) {
+            micCheck.reads = (micCheck.reads || 0) + 1;
+            state.cabIR.mic = micCheck.mic;
+            state.cabIR.position = micCheck.position;
+            setTimeout(() => { state.protocol.skipFXModelApply = true; requestCurrentPresetState(); }, micCheck.reads === 1 ? 1000 : 2000);
+          } else cabMicLive.check = null;
+          if (!took && !cabMicLive.check) {
             state.cabIR.mic = parsedCabIR.mic;
             state.cabIR.position = pos;
             toast('The Nano plays ' + parsedCabIR.mic + ', position ' + pos + ' – it did not take ' + micCheck.mic + ', position ' + micCheck.position + '.', 'error', 8000);
@@ -3705,7 +3747,7 @@
       const want = state.cabIR.micPending;
       if (!want || !state.connected || !state.cabIR.on) return;
       const slot = state.cabIR.stateSlot;
-      if (!(slot >= 1 && slot <= 5) || !sameName(state.irNames.get(slot), want.cab)) {
+      if (!cabInSlot(slot, want.cab)) {
         log('Cab mic/position: "' + want.cab + '" is in no cab slot of this preset - it is written with Save.');
         return;
       }
@@ -3723,6 +3765,15 @@
       }
     }
     const cabMicLiveActive = () => Boolean(cabMicLive.timer || cabMicLive.busy);
+    // Is this cab in the slot the preset plays? The state names the cab that plays from that slot; the slot list read
+    // at connect can name it differently or be out of date (a cab loaded with another app) - then the state counts.
+    function cabInSlot(slot, cab) {
+      if (!(slot >= 1 && slot <= 5)) return false;
+      if (sameName(state.irNames.get(slot), cab)) return true;
+      if (!sameName(state.currentIR.shortName, cab)) return false;
+      log('Cab slot ' + slot + ' is listed as "' + (state.irNames.get(slot) || '') + '", the preset plays "' + state.currentIR.shortName + '" from it - written there.');
+      return true;
+    }
 
     // The mic and its position are not a value of the preset: they say WHICH factory IR the cab is. The message above
     // only lets it be heard - a Save after it did not keep it (tried on a Nano, 2026-10-13). What a preset keeps is the
@@ -3741,7 +3792,7 @@
       if (!item) return { problem: 'the cab “' + want.cab + '” was not found in the Nano\'s library, so ' + what + ' was not stored' };
       // the slot of this preset if it holds this cab - else the cab comes from the library and needs a slot
       let slot = state.cabIR.stateSlot;
-      if (!(slot >= 1 && slot <= 5) || !sameName(state.irNames.get(slot), want.cab)) slot = await chooseSlot('cab', want.cab + ' (' + what + ')');
+      if (!cabInSlot(slot, want.cab)) slot = await chooseSlot('cab', want.cab + ' (' + what + ')');
       if (!slot) return { problem: 'no cab slot was chosen, so ' + what + ' was not stored' };
 
       if (cabMicLive.written !== want || cabMicLive.writtenSlot !== slot) {   // not already in the slot from the click
@@ -8993,6 +9044,7 @@ function parseSelectedCaptureState(payload) {
     });
 
     function disconnect() {
+      chooseNext = true;   // the next Connect opens the list (another device may be wanted)
       if (state.device && state.device.gatt.connected) {
         state.device.gatt.disconnect();
       } else {

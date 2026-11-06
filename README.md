@@ -113,7 +113,8 @@ The Nano takes one Bluetooth connection at a time: close the Cortex Cloud app (a
 Nano Cortex Controller board before connecting directly. While something holds that connection, the Nano is missing
 from the browser's list of devices – wait about ten seconds after closing the other app and try again; if it still
 does not appear, switch the Nano off and on. The editor ends its connection itself when the page is closed or
-reloaded.
+reloaded, and **Connect** first tries the Nano it was connected to last directly – that also reaches a Nano the
+computer still holds from before, which the list leaves out. After **Disconnect**, Connect opens the list again.
 
 ### Mac app
 
