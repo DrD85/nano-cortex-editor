@@ -242,6 +242,7 @@
 
     .knob {
       --pct: 50%;
+      touch-action: none;   /* on a touch screen a drag turns the knob instead of scrolling the page */
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -597,6 +598,290 @@
     .lib-tag { padding: 1px 7px; border-radius: 999px; background: #1d1d1d; border: 1px solid #2c2c2c; color: #bdbdbd; font-size: 11px; }
     .lib-tag.hit { background: #f2f2f2; color: #000; border-color: #f2f2f2; }
     .lib-empty { color: var(--muted); padding: 30px 0; text-align: center; }
+
+    /* in the iPhone app (data-app on <html>): no grey flash on taps, no text selection or callout on buttons held down;
+       closed, the outer screen's clock sits in the top right corner (--app-corner) */
+    html[data-app="ios"] { -webkit-tap-highlight-color: transparent; }
+    html[data-app="ios"] :is(button, .knob, .sc-node, .toggle-switch, .seg) { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    html[data-app="ios"] header.topbar { padding-right: calc(var(--app-corner, 0px) + 12px); }
+
+    /* ---- iPhone Duo (the app sets data-posture; the page sets data-duo: outer, half, book, flat) ----
+       Overview first: every block is in sight and one tap away; nothing scrolls that does not have to. */
+    #duoStage, #duoList, #duoFooter, .duo-only { display: none; }
+    html[data-duo] body { overscroll-behavior: none; }
+    html[data-duo] .beta-footer, html[data-duo] header.topbar .brand, html[data-duo] #renameBtn, html[data-duo] #expBtn,
+    html[data-duo] #fsBtn, html[data-duo] #midiBtn, html[data-duo] .tool-sep, html[data-duo] #syncLine { display: none; }
+    html[data-duo] .more-menu .duo-only { display: flex; }
+    /* (the cards are fixed in place - the page itself may be empty, so it keeps its dark ground on its own) */
+    html[data-duo] { background: #000; }
+    html[data-duo] body { min-height: 100vh; }
+    /* the iPhone app gives the page the whole screen: the body is the frame above the home bar (--sa-bottom, less the
+       page's own 8 px), and every fixed panel sits in it (transform). The system's clock keeps a corner: upright it is the
+       top band right of the top bar (--head-h tall, --head-pad-r wide), sideways and closed a strip on the right
+       (--app-corner, about 120-160 pt down) */
+    html[data-app="ios"][data-duo] body { position: fixed; top: 0; left: 0; right: 0; bottom: max(0px, calc(var(--sa-bottom, 0px) - 8px));
+      height: auto; min-height: 0; margin: 0; overflow: hidden; transform: translateZ(0); }
+    html[data-app="ios"][data-duo="flat"] main { position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain;
+      align-content: start; grid-auto-rows: max-content; }
+    html[data-duo] header.topbar { box-sizing: border-box; min-height: 0; position: fixed; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; gap: 8px;
+      height: var(--head-h, 56px); padding: 8px 12px; padding-right: calc(var(--head-pad-r, var(--app-corner, 0px)) + 12px);
+      padding-left: calc(var(--app-corner-left, 0px) + 12px);
+      background: #0b0c0d; border: 0; }
+    html[data-duo] header.topbar .preset-bar { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; margin: 0; }
+    html[data-duo] header.topbar .preset-field { flex: 1; min-width: 0; }
+    html[data-duo] header.topbar .tools { display: flex; align-items: center; gap: 8px; flex: none; margin: 0; }
+    html[data-duo] .conn-btn { padding: 0 12px; justify-content: center; }
+    html[data-duo] header.topbar .conn-btn.connected { display: none; }   /* connected, its menu is the "…" one: the room goes to the preset's name */
+    html:is([data-duo="outer"], [data-duo="book"]) :is(#tunerBtn, #jamBtn) { display: none; }
+    html[data-duo="outer"] :is(#abBox, .conn-btn) { display: none; }
+    html:is([data-duo="outer"], [data-duo="book"]) header.topbar :is(.icon-btn, .conn-btn) { width: 40px; min-width: 40px; height: 40px; padding: 0; }
+    html:is([data-duo="outer"], [data-duo="book"]) header.topbar .preset-field select { padding-left: 10px; }
+    html[data-duo] .conn-btn #status { display: none; }
+    html[data-duo] main { padding: 0; display: block; }
+    html[data-duo] .connect-hero { position: fixed; inset: var(--head-h, 56px) 0 0 0; padding-top: 40px; }
+    html[data-duo="book"] .connect-hero { left: calc(var(--fold-start) + var(--fold-size)); top: 0; }
+    html[data-duo] main.offline :is(.top-row, #chain) > * { opacity: .2; filter: grayscale(1); pointer-events: none; user-select: none; }
+
+    /* the chain with names: half open and open flat */
+    html:is([data-duo="half"], [data-duo="flat"]) #signalChain { position: relative; display: flex; align-items: flex-start; gap: 2px; padding: 10px 6px 8px;
+      overflow: hidden; border-radius: 14px; }
+    html:is([data-duo="half"], [data-duo="flat"]) .signal-chain::before { top: 30px; left: 18px; right: 18px; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-node, html:is([data-duo="half"], [data-duo="flat"]) .sc-node.wide { flex: 1 1 0; min-width: 0; gap: 4px; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-node.io { flex: 0 0 28px; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-tile, html:is([data-duo="half"], [data-duo="flat"]) .sc-node.wide .sc-tile {
+      width: 42px; height: 42px; padding: 0; border-radius: 11px; display: flex; align-items: center; justify-content: center; gap: 0; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-tile .ico { width: 20px; height: 20px; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-node .sc-tile .nm { display: none; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-tile.io { width: 26px; height: 26px; margin-top: 8px; font-size: 8px; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-tile.io.meter { width: 22px; height: 42px; margin-top: 0; padding: 5px 0; gap: 3px; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-lbl { font-size: 8.5px; letter-spacing: .12em; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-sub, html:is([data-duo="half"], [data-duo="flat"]) .sc-wide-sub {
+      display: block; min-height: 0; max-width: 100%; font-size: 11px; font-weight: 600; color: #e6e8ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-node.io .sc-sub, html:is([data-duo="half"], [data-duo="flat"]) .sc-node.io .sc-lbl { display: none; }
+    html[data-duo="half"] .sc-node.duo-sel .sc-tile { box-shadow: 0 0 0 3px #0b0c0d, 0 0 0 5px var(--c); }
+    html:is([data-duo="half"], [data-duo="flat"]) .sc-node:hover .sc-tile { transform: none; }
+    .sc-wide-sub { display: none; }
+
+    /* ---- half open, the fold across: the chain and the live view above it, all controls of the block below ---- */
+    html[data-duo="half"] body { height: 100vh; overflow: hidden; }
+    html[data-duo="half"] #signalChain { position: fixed; top: calc(var(--head-h, 56px) + 4px); left: calc(12px + var(--app-corner-left, 0px)); right: calc(12px + var(--app-corner, 0px)); height: 92px; }
+    html[data-duo="half"] #duoStage { display: block; position: fixed; top: calc(var(--head-h, 56px) + 104px); left: 12px; right: 12px;
+      height: calc(var(--fold-start) - var(--head-h, 56px) - 112px); }
+    html[data-duo="half"] :is(.top-row, #chain) { position: fixed; top: calc(var(--fold-start) + var(--fold-size) + 8px); left: 12px; right: 12px; bottom: 8px;
+      display: block; overflow: auto; padding: 0; }
+    html[data-duo="half"] body.jam-open :is(.top-row, #chain) { bottom: calc(var(--jam-h, 72px) + 8px); }
+
+    /* ---- on its side like a book, the fold upright: every block on the left page, the chosen one on the right ---- */
+    html[data-duo="book"] body { height: 100vh; overflow: hidden; }
+    html[data-duo="book"] header.topbar { right: auto; width: var(--fold-start); }
+    html[data-duo="book"] #signalChain { display: none; }
+    html[data-duo="book"] #duoList { display: grid; grid-auto-rows: minmax(0, 1fr); gap: 6px; position: fixed; top: calc(var(--head-h, 56px) + 4px); left: calc(12px + var(--app-corner-left, 0px));
+      width: calc(var(--fold-start) - 24px - var(--app-corner-left, 0px)); bottom: 76px; }
+    html[data-duo="book"] #duoFooter { display: flex; position: fixed; left: calc(12px + var(--app-corner-left, 0px));
+      width: calc(var(--fold-start) - 24px - var(--app-corner-left, 0px)); bottom: 8px; height: 60px; }
+    html[data-duo="book"] #duoStage { display: block; position: fixed; top: 8px; left: calc(var(--fold-start) + var(--fold-size) + 12px);
+      right: calc(12px + var(--app-corner, 0px)); height: calc(46% - 8px); }
+    html[data-duo="book"] :is(.top-row, #chain) { position: fixed; top: calc(46% + 8px); left: calc(var(--fold-start) + var(--fold-size) + 12px); right: calc(12px + var(--app-corner, 0px)); bottom: 8px;
+      display: block; overflow: auto; padding: 0; }
+    html[data-duo="book"] .jam-dock { right: auto; width: var(--fold-start); }
+    html[data-duo="book"] body.jam-open #duoList { bottom: calc(var(--jam-h, 72px) + 76px); }
+    html[data-duo="book"] body.jam-open #duoFooter { bottom: calc(var(--jam-h, 72px) + 8px); }
+    #duoFooter .ab-box { flex: none; }
+
+    /* the chosen block alone, filling its half (half open and book) */
+    html:is([data-duo="half"], [data-duo="book"]) :is(.top-row > .top-card, #chain > .block):not(.duo-focus) { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) :is(.top-row, #chain):not(:has(.duo-focus)) { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus { min-height: 100%; height: auto; margin: 0; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.block { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 10px;
+      row-gap: 10px; align-content: start; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.block > .block-head { display: contents; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.block > .block-head .block-title { grid-column: 1; grid-row: 1; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.block > .block-head .block-title h2 { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.block > .block-head .head-actions { grid-column: 3; grid-row: 1; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.block > .model-row { grid-column: 2; grid-row: 1; margin: 0; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.block > :not(.block-head):not(.model-row) { grid-column: 1 / -1; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus .fxp { display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus .fxp > * { flex: none; margin: 0; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus .fxp .fxp-fav { display: flex; gap: 6px; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus .fxp .fxp-fav .empty.wide { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus :is(.pedal-thumb, .fx-info-btn) { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus .model-row { grid-template-columns: minmax(0, 1fr); }
+    /* an EQ: its curve is above the fold, all its bands below at once - a row per band */
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.eq-graph :is(.eq-mini, .eq-foot) { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus.eq-graph .param-grid { display: grid; }
+
+    /* the live view: the EQ dialog sits in it, without its frame and fields (the knobs are below) */
+    .duo-stage { border: 1px solid var(--border); border-radius: 14px; background: linear-gradient(180deg, rgba(23, 25, 27, .94), rgba(9, 10, 11, .94)); overflow: hidden; }
+    #duoStage > #eqOverlay { position: static; inset: auto; display: block; height: 100%; padding: 0; background: none; z-index: auto; }
+    #duoStage > #eqOverlay[hidden] { display: none; }
+    #duoStage .eq-panel { width: 100%; height: 100%; max-height: none; padding: 8px 10px; gap: 6px; border: 0; border-radius: 0; background: none;
+      display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+    #duoStage .eq-panel :is(.eq-strip, .eq-note, #eqClose, #eqToggle) { display: none; }
+    #duoStage .eq-panel .tuner-head { min-height: 0; }
+    #duoStage .eq-panel .dlg-title { font-size: 14px; }
+    #duoStage .eq-stage { height: 100%; min-height: 0; }
+    #duoStage .eq-stage canvas { height: 100%; min-height: 0; }
+    .duo-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 0; }
+    .duo-head b { font-size: 14px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .duo-live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 650; color: #9df5ad; letter-spacing: .04em; white-space: nowrap; }
+    .duo-live i { width: 7px; height: 7px; border-radius: 50%; background: #45F862; box-shadow: 0 0 8px #45F862; }
+    .duo-live.off { color: #8e9297; }
+    .duo-live.off i { background: #5e6369; box-shadow: none; }
+    .duo-body { display: grid; height: calc(100% - 44px); padding: 8px 12px 10px; gap: 14px; }
+    .duo-body.comp { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+    .duo-body svg { width: 100%; height: 100%; display: block; }
+    .duo-note { font-size: 11px; color: #6f747a; padding: 0 12px 8px; margin-top: -6px; }
+    .duo-big { display: grid; align-content: center; justify-items: start; gap: 6px; }
+    .duo-read { font-size: 44px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+    .duo-read small { font-size: 13px; color: #8e9297; font-weight: 600; margin-left: 4px; }
+    .duo-bars { display: grid; gap: 6px; width: 100%; }
+    .duo-bars i { display: block; height: 8px; border-radius: 4px; background: #23272b; position: relative; overflow: hidden; }
+    .duo-bars i::after { content: ""; position: absolute; inset: 0; width: var(--v, 0%);
+      background: linear-gradient(90deg, #45F862 0, #45F862 70%, #f2d14b 70%, #f2d14b 90%, #ff5a4d 90%); background-size: calc(100% / max(var(--f, 1), .01)) 100%; }
+    .duo-mark { font-size: 13px; color: #8e9297; }
+    .duo-mark.ok { color: #7ff593; font-weight: 650; }
+    .duo-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* the book's left page: every block, its main values, a switch */
+    .duo-row { display: flex; align-items: center; gap: 10px; min-height: 0; padding: 6px 10px; border: 1px solid var(--border); border-radius: 12px;
+      background: linear-gradient(180deg, rgba(23, 25, 27, .94), rgba(9, 10, 11, .94)); cursor: pointer; overflow: hidden; }
+    .duo-row.sel { border-color: var(--c); box-shadow: inset 0 0 0 1px var(--c); }
+    .duo-row.off { opacity: .55; }
+    .duo-row .fx-icon { --block-color: var(--c); }
+    .duo-row .txt { flex: 1; min-width: 0; }
+    .duo-row .top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+    .duo-row .lbl { width: 54px; flex: none; font-size: 9.5px; letter-spacing: .13em; text-transform: uppercase; color: #8e9297; }
+    .duo-row .nm { font-size: 13.5px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .duo-row .vals { margin-top: 2px; font-size: 11.5px; color: #8e9297; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .duo-row .vals b { color: #cfd3d7; font-weight: 600; }
+    .duo-row .toggle-switch { flex: none; transform: scale(.85); --block-color: var(--c); }
+
+    /* the meter strip with tuner and input (closed, and the book's left page) */
+    #duoFooter { align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 14px; background: #0f1113; }
+    #duoFooter .duo-read { font-size: 24px; }
+    #duoFooter .duo-bars { flex: 1; min-width: 40px; }
+    #duoFooter .icon-btn { flex: none; }
+    #duoFooter .duo-in.on { background: #ff5a4d; border-color: #ff5a4d; color: #1a0503; }
+
+    /* ---- closed: the outer screen is the stage - every block a big tile, a tap switches it ---- */
+    html[data-duo="outer"] :is(.top-row, #chain, #duoStage, #duoList) { display: none; }
+    /* closed: the system keeps the top right corner for its clock (--app-corner wide, about 160 pt down) - the top bar
+       and the level strip stay left of it, the tiles start below it */
+    html[data-duo="outer"] #signalChain { position: fixed; top: calc(var(--head-h, 56px) + 106px); left: 12px; right: 12px; bottom: 8px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: minmax(0, 1fr); align-items: stretch; gap: 10px; padding: 0; border: 0; border-radius: 0; background: none; overflow: hidden; }
+    html[data-duo="outer"] body.jam-open #signalChain { bottom: calc(var(--jam-h, 72px) + 8px); }
+    html[data-duo="outer"] .signal-chain::before { display: none; }
+    html[data-duo="outer"] .sc-node.io { display: none; }
+    html[data-duo="outer"] .sc-node, html[data-duo="outer"] .sc-node.wide { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: auto 1fr; align-items: start; justify-items: start; gap: 0; padding: 12px 14px; border-radius: 16px;
+      border: 2px solid var(--c); background: var(--c); color: var(--ink, #0b0b0b); }
+    html[data-duo="outer"] .sc-node[data-state="off"] { background: #101214; color: var(--c); }
+    html[data-duo="outer"] .sc-node[data-state="empty"] { border-style: dashed; border-color: #3a3f45; background: none; color: #5e6369; }
+    html[data-duo="outer"] .sc-node .sc-tile, html[data-duo="outer"] .sc-node.wide .sc-tile { grid-column: 2; grid-row: 1; width: auto; height: auto; padding: 0;
+      border: 0; background: none; box-shadow: none; color: inherit; display: block; }
+    html[data-duo="outer"] .sc-node .sc-tile .nm { display: none; }
+    html[data-duo="outer"] .sc-node .sc-tile .ico { width: 22px; height: 22px; }
+    html[data-duo="outer"] .sc-node .sc-lbl { grid-column: 1; grid-row: 1; font-size: 10px; letter-spacing: .16em; font-weight: 700; color: inherit; opacity: .75; }
+    html[data-duo="outer"] .sc-node :is(.sc-sub, .sc-wide-sub) { grid-column: 1 / -1; grid-row: 2; align-self: end; display: block; max-width: 100%; min-height: 0;
+      font-size: 16px; font-weight: 700; line-height: 1.15; text-align: left; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    html[data-duo="outer"] .sc-node[data-state="off"] .sc-tile::after { content: "OFF"; font-size: 10px; font-weight: 700; letter-spacing: .14em; }
+    html[data-duo="outer"] .sc-node[data-state="off"] .sc-tile .ico { display: none; }
+    html[data-duo="outer"] #duoFooter { display: flex; position: fixed; top: calc(var(--head-h, 56px) + 6px); left: 12px; right: calc(var(--app-corner, 0px) + 8px); height: 92px; min-width: 0; }
+    html[data-duo="outer"] #duoFooter .duo-read { font-size: 28px; }
+    html[data-duo="outer"] #duoFooter .icon-btn { width: 44px; height: 44px; }
+    #duoFooter > * { min-width: 0; }
+    html[data-duo="outer"] .connect-hero { inset: calc(var(--head-h, 56px) + 106px) 0 0 0; padding-top: 0; }
+    html[data-duo="outer"] .jam-bar { padding: 8px 12px; min-height: 0; }
+    html[data-duo="outer"] .jam-now { margin: 0 6px; }
+
+    /* ---- open flat: the whole preset on one screen, every block a compact card ---- */
+    html[data-duo="flat"] main { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px; padding: calc(var(--head-h, 56px) + 8px) 12px 12px; align-items: stretch; }
+    html[data-duo="flat"] body.jam-open main { padding-bottom: calc(var(--jam-h, 72px) + 14px); }
+    html[data-duo="flat"] main > :is(#signalChain, .connect-hero) { grid-column: 1 / -1; }
+    html[data-duo="flat"] main > #signalChain { margin-right: var(--app-corner, 0px); margin-left: var(--app-corner-left, 0px); }
+    html[data-duo="flat"] :is(.top-row, #chain) { display: contents; }
+    html[data-duo="flat"] :is(.top-card, .block) { min-height: 0; height: auto; padding: 10px 12px; margin: 0; border-radius: 14px; grid-column: auto; gap: 8px; }
+    html[data-duo="flat"] .block { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 8px; row-gap: 8px; align-content: start; }
+    html[data-duo="flat"] .block > .block-head { display: contents; }
+    html[data-duo="flat"] .block > .block-head .block-title { grid-column: 1; grid-row: 1; }
+    html[data-duo="flat"] .block > .block-head .head-actions { grid-column: 3; grid-row: 1; }
+    html[data-duo="flat"] .block > .model-row { grid-column: 2; grid-row: 1; }
+    html[data-duo="flat"] .block > :not(.block-head):not(.model-row) { grid-column: 1 / -1; }
+    html[data-duo="flat"] :is(.top-card, .block) .block-title h2 { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) .block-title h2 { display: none; }
+    html:is([data-duo="half"], [data-duo="book"]) .top-card.duo-focus { padding: 12px 14px; border-radius: 14px; }
+    html[data-duo="flat"] .top-card .block-head { margin: 0; min-height: 0; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(#captureSelect, #irSelect, .block .model-select) { height: 34px; padding-top: 0; padding-bottom: 0; line-height: 32px; font-size: 13.5px; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 8px; row-gap: 8px; align-content: start; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > .block-head { display: contents; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > .block-head > .block-title { grid-column: 1; grid-row: 1; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > .block-head > :last-child { grid-column: 3; grid-row: 1; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > select { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > :not(.block-head):not(select) { grid-column: 1 / -1; }
+    html[data-duo="flat"] .block.eq-graph .param-grid { display: none; }   /* an EQ: its curve is the overview, a tap opens it large */
+    html[data-duo="flat"] .top-card :is(.amp-face, .cabinet) { padding: 6px 4px; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 8px; row-gap: 8px; align-content: start; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card > .block-head { display: contents; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card .block-title { display: contents; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card .block-title .fx-icon { grid-column: 1; grid-row: 1; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card .block-title h2 { display: block; grid-column: 2; grid-row: 1; align-self: center; margin: 0; font-size: 15px; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card > .block-head > :last-child { grid-column: 3; grid-row: 1; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card #gateParams { grid-column: 1 / -1; margin: 0; }
+    html[data-duo="flat"] :is(.pedal-thumb, .fx-info-btn, .fxp, .mc6-exp) { display: none; }
+    html[data-duo="flat"] .block .model-row { grid-template-columns: minmax(0, 1fr); margin: 0 0 4px; }
+    html[data-duo="flat"] .block .model-select { height: 34px; font-size: 13.5px; }
+    html[data-duo="flat"] .block.eq-graph .eq-mini canvas { height: 76px; }
+    html[data-duo="flat"] .block .eq-foot { display: none; }
+    html[data-duo="flat"] .mic-mini { padding: 4px 8px; }
+    html[data-duo="flat"] .mic-mini .spk { display: none; }   /* the mic's name is enough here: the knobs get the room */
+    /* open flat and turned sideways (three columns): an effect with many controls takes two columns, its sliders in
+       four columns, the others fill the gaps - the whole preset stays on the screen */
+    @media (min-width: 940px) {
+      html[data-duo="flat"] main { grid-auto-flow: row dense; }
+      html[data-duo="flat"] .block:not(.eq-graph):has(.param-grid > :nth-child(7)) { grid-column: span 2; }
+      html[data-duo="flat"] .block:not(.eq-graph) .param-grid:has(> :nth-child(7)) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    /* ---- the Duo layouts draw knobs as sliders: name and value above a bar, the whole row is dragged sideways (its
+       width = the whole range) - the finger does not hide what it changes; a tap without moving asks for the value ---- */
+    html[data-duo]:not([data-duo="outer"]) :is(.param-grid, .amp-knobs) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; align-items: center; align-content: start; }
+    html[data-duo]:not([data-duo="outer"]) .cabinet .cab-controls { grid-template-columns: minmax(0, 1fr) !important; gap: 4px; align-items: center; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 18px 18px; gap: 0 6px; align-items: center;
+      justify-items: stretch; min-width: 0; padding: 0; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .param-name { order: 0; grid-column: 1; grid-row: 1; position: relative; z-index: 1; pointer-events: none; margin: 0; min-height: 0;
+      text-align: left; font-size: 10px; letter-spacing: .08em; color: #aeb3b9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text { order: 0; grid-column: 2; grid-row: 1; position: relative; z-index: 1; pointer-events: none; padding: 0; border-radius: 0;
+      text-align: right; font-size: 12.5px; font-weight: 600; color: #eef0f2; white-space: nowrap; background: none; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob { order: 0; grid-column: 1 / -1; grid-row: 1 / -1; align-self: stretch; position: relative; width: auto; height: auto; margin: 0;
+      border: 0; border-radius: 0; box-shadow: none; background: none; cursor: ew-resize; touch-action: pan-y; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::before { content: ""; display: block; position: absolute; inset: auto 0 5px 0; width: auto; height: 8px; border-radius: 4px;
+      box-shadow: none; background: linear-gradient(90deg, var(--block-color, #e5e5e5) 0 calc(var(--pct, 0%) * 100 / 73), #262a2f 0); }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob.volume::before { background: linear-gradient(90deg, #9aa0a6 0 calc(var(--pct, 0%) * 100 / 73), #262a2f 0); }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::after { display: block; position: absolute; top: auto; bottom: 1px; left: calc(var(--pct, 0%) * 100 / 73); z-index: 1; width: 4px;
+      height: 16px; border-radius: 2px; background: #f4f5f6; box-shadow: 0 0 0 2px rgba(0, 0, 0, .6); transform: translateX(-50%); transform-origin: 50% 50%; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param.dragging > .value-text { color: var(--block-color, #fff); }
+    html[data-duo]:not([data-duo="outer"]) .knob-param.dragging > .knob::before { box-shadow: 0 0 0 1px var(--block-color, #fff); }
+    html[data-duo]:not([data-duo="outer"]) :is(.switch-param, .stepped-param) { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: auto; align-items: center;
+      justify-items: stretch; gap: 0 6px; min-width: 0; }
+    html[data-duo]:not([data-duo="outer"]) :is(.switch-param, .stepped-param) > .param-name { margin: 0; min-height: 0; text-align: left; font-size: 10px; letter-spacing: .08em; color: #aeb3b9;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    html[data-duo]:not([data-duo="outer"]) .switch-pill { min-width: 50px; max-width: 120px; height: 28px; padding: 0 10px; font-size: 11px; }
+    html[data-duo]:not([data-duo="outer"]) .stepped-select { width: auto; min-width: 0; max-width: 120px; height: 28px; padding: 0 8px; font-size: 12px; }
+    html[data-duo]:not([data-duo="outer"]) #gateParams { place-items: stretch; align-content: start; width: 100%; }
+    /* half open: three in a row, taller, spread over the lower half - it is held in the hands */
+    html[data-duo="half"] .duo-focus.block { grid-template-rows: auto auto minmax(0, 1fr); }
+    html[data-duo="half"] .duo-focus .param-grid:not(.duo-bands) { align-self: stretch; align-content: space-evenly; }
+    html[data-duo="half"] .duo-focus :is(.param-grid:not(.duo-bands), .amp-knobs) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
+    html[data-duo="half"] .duo-focus .knob-param { grid-template-rows: 24px 28px; }
+    html[data-duo="half"] .duo-focus .knob-param > .param-name { font-size: 11px; }
+    html[data-duo="half"] .duo-focus .knob-param > .value-text { font-size: 15px; }
+    html[data-duo="half"] .duo-focus .knob-param > .knob::before { height: 12px; inset: auto 0 7px 0; border-radius: 6px; }
+    html[data-duo="half"] .duo-focus .knob-param > .knob::after { height: 24px; width: 5px; bottom: 1px; }
+    /* an EQ below the fold or on the right page: a row per band (gain, frequency, Q as sliders, type and on / off) */
+    html:is([data-duo="half"], [data-duo="book"]) .duo-focus .param-grid.duo-bands { grid-template-columns: repeat(var(--duo-cols), minmax(0, 1fr));
+      gap: 8px 12px; align-content: start; }
+    html[data-duo]:not([data-duo="outer"]) .duo-bands > :is(.switch-param, .stepped-param) { grid-template-columns: minmax(0, 1fr); grid-template-rows: 14px auto; gap: 3px 0; }
+    html[data-duo]:not([data-duo="outer"]) .duo-bands .switch-pill { max-width: none; width: 100%; height: 24px; padding: 0 4px; }
 
     /* shared presets: cards from GitHub, the capture and cab of each checked against the Nano */
     .shared-panel { grid-template-rows: auto auto auto minmax(0, 1fr); }
@@ -1231,6 +1516,7 @@
     .cap-type { padding: 2px 8px; border: 1px solid #33383e; border-radius: 999px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
                 color: #9aa0a6; white-space: nowrap; }
     .cap-type:empty { display: none; }
+    html[data-duo] .cap-type { display: none; }
 
     /* effect info */
     .fx-info-btn { width: 26px; height: 26px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: transparent;
@@ -2437,6 +2723,12 @@
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
+    // inside the iPhone app (Nano Cortex Pocket) the top bar names the app and its version
+    if (window.nanoApp && window.nanoApp.name) {
+      document.querySelector('.brand h1').textContent = window.nanoApp.name;
+      $('editorVersion').textContent = 'v' + window.nanoApp.version;
+      $('editorVersion').title = 'Editor page ' + EDITOR_VERSION;
+    }
 
     const logLines = [];
 
@@ -5447,6 +5739,25 @@ function parseSelectedCaptureState(payload) {
       if (shouldSend) sendParamValue(blockKey, param);
     }
 
+    // How far a knob is dragged, in its own unit (95 px = the whole range): upward on a knob; sideways on the sliders the
+    // iPhone app's Duo layouts draw instead (the slider's width = the whole range), where a tap without moving asks for
+    // the value (the value text cannot be tapped there - the whole row is the slider).
+    function knobDrag(down) {
+      const el = down.currentTarget, layout = document.documentElement.dataset.duo;
+      if (!layout || layout === 'outer') { const y0 = down.clientY; return { delta: m => y0 - m.clientY, end: () => {} }; }
+      const row = el.closest('.knob-param') || el, width = Math.max(60, row.getBoundingClientRect().width), x0 = down.clientX, y0 = down.clientY;
+      let moved = 0;
+      row.classList.add('dragging');
+      return {
+        delta: m => { moved = Math.max(moved, Math.abs(m.clientX - x0), Math.abs(m.clientY - y0)); return (m.clientX - x0) / width * 95; },
+        end: up => {
+          row.classList.remove('dragging');
+          const value = row.querySelector('.value-text');
+          if (up && up.type === 'pointerup' && moved < 5 && value) value.click();
+        }
+      };
+    }
+
     function updateKnobVisual(knobEl, valueEl, normalized, text) {
       knobEl.style.setProperty('--pct', Math.round(normalized * 73) + '%');
       knobEl.style.setProperty('--angle', (-135 + normalized * 270) + 'deg');
@@ -5962,9 +6273,9 @@ function parseSelectedCaptureState(payload) {
       knobEl.addEventListener('wheel', e => { e.preventDefault(); apply(current + (e.deltaY < 0 ? fine : -fine)); }, { passive: false });
       knobEl.addEventListener('pointerdown', e => {
         e.preventDefault();
-        const startY = e.clientY, start = current;
-        const onMove = m => apply(start + ((startY - m.clientY) / 95) * (max - min));
-        const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
+        const drag = knobDrag(e), start = current;
+        const onMove = m => apply(start + (drag.delta(m) / 95) * (max - min));
+        const onUp = u => { drag.end(u); window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
         window.addEventListener('pointermove', onMove);
         window.addEventListener('pointerup', onUp);
         window.addEventListener('pointercancel', onUp);
@@ -6116,16 +6427,17 @@ function parseSelectedCaptureState(payload) {
         if (disabled) return;
         e.preventDefault();
 
-        const dragStartY = e.clientY;
+        const drag = knobDrag(e);
         const dragStartValue = Number(param.value);
         const range = meta.max - meta.min;
 
         const onMove = moveEvent => {
-          const delta = ((dragStartY - moveEvent.clientY) / 95) * range;
+          const delta = (drag.delta(moveEvent) / 95) * range;
           applyValue(dragStartValue + delta);
         };
 
-        const onUp = () => {
+        const onUp = up => {
+          drag.end(up);
           window.removeEventListener('pointermove', onMove);
           window.removeEventListener('pointerup', onUp);
           window.removeEventListener('pointercancel', onUp);
@@ -6210,9 +6522,9 @@ function parseSelectedCaptureState(payload) {
       knobEl.addEventListener('wheel', e => { e.preventDefault(); apply(db() + (e.deltaY < 0 ? 0.5 : -0.5)); }, { passive: false });
       knobEl.addEventListener('pointerdown', e => {
         e.preventDefault();
-        const startY = e.clientY, start = db();
-        const onMove = m => apply(start + ((startY - m.clientY) / 95) * 36);
-        const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
+        const drag = knobDrag(e), start = db();
+        const onMove = m => apply(start + (drag.delta(m) / 95) * 36);
+        const onUp = u => { drag.end(u); window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
         window.addEventListener('pointermove', onMove);
         window.addEventListener('pointerup', onUp);
         window.addEventListener('pointercancel', onUp);
@@ -6288,15 +6600,16 @@ function parseSelectedCaptureState(payload) {
 
       knobEl.addEventListener('pointerdown', e => {
         e.preventDefault();
-        const dragStartY = e.clientY;
+        const drag = knobDrag(e);
         const dragStartValue = state.amp[key];
 
         const onMove = moveEvent => {
-          const delta = ((dragStartY - moveEvent.clientY) / 95) * 255;
+          const delta = (drag.delta(moveEvent) / 95) * 255;
           applyRaw(dragStartValue + delta);
         };
 
-        const onUp = () => {
+        const onUp = up => {
+          drag.end(up);
           window.removeEventListener('pointermove', onMove);
           window.removeEventListener('pointerup', onUp);
           window.removeEventListener('pointercancel', onUp);
@@ -6692,15 +7005,15 @@ function parseSelectedCaptureState(payload) {
         document.body.appendChild(pop);
       }
       const blockRect = document.getElementById('block-' + key).getBoundingClientRect();
-      const anchorRect = anchor.getBoundingClientRect();
+      const anchorRect = anchor.getBoundingClientRect(), fb = fixedFrame();
       pop.style.setProperty('--block-color', getComputedStyle(document.getElementById('block-' + key)).getPropertyValue('--block-color'));
-      pop.style.left = Math.max(8, blockRect.left + 10) + 'px';
+      pop.style.left = Math.max(8, blockRect.left - fb.left + 10) + 'px';
       pop.style.width = Math.max(230, blockRect.width - 20) + 'px';
       // Below the button, or above it when there is clearly more room there (like a macOS popover).
-      const below = window.innerHeight - anchorRect.bottom - 18, above = anchorRect.top - 18;
+      const below = fb.bottom - anchorRect.bottom - 18, above = anchorRect.top - fb.top - 18;
       const up = below < 300 && above > below;
-      pop.style.top = up ? '' : (anchorRect.bottom + 6) + 'px';
-      pop.style.bottom = up ? (window.innerHeight - anchorRect.top + 6) + 'px' : '';
+      pop.style.top = up ? '' : (anchorRect.bottom - fb.top + 6) + 'px';
+      pop.style.bottom = up ? (fb.bottom - anchorRect.top + 6) + 'px' : '';
       pop.style.maxHeight = Math.max(160, up ? above : below) + 'px';
 
       const list = fxPresetsOf(block.model);
@@ -7713,7 +8026,7 @@ function parseSelectedCaptureState(payload) {
 
     const nativeMeter = () => window.nanoMeter || null;   // the Mac app's helper
     // channels: 1 or 2 measured ones, starting at channel "first" (1-based) of the "total" the input delivers
-    const meter = { on: false, starting: false, userOff: false, native: false, rate: 48000, ctx: null, stream: null, raw: [], weighted: [], buf: null,
+    const meter = { on: false, starting: false, userOff: false, native: false, di: null, rate: 48000, ctx: null, stream: null, raw: [], weighted: [], buf: null,
       timer: null, lastTime: 0, channels: 2, total: 2, first: 1, label: '', deviceId: '', inputs: [], error: '',
       peakDb: [-Infinity, -Infinity], holdDb: [-Infinity, -Infinity], holdAt: [0, 0], clipAt: 0, energy: 0, frames: 0, blockPeak: 0, blocks: [] };
     // before / undo: { preset, db, level } - capture volume and Level before a run; levelAsk: the preset whose Level was asked about
@@ -7821,6 +8134,7 @@ function parseSelectedCaptureState(payload) {
           renderLevel();
           renderSignalChain();
         } else if (Array.isArray(data.p)) {
+          m.di = data.d || null;   // the iPhone app: the dry signal on channels 1/2 as well (the Duo's compressor view)
           meterFeed(data.p, Number(data.e) || 0, Number(data.n) || 0, m.rate);
         }
       });
@@ -7978,6 +8292,7 @@ function parseSelectedCaptureState(payload) {
       });
       const read = $('outRead');
       if (read) read.textContent = loud > -70 ? dbText(loud) : '–';
+      if (duoLayout()) duoMeterDraw();
       if (!dialog) return;
       $('lvBarLoud').style.setProperty('--v', meterPos(loud));
       $('lvNumLoud').textContent = loud > -70 ? dbText(loud) : '–';
@@ -8556,14 +8871,14 @@ function parseSelectedCaptureState(payload) {
         (info.basedOn ? '<div class="fxi-foot">' + escapeHTML(FX_INFO_FOOT) + '</div>' : '');
       document.body.appendChild(pop);
       // Under the block header, or above it when there is clearly more room there.
-      const blockRect = blockEl.getBoundingClientRect(), anchorRect = anchor.getBoundingClientRect();
-      const width = Math.min(320, window.innerWidth - 16);
+      const blockRect = blockEl.getBoundingClientRect(), anchorRect = anchor.getBoundingClientRect(), fb = fixedFrame();
+      const width = Math.min(320, fb.width - 16);
       pop.style.width = width + 'px';
-      pop.style.left = Math.max(8, Math.min(blockRect.left + blockRect.width / 2 - width / 2, window.innerWidth - width - 8)) + 'px';
-      const below = window.innerHeight - anchorRect.bottom - 18, above = anchorRect.top - 18;
+      pop.style.left = Math.max(8, Math.min(blockRect.left - fb.left + blockRect.width / 2 - width / 2, fb.width - width - 8)) + 'px';
+      const below = fb.bottom - anchorRect.bottom - 18, above = anchorRect.top - fb.top - 18;
       const up = below < pop.offsetHeight && above > below;
-      if (up) pop.style.bottom = (window.innerHeight - anchorRect.top + 8) + 'px';
-      else pop.style.top = (anchorRect.bottom + 8) + 'px';
+      if (up) pop.style.bottom = (fb.bottom - anchorRect.top + 8) + 'px';
+      else pop.style.top = (anchorRect.bottom - fb.top + 8) + 'px';
       pop.style.maxHeight = Math.max(160, up ? above : below) + 'px';
     }
 
@@ -8618,12 +8933,21 @@ function parseSelectedCaptureState(payload) {
           return;
         }
         node.className = 'sc-node' + (n.wide ? ' wide' : '');
+        node.dataset.key = n.key;
+        node.dataset.state = n.state;
+        node.style.setProperty('--c', n.color);
+        node.style.setProperty('--ink', iconInk(n.color));
         const icon = n.icon ? '<span class="ico" style="--icon: var(--ico-' + n.icon + ')"></span>' : '';
         node.innerHTML = '<div class="sc-tile ' + n.state + '" style="--c:' + n.color + ';--ink:' + iconInk(n.color) + '">' + icon +
           (n.wide ? '<span class="nm">' + escapeHTML(n.name) + '</span>' : '') + '</div>' +
-          '<span class="sc-lbl">' + escapeHTML(n.label) + '</span>' + (n.wide ? '' : '<span class="sc-sub">' + escapeHTML(n.sub || '') + '</span>');
+          '<span class="sc-lbl">' + escapeHTML(n.label) + '</span>' + (n.wide ? '<span class="sc-wide-sub">' + escapeHTML(n.name) + '</span>'
+            : '<span class="sc-sub">' + escapeHTML(n.sub || '') + '</span>');
         node.title = n.label + (n.wide ? ': ' + n.name : n.sub ? ': ' + n.sub : '') + ' - double-click: on / off';
         node.addEventListener('click', () => {
+          // the iPhone Duo: closed, a tap switches the block; half open or as a book, it chooses the block
+          const layout = duoLayout();
+          if (layout === 'outer') { if (n.state !== 'empty') n.toggle(); return; }
+          if (layout === 'half' || layout === 'book') { duoSetFocus(n.key); return; }
           const target = $(n.target);
           if (!target) return;
           target.style.setProperty('--flash', n.color);
@@ -8650,6 +8974,16 @@ function parseSelectedCaptureState(payload) {
       Object.entries(state.blocks).forEach(([key, block]) => chain.appendChild(renderBlock(key, block)));
       renderSignalChain();
       if (eqView) eqView.afterRender();
+      duoApply();
+    }
+
+    // the iPhone Duo's layout ('' elsewhere): set by the Duo section from the app's posture
+    function duoLayout() { return document.documentElement.dataset.duo || ''; }
+    // the box fixed elements are placed in: the window, or the body when it frames them (the iPhone app on the Duo)
+    function fixedFrame() {
+      const body = document.body, t = getComputedStyle(body).transform;
+      if (t && t !== 'none') { const r = body.getBoundingClientRect(); return { left: r.left, top: r.top, bottom: r.bottom, width: r.width }; }
+      return { left: 0, top: 0, bottom: window.innerHeight, width: window.innerWidth };
     }
 
     // The page goes (reload, closed tab): end the connection now, so the Nano advertises again at once - a link left
@@ -9880,7 +10214,8 @@ function parseSelectedCaptureState(payload) {
       if (!jamStore.open) return;
       $('jamPlay').firstElementChild.style.setProperty('--icon', 'var(--ico-' + (playing ? 'pause' : 'play') + ')');
       $('jamPlay').classList.toggle('on', playing);
-      $('jamTitle').textContent = track ? track.name : 'Choose the folder with your jam tracks';
+      $('jamTitle').textContent = track ? track.name
+        : document.documentElement.dataset.app === 'ios' ? 'Choose your jam tracks (Files app)' : 'Choose the folder with your jam tracks';
       $('jamInfo').textContent = track ? (jam.index + 1) + ' / ' + jam.tracks.length + ' · ' + jamTrackNote(track, false) : '';
       const trim = jamTrim(track);
       $('jamTrim').textContent = dbText(trim, true);
@@ -10985,6 +11320,376 @@ function parseSelectedCaptureState(payload) {
 
       return { decorateBlock, frequencyText, typeFrequency, afterRender, openDialog, closeDialog, store, eqModel, bandDb, totalDb, toHz, fromHz, dialog, spec };
     })();
+
+    // ---- iPhone Duo ----
+    // The app sets data-posture on <html> (outer, half, flat, phone) and the fold (--fold-start / --fold-size); the
+    // page chooses its layout from it (data-duo):
+    // - closed (outer screen): the stage - every block a big tile, a tap switches it; the meter, tuner, input below,
+    // - half open, the fold across: the chain with names and the chosen block's live view above the fold (an EQ: its
+    //   curve over the spectrum; a compressor: its curve with the level going through it), all its controls below,
+    // - on its side like a book: every block with its main values on the left page, the chosen one on the right,
+    // - open flat: the whole preset on one screen, every block a compact card.
+    // What the user asked for first: overview, and every effect one tap away.
+    const DUO_KEYS = ['gate', 'pre1', 'pre2', 'capture', 'cab', 'post1', 'post2', 'post3'];
+    const duo = { focus: 'pre1', stage: '', comp: null, gr: 0, frame: 0 };
+    try { const saved = localStorage.getItem('nanoDuoFocus'); if (DUO_KEYS.includes(saved)) duo.focus = saved; } catch (e) { /* storage unavailable */ }
+    const duoStage = document.createElement('section');
+    duoStage.id = 'duoStage';
+    duoStage.className = 'duo-stage';
+    const duoList = document.createElement('section');
+    duoList.id = 'duoList';
+    const duoFooter = document.createElement('section');
+    duoFooter.id = 'duoFooter';
+    document.querySelector('main').append(duoStage, duoList, duoFooter);
+    // the jam player's height (one row on a wide screen, three on the closed one): the layouts make room for it
+    new ResizeObserver(() => document.documentElement.style.setProperty('--jam-h', Math.ceil($('jamDock').getBoundingClientRect().height) + 'px'))
+      .observe($('jamDock'));
+
+    // menu entries for what the Duo's top bar has no room for
+    [['renameBtn', 'rename', 'Rename preset…'], ['expBtn', 'exp', 'Expression pedal…'], ['fsBtn', 'footswitch', 'Footswitches…'], ['midiBtn', 'midi', 'MIDI…']]
+      .reverse().forEach(([id, icon, text]) => {
+        const item = document.createElement('button');
+        item.className = 'duo-only';
+        item.innerHTML = '<span class="ico" style="--icon: var(--ico-' + icon + ')"></span>' + text;
+        item.addEventListener('click', () => $(id).click());
+        $('moreMenu').prepend(item);
+      });
+
+    function duoUpdateLayout() {
+      const root = document.documentElement, posture = root.dataset.posture;
+      const layout = posture === 'outer' ? 'outer' : posture === 'half' ? (root.dataset.foldAxis === 'vertical' ? 'book' : 'half') : posture === 'flat' ? 'flat' : '';
+      if (layout !== duoLayout()) {
+        if (layout) root.dataset.duo = layout; else delete root.dataset.duo;
+        // the EQ dialog is the live view of an EQ while the halves are apart
+        const overlay = $('eqOverlay'), docked = layout === 'half' || layout === 'book';
+        if (docked && overlay.parentElement !== duoStage) { if (!overlay.hidden) eqView.closeDialog(); duoStage.appendChild(overlay); }
+        if (!docked && overlay.parentElement === duoStage) { if (!overlay.hidden) eqView.closeDialog(); document.body.appendChild(overlay); }
+        if (layout !== 'book' && duo.abHome && $('abBox').parentElement !== duo.abHome.parent) duo.abHome.parent.insertBefore($('abBox'), duo.abHome.next);
+        duo.stage = '';
+        render();
+      } else {
+        duo.stage = '';   // (a new size: the live view is drawn again)
+        duoApply();
+      }
+    }
+    window.addEventListener('nanoposture', duoUpdateLayout);
+    window.addEventListener('resize', () => { if (duoLayout()) { duo.stage = ''; duoApply(); } });
+
+    function duoCard(key) {
+      return key === 'capture' ? $('captureCard') : key === 'cab' ? $('cabCard') : key === 'gate' ? $('gateCard') : $('block-' + key);
+    }
+    function duoToggle(key) {
+      if (key === 'capture') $('captureToggle').click();
+      else if (key === 'cab') $('cabIRToggle').click();
+      else if (key === 'gate') $('gateToggle').click();
+      else {
+        const toggle = document.querySelector('#block-' + key + ' > .block-head .toggle-switch');
+        if (toggle) toggle.click();
+      }
+    }
+    function duoSetFocus(key) {
+      if (!DUO_KEYS.includes(key) || key === duo.focus) return;
+      duo.focus = key;
+      try { localStorage.setItem('nanoDuoFocus', key); } catch (e) { /* storage unavailable */ }
+      duoApply();
+    }
+
+    // after every render: the chosen block, its live view, the list, the meter strip
+    function duoApply() {
+      const layout = duoLayout();
+      if (!layout) return;
+      document.querySelectorAll('.duo-focus').forEach(el => el.classList.remove('duo-focus'));
+      const card = duoCard(duo.focus);
+      if (card) card.classList.add('duo-focus');
+      const block = state.blocks[duo.focus], grid = card && card.querySelector('.param-grid');
+      const eq = block && grid && eqView && eqView.eqModel(block);
+      if (eq && eq.bands.length > 1 && eq.bands.length < 6) {
+        const perBand = Math.floor(block.params.length / eq.bands.length);   // (Parametric 3: gain, freq, Q, type, on - and Output after them)
+        grid.classList.add('duo-bands');
+        grid.style.setProperty('--duo-cols', String(Math.max(2, Math.min(6, perBand))));
+      }
+      document.querySelectorAll('#signalChain .sc-node').forEach(node => node.classList.toggle('duo-sel', node.dataset.key === duo.focus));
+      if (layout === 'half' || layout === 'book') duoStageRender();
+      if (layout === 'book') duoListRender();
+      if (layout === 'outer' || layout === 'book') duoFooterRender();
+    }
+
+    // ---- the live view ----
+    function duoBlockInfo(key) {
+      if (key === 'capture') return { title: 'Capture', name: state.currentCapture.name || 'Capture', icon: 'capture', color: '#F2F2F2', on: state.capture.on };
+      if (key === 'cab') return { title: 'Cab / IR', name: state.currentIR.shortName || 'Cab', icon: 'cab', color: '#F2F2F2', on: state.cabIR.on };
+      if (key === 'gate') return { title: 'Gate', name: 'Gate', icon: 'gate', color: '#F2F2F2', on: state.gate.on };
+      const block = state.blocks[key];
+      const style = fxStyle(block.models.find(m => m.name === block.model));
+      return { title: block.title, name: block.model, icon: style.icon, color: style.color, on: block.on && block.model !== 'None' };
+    }
+
+    const duoIcon = (info, size) => '<span class="fx-icon" style="--icon: var(--ico-' + info.icon + ');--block-color:' + info.color + ';--icon-ink:' +
+      iconInk(info.color) + ';width:' + size + 'px;height:' + size + 'px"></span>';
+
+    function duoStageRender() {
+      const key = duo.focus, block = state.blocks[key];
+      if (block && eqView && eqView.eqModel(block)) {
+        if ($('eqOverlay').hidden || eqView.dialog.key !== key) eqView.openDialog(key);
+        duo.stage = 'eq:' + key;
+        return;
+      }
+      if ($('eqOverlay').parentElement === duoStage && !$('eqOverlay').hidden) eqView.closeDialog();
+      const comp = block ? duoCompModel(block) : null;
+      const info = duoBlockInfo(key);
+      const kind = (comp ? 'comp:' : 'meter:') + key + ':' + info.name;
+      duo.comp = comp;
+      if (duo.stage !== kind) {
+        duo.stage = kind;
+        duoStage.querySelectorAll(':scope > :not(#eqOverlay)').forEach(el => el.remove());
+        const head = document.createElement('div');
+        head.className = 'duo-head';
+        head.innerHTML = duoIcon(info, 24) +
+          '<b>' + escapeHTML(info.title + ' · ' + info.name) + '</b><span class="duo-live" id="duoLive"><i></i><span></span></span>';
+        duoStage.appendChild(head);
+        const body = document.createElement('div');
+        body.className = 'duo-body' + (comp ? ' comp' : '');
+        duoStage.appendChild(body);
+        if (comp) {
+          body.innerHTML = '<svg id="duoCurve"></svg><svg id="duoBars"></svg>';
+          const note = document.createElement('div');
+          note.className = 'duo-note';
+          note.textContent = 'Gain reduction worked out from the ' + (key.startsWith('pre') ? 'DI' : 'output') + ' and the knobs – the Nano does not report it.';
+          duoStage.appendChild(note);
+          body.style.height = 'calc(100% - 64px)';
+          requestAnimationFrame(() => duoCompDraw(true));
+        } else {
+          body.innerHTML = '<div class="duo-big"><span class="cap" style="font-size:10px;letter-spacing:.14em;color:#8e9297">OUTPUT · LUFS</span>' +
+            '<span class="duo-read" id="duoRead">–<small>LUFS</small></span><div class="duo-bars"><i id="duoBarL"></i><i id="duoBarR"></i></div>' +
+            '<span class="duo-mark" id="duoMark"></span><div class="duo-actions" id="duoActions"></div></div>';
+          const actions = body.querySelector('#duoActions');
+          const add = (text, action, primary) => {
+            const button = document.createElement('button');
+            button.className = primary ? 'primary' : '';
+            button.textContent = text;
+            button.addEventListener('click', action);
+            actions.appendChild(button);
+          };
+          if (!meter.on) add('Measure the Nano (USB-C)', () => meterStart(''), true);
+          add(key === 'capture' ? 'Auto level…' : 'Level & Auto level…', openLevel, false);
+          if (key === 'cab' && isFactoryCabIR()) add('Mic: ' + (state.cabIR.mic || '') + ', position ' + (state.cabIR.position || 1) + '…', openMic, false);
+        }
+      }
+      duoMeterDraw();
+    }
+
+    // A compressor of the Nano as the view draws it: its knobs read as numbers. Legendary 87 has no threshold - like
+    // the original, more input means more compression - so its threshold is taken from Input (an estimate).
+    function duoCompModel(block) {
+      if (!block.on || !/comp|legendary 87/i.test(block.model || '')) return null;
+      const param = name => block.params.find(p => String(p.name).toLowerCase() === name);
+      const text = p => (p ? String(paramDisplayValue(p)).replace(/−/g, '-').replace(',', '.') : '');
+      const number = p => parseFloat(text(p));
+      const seconds = p => { const t = text(p), v = parseFloat(t); return /ms/.test(t) ? v / 1000 : v; };
+      const threshold = param('threshold'), input = param('input');
+      const ratioText = text(param('ratio'));
+      const ratio = /inf|∞|all/i.test(ratioText) ? 20 : parseFloat(ratioText) || 4;
+      const thr = threshold ? number(threshold) : -10 - ((number(input) || -24) + 24);
+      const mix = param('mix') ? number(param('mix')) / 100 : 1;
+      return {
+        thr: clamp(Number.isFinite(thr) ? thr : -20, -60, 0), ratio: clamp(ratio, 1, 40), knee: 6,
+        attack: clamp(seconds(param('attack')) || 0.01, 0.0002, 1), release: clamp(seconds(param('release')) || 0.25, 0.02, 5),
+        makeup: number(param('makeup')) || 0, mix: clamp(Number.isFinite(mix) ? mix : 1, 0, 1)
+      };
+    }
+    const duoCompOut = (c, level) => {
+      const over = level - c.thr;
+      if (over <= -c.knee / 2) return level;
+      if (over >= c.knee / 2) return c.thr + over / c.ratio;
+      return level + (1 / c.ratio - 1) * Math.pow(over + c.knee / 2, 2) / (2 * c.knee);
+    };
+
+    // the level the compressor sees: the dry signal for one before the capture (the app sends channels 1/2 with the
+    // meter), else the output
+    function duoCompInput() {
+      const di = meter.di;
+      if (duo.focus.startsWith('pre') && di && di.n > 0 && di.e > 0) return { db: -0.691 + 10 * Math.log10(di.e / di.n), dry: true };
+      const recent = meter.blocks.slice(-4);
+      const e = blockEnergy(recent);
+      return { db: e > 0 ? lufsOf(e) : -Infinity, dry: false };
+    }
+
+    function duoCompDraw(full) {
+      const c = duo.comp, curve = $('duoCurve'), bars = $('duoBars');
+      if (!c || !curve || !bars) return;
+      const W = Math.max(120, Math.round(curve.getBoundingClientRect().width)), H = Math.max(100, Math.round(curve.getBoundingClientRect().height));
+      const lo = -60, x = db => 26 + (clamp(db, lo, 0) - lo) / -lo * (W - 32), y = db => H - 20 - (clamp(db, lo, 0) - lo) / -lo * (H - 30);
+      const input = duoCompInput();
+      // the gain reduction follows the level with the compressor's attack and release
+      const target = Number.isFinite(input.db) ? Math.max(0, input.db - duoCompOut(c, input.db)) : 0;
+      const now = performance.now(), dt = duo.frame ? Math.min(0.2, (now - duo.frame) / 1000) : 0.025;
+      duo.frame = now;
+      duo.gr += (target - duo.gr) * (1 - Math.exp(-dt / (target > duo.gr ? c.attack : c.release)));
+      if (full) {
+        curve.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+        let s = '';
+        [-48, -36, -24, -12, 0].forEach(db => {
+          s += '<line x1="' + x(db) + '" x2="' + x(db) + '" y1="8" y2="' + (H - 20) + '" stroke="#1d2024"/><line x1="26" x2="' + (W - 6) + '" y1="' + y(db) + '" y2="' + y(db) + '" stroke="#1d2024"/>' +
+            '<text x="' + x(db) + '" y="' + (H - 6) + '" text-anchor="middle" fill="#5e6369" font-size="9.5">' + db + '</text><text x="22" y="' + (y(db) + 3) + '" text-anchor="end" fill="#5e6369" font-size="9.5">' + db + '</text>';
+        });
+        s += '<line x1="' + x(lo) + '" y1="' + y(lo) + '" x2="' + x(0) + '" y2="' + y(0) + '" stroke="#2c3036" stroke-dasharray="3 4"/>';
+        s += '<line x1="' + x(c.thr) + '" x2="' + x(c.thr) + '" y1="8" y2="' + (H - 20) + '" stroke="#45F862" stroke-opacity=".35" stroke-dasharray="2 3"/>' +
+          '<text x="' + (x(c.thr) + 4) + '" y="18" fill="#7ff593" font-size="9.5">threshold</text>';
+        let d = '';
+        for (let i = 0; i <= 120; i++) { const level = lo + i / 120 * -lo; d += (i ? ' L' : 'M') + x(level).toFixed(1) + ',' + y(duoCompOut(c, level)).toFixed(1); }
+        s += '<path d="' + d + '" fill="none" stroke="#45F862" stroke-width="2.4"/>';
+        s += '<line id="duoGrLine" stroke="#ffb02e" stroke-width="3" stroke-opacity=".8"/><circle id="duoHalo" r="14" fill="#45F862" fill-opacity=".18"/>' +
+          '<circle id="duoDot" r="6.5" fill="#f2f2f2" stroke="#0b0c0d" stroke-width="2"/>';
+        curve.innerHTML = s;
+        const BW = Math.max(200, Math.round(bars.getBoundingClientRect().width)), BH = Math.max(100, Math.round(bars.getBoundingClientRect().height));
+        bars.setAttribute('viewBox', '0 0 ' + BW + ' ' + BH);
+        const col = BW / 4, h = BH - 46;
+        let b = '<defs><linearGradient id="duoLv" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#45F862"/><stop offset=".7" stop-color="#45F862"/>' +
+          '<stop offset=".7" stop-color="#f2d14b"/><stop offset=".9" stop-color="#f2d14b"/><stop offset=".9" stop-color="#ff5a4d"/></linearGradient></defs>';
+        [['IN', 'duoIn'], ['GR', 'duoGr'], ['OUT', 'duoOut']].forEach(([label, id], i) => {
+          const bx = i * col + 6, bw = col - 18;
+          b += '<text x="' + (bx + bw / 2) + '" y="12" text-anchor="middle" fill="#8e9297" font-size="10" letter-spacing="1.4">' + label + '</text>' +
+            '<rect x="' + bx + '" y="18" width="' + bw + '" height="' + h + '" rx="7" fill="#15181b" stroke="#23272b"/>' +
+            '<rect id="' + id + 'Bar" x="' + (bx + 3) + '" y="21" width="' + (bw - 6) + '" height="0" rx="5" fill="' + (id === 'duoGr' ? '#ffb02e' : 'url(#duoLv)') + '"/>' +
+            '<text id="' + id + 'Text" x="' + (bx + bw / 2) + '" y="' + (h + 38) + '" text-anchor="middle" fill="#f2f2f2" font-size="14" font-weight="700">–</text>';
+        });
+        b += '<g transform="translate(' + (3 * col + 2) + ',30)"><text fill="#8e9297" font-size="10" letter-spacing="1.4">LUFS</text>' +
+          '<text id="duoCompLufs" y="30" fill="#f2f2f2" font-size="22" font-weight="700">–</text>' +
+          '<text y="72" fill="#8e9297" font-size="10" letter-spacing="1.4">RATIO</text><text y="94" fill="#f2f2f2" font-size="17" font-weight="700">' +
+          (c.ratio >= 20 ? '∞' : (Math.round(c.ratio * 10) / 10)) + ' : 1</text></g>';
+        bars.innerHTML = b;
+        duo.compSize = { h, top: 21 };
+      }
+      // the moving parts
+      const level = Number.isFinite(input.db) ? clamp(input.db, lo, 0) : lo;
+      const out = level - duo.gr;
+      const dot = $('duoDot'), halo = $('duoHalo'), line = $('duoGrLine');
+      if (dot) {
+        dot.setAttribute('cx', x(level)); dot.setAttribute('cy', y(out));
+        halo.setAttribute('cx', x(level)); halo.setAttribute('cy', y(out));
+        line.setAttribute('x1', x(level)); line.setAttribute('x2', x(level)); line.setAttribute('y1', y(level)); line.setAttribute('y2', y(out));
+        dot.setAttribute('opacity', Number.isFinite(input.db) && input.db > -70 ? 1 : 0.25);
+      }
+      const size = duo.compSize;
+      const setBar = (id, frac, text, down) => {
+        const bar = $(id + 'Bar'), label = $(id + 'Text');
+        if (!bar) return;
+        const hh = Math.max(0, Math.min(1, frac)) * (size.h - 6);
+        bar.setAttribute('height', hh.toFixed(1));
+        bar.setAttribute('y', (down ? size.top : size.top + size.h - 6 - hh).toFixed(1));
+        label.textContent = text;
+      };
+      const outPeak = Math.max(meter.peakDb[0], meter.peakDb[1] !== undefined ? meter.peakDb[1] : -Infinity);
+      setBar('duoIn', Number.isFinite(input.db) ? (input.db + 60) / 60 : 0, Number.isFinite(input.db) && input.db > -70 ? dbText(input.db) : '–');
+      setBar('duoGr', duo.gr / 20, duo.gr >= 0.05 ? '−' + duo.gr.toFixed(1) : '0.0', true);
+      setBar('duoOut', Number.isFinite(outPeak) ? (outPeak + 60) / 60 : 0, Number.isFinite(outPeak) && outPeak > -90 ? dbText(outPeak) : '–');
+      const loud = meter.on ? lufsOf(blockEnergy(meter.blocks)) : -Infinity;
+      const lufs = $('duoCompLufs');
+      if (lufs) lufs.textContent = loud > -70 ? dbText(loud) : '–';
+      const live = $('duoLive');
+      if (live) {
+        live.classList.toggle('off', !meter.on);
+        live.lastChild.textContent = !meter.on ? 'METER OFF' : input.dry ? 'LIVE · DI 1/2 + USB 3/4' : 'LIVE · USB ' + meter.first + (meter.channels > 1 ? '/' + (meter.first + 1) : '');
+      }
+    }
+
+    // called by meterDraw: the live view, the meter strip
+    function duoMeterDraw() {
+      const layout = duoLayout();
+      if (!layout) return;
+      if (duo.comp && (layout === 'half' || layout === 'book')) { duoCompDraw(false); }
+      const loud = meter.on ? lufsOf(blockEnergy(meter.blocks)) : -Infinity;
+      const text = loud > -70 ? dbText(loud) : '–';
+      document.querySelectorAll('#duoRead, #duoFootRead').forEach(el => { el.firstChild.textContent = text; });
+      [['duoBarL', 0], ['duoBarR', 1], ['duoFootL', 0], ['duoFootR', 1]].forEach(([id, ch]) => {
+        const bar = $(id);
+        if (!bar) return;
+        const pos = meterPos(meter.peakDb[Math.min(ch, meter.channels - 1)]);
+        bar.style.setProperty('--v', pos);
+        bar.style.setProperty('--f', (parseFloat(pos) || 0) / 100);
+      });
+      const live = $('duoLive');
+      if (live && !duo.comp) {
+        live.classList.toggle('off', !meter.on);
+        live.lastChild.textContent = meter.on ? 'LIVE · USB ' + meter.first + (meter.channels > 1 ? '/' + (meter.first + 1) : '') : 'METER OFF';
+      }
+      const mark = state.connected ? levelMark(state.selectedPreset) : null;
+      document.querySelectorAll('#duoMark, #duoFootMark').forEach(el => {
+        el.textContent = mark ? levelMarkText(mark) : meter.on ? 'not levelled yet' : '';
+        el.classList.toggle('ok', Boolean(mark && Math.abs(mark.lufs - alTarget(mark.kind)) <= MARK_TOLERANCE));
+      });
+    }
+
+    // ---- the book's left page: every block with its main values ----
+    function duoValues(key) {
+      const pairs = [];
+      if (key === 'capture') {
+        AMP_KNOBS.forEach(k => pairs.push([k.label, ampText(state.amp[k.key])]));
+        pairs.push(['Volume', dbText(Number(state.captureVolumeDb) || 0, true) + ' dB']);
+      } else if (key === 'cab') {
+        pairs.push(['Level', formatCabValue('level', state.cabIR.levelDb)], ['High pass', formatCabValue('highPass', state.cabIR.highPassHz)],
+          ['Low pass', formatCabValue('lowPass', state.cabIR.lowPassHz)]);
+        if (state.cabIR.on && isFactoryCabIR()) pairs.unshift(['Mic', (state.cabIR.mic || '') + ' ' + (state.cabIR.position || 1)]);
+      } else if (key === 'gate') {
+        if (state.gate.params[0]) pairs.push(['Reduction', Math.round(state.gate.params[0].value) + ' %']);
+      } else {
+        const block = state.blocks[key];
+        if (block.model !== 'None') block.params.slice(0, 5).forEach(p => pairs.push([p.name, paramDisplayValue(p)]));
+      }
+      return pairs;
+    }
+    function duoListRender() {
+      duoList.innerHTML = '';
+      DUO_KEYS.forEach(key => {
+        const info = duoBlockInfo(key);
+        const empty = key !== 'capture' && key !== 'cab' && key !== 'gate' && state.blocks[key].model === 'None';
+        const row = document.createElement('div');
+        row.className = 'duo-row' + (key === duo.focus ? ' sel' : '') + (info.on ? '' : ' off');
+        row.style.setProperty('--c', info.color);
+        row.innerHTML = duoIcon(info, 26) +
+          '<div class="txt"><div class="top"><span class="lbl">' + escapeHTML(info.title.replace(' FX ', ' ')) + '</span><span class="nm">' + escapeHTML(empty ? 'empty' : info.name) + '</span></div>' +
+          '<div class="vals">' + duoValues(key).map(([k, v]) => escapeHTML(k) + ' <b>' + escapeHTML(v) + '</b>').join(' · ') + '</div></div>' +
+          '<div class="toggle-switch' + (info.on ? ' on' : '') + '"><div class="toggle-dot"></div></div>';
+        row.addEventListener('click', e => {
+          if (e.target.closest('.toggle-switch')) { if (!empty) duoToggle(key); return; }
+          duoSetFocus(key);
+        });
+        duoList.appendChild(row);
+      });
+    }
+
+    // ---- the meter strip: loudness, tuner, input mute, jam tracks ----
+    function duoFooterRender() {
+      if (!duoFooter.dataset.built) {
+        duoFooter.dataset.built = '1';
+        duoFooter.innerHTML = '<div style="display:grid;gap:1px"><span class="duo-read" id="duoFootRead">–<small>LUFS</small></span><span class="duo-mark" id="duoFootMark"></span></div>' +
+          '<div class="duo-bars"><i id="duoFootL"></i><i id="duoFootR"></i></div>' +
+          '<button class="icon-btn duo-tuner" title="Tuner" aria-label="Tuner"><span class="ico" style="--icon: var(--ico-tuner)"></span></button>' +
+          '<button class="icon-btn duo-in" title="Mute the guitar input" aria-label="Mute the guitar input">IN</button>' +
+          '<button class="icon-btn duo-jam" title="Jam tracks" aria-label="Jam tracks"><span class="ico" style="--icon: var(--ico-jam)"></span></button>';
+        duoFooter.querySelector('.duo-tuner').addEventListener('click', () => $('tunerBtn').click());
+        duoFooter.querySelector('.duo-in').addEventListener('click', () => setMute('in', state.inputMuted !== true));
+        duoFooter.querySelector('.duo-jam').addEventListener('click', () => $('jamBtn').click());
+        duoFooter.querySelector('.duo-bars').addEventListener('click', openLevel);
+        duoFooter.querySelector('.duo-read').addEventListener('click', openLevel);
+      }
+      const ab = $('abBox');
+      if (duoLayout() === 'book' && ab.parentElement !== duoFooter) {
+        if (!duo.abHome) duo.abHome = { parent: ab.parentElement, next: ab.nextSibling };
+        duoFooter.insertBefore(ab, duoFooter.querySelector('.duo-tuner'));
+      }
+      duoFooter.querySelector('.duo-in').classList.toggle('on', state.inputMuted === true);
+      duoMeterDraw();
+    }
+
+    // the jam tracks in the app: the iPhone's file picker takes tracks, not a folder
+    if (document.documentElement.dataset.app === 'ios') {
+      $('jamFolder').removeAttribute('webkitdirectory');
+      $('jamFolder').setAttribute('accept', 'audio/*,.mp3,.m4a,.aac,.wav,.aif,.aiff,.caf,.flac,.ogg');
+      $('jamPick').title = 'Choose your jam tracks';
+      $('jamPick').setAttribute('aria-label', 'Choose tracks');
+    }
+    duoUpdateLayout();   // (the posture may already be known)
 
     $('heroConnect').addEventListener('click', () => $('connectBtn').click());
     setStatus('Disconnected');

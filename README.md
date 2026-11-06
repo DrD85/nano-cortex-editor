@@ -106,7 +106,7 @@ on macOS, Windows, ChromeOS or Android, click **Connect** and choose your Nano C
 |---|---|
 | Chrome, Edge | works |
 | Brave | works after enabling Web Bluetooth: `brave://flags` → **Web Bluetooth API** → *Enabled*, relaunch; if Connect still does nothing, turn the Shields off for the editor page |
-| iPhone / iPad | the **Bluefy** browser (Safari has no Web Bluetooth) |
+| iPhone / iPad | the app **[Nano Cortex Pocket](https://github.com/DrD85/nano-cortex-pocket)**, or the **Bluefy** browser (Safari has no Web Bluetooth) |
 | Safari, Firefox | no Web Bluetooth – not possible |
 
 The Nano takes one Bluetooth connection at a time: close the Cortex Cloud app (also on your phone) and switch off a
@@ -123,6 +123,12 @@ If macOS says the app is damaged, run `xattr -cr "/Applications/Nano Cortex Edit
 macOS asks for Bluetooth access when you connect for the first time.
 Zoom with **⌘ +**, **⌘ −** and **⌘ 0** (or *View* in the menu bar), as in the browser; the app keeps the zoom.
 The window has no title bar: its buttons sit in the editor's top bar, which also moves the window.
+
+### On the iPhone: Nano Cortex Pocket
+
+**[Nano Cortex Pocket](https://github.com/DrD85/nano-cortex-pocket)** is a separate iPhone app around this editor's
+page: Bluetooth from the app (no Bluefy), the Nano's USB audio for the level meter, Auto level and the EQ spectrum,
+and layouts for the iPhone Duo – closed, half open and open flat. It has its own versions and releases.
 
 ### With the Nano Cortex Controller
 
@@ -378,4 +384,6 @@ Unter **…** → **Shared presets** findest du Presets anderer Spieler, jeweils
 Namen des Captures** – der Editor zeigt, ob dein Nano es hat oder es fehlt. **Share this preset** stellt dein eigenes
 Preset dazu (über ein Formular auf GitHub, dafür braucht es ein kostenloses GitHub-Konto).
 Die Mac-App gibt es unter *Releases*. Sie ist nicht signiert: Starte sie beim ersten Mal per Rechtsklick → **Öffnen**.
+Fürs **iPhone** gibt es die eigene App **[Nano Cortex Pocket](https://github.com/DrD85/nano-cortex-pocket)** mit
+diesem Editor, Bluetooth aus der App, Pegel, Auto level und Spektrum über USB-C und eigenen Ansichten fürs iPhone Duo.
 Der Editor schreibt auf dein Gerät, die Nutzung erfolgt auf eigene Gefahr.
