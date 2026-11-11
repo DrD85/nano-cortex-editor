@@ -2273,10 +2273,62 @@
       };
     }
 
+    // NanOS 2.3.0 (November 2026): the ranges of its five new models - the Quad Cortex's definitions of the same
+    // models. Their ids, the number of values and the defaults were read from a Nano Cortex on 2.3.0.
+    // [min, max, step, unit, decimals]
+    const PERCENT = [0, 100, 0.1, '%', 1], SEMITONES = [-24, 24, 1, 'Sem', 0];
+    const MODEL_PARAM_META = {
+      'Poly Octaver': { 'Dry': PERCENT, 'Oct': PERCENT, 'Sub': PERCENT },
+      'Wham': { 'Mix': PERCENT, 'Pedal': PERCENT, 'Heel Pitch 1': SEMITONES, 'Toe Pitch 1': SEMITONES, 'Heel Pitch 2': SEMITONES,
+        'Toe Pitch 2': SEMITONES, 'Blend': [0, 100, 1, '%', 0] },
+      'Chief OC2': { 'Output': [-12, 12, 0.1, 'dB', 1], 'Dry': PERCENT, 'Oct 1': PERCENT, 'Oct 2': PERCENT },
+      'Blossom (ST)': { 'Mix': PERCENT, 'Decay': [0.5, 20, 0.01, 's', 2], 'Pre Delay': [0, 500, 1, 'ms', 0], 'High Pass': [30, 800, 1, 'Hz', 0],
+        'Low Pass': [1000, 20000, 1, 'Hz', 0], 'E.R. Length': [0, 100, 1, '%', 0], 'Diffusion': [0, 100, 1, '%', 0],
+        'Bass': [-18, 6, 0.1, 'dB', 1], 'Treble': [-18, 6, 0.1, 'dB', 1], 'Ducking': [0, 100, 1, '%', 0], 'Modulation': PERCENT },
+      'Shimmer': { 'Mix': PERCENT, 'Decay': [4, 20, 0.1, 's', 1], 'Brightness': PERCENT, 'Feedback': PERCENT, 'Pitch': SEMITONES,
+        'Pre Delay': [1, 200, 1, 'ms', 0], 'Damping': PERCENT, 'High Pass': [20, 800, 1, 'Hz', 0], 'Rand Pitch': [2, 33, 1, 'Cent', 0],
+        'Mod Speed': [0.1, 5, 0.01, 'Hz', 2], 'Mod Depth': PERCENT }
+    };
+
+    // Many controls are not linear - frequencies and times above all. The Nano's value (0-1) is the share of the
+    // range to the power of a skew: value 0-1 = ((value - min) / (max - min)) ^ skew. The skews are the Quad Cortex's
+    // for the same model and parameter where name and range are the same; ten defaults read from a Nano confirmed
+    // them (a high pass at 200 Hz is 0.470 of 30-800 Hz with skew 0.5, not 0.22). Shown linearly - as before 1.14 -
+    // such a high pass read 394 Hz. Parameters that are not listed here are taken as linear.
+    const PARAM_SKEW = {
+      "Low-High Cut": { "HPF Freq": 0.3, "LPF Freq": 0.3 },
+      "Utility Gate": { "Threshold": 0.6, "Hold": 0.6, "Release": 0.6, "Range": 0.6 },
+      "Legendary 87 (M)": { "Attack": 0.6, "Release": 0.6 },
+      "Opto Comp (M)": { "Ratio": 0.6, "Attack": 0.6, "Release": 0.6 },
+      "Solid State Comp (M)": { "Attack": 0.6, "Release": 0.6 },
+      "VCA Comp (M)": { "Ratio": 0.6, "Release": 0.6 },
+      "Legendary 87 (ST)": { "Attack": 0.6, "Release": 0.6 },
+      "Opto Comp (ST)": { "Ratio": 0.6, "Attack": 0.6, "Release": 0.6 },
+      "Solid State Comp (ST)": { "Attack": 0.6, "Release": 0.6 },
+      "VCA Comp (ST)": { "Ratio": 0.6, "Release": 0.6 },
+      "Chorus 229T": { "Rate": 0.5 },
+      "Tremolo": { "Rate": 0.6, "Fade In": 0.6, "Fade Out": 0.6 },
+      "Analog Delay": { "High Pass": 0.6, "Low Pass": 0.6, "Delay Time": 0.6, "Mod Rate": 0.6 },
+      "Digital Delay (ST)": { "High Pass": 0.6, "Low Pass": 0.6, "Delay Time": 0.6, "Mod Rate": 0.6, "Attack": 0.6, "Release": 0.6 },
+      "Dual Delay": { "Delay Time L": 0.6, "Delay Time R": 0.6, "High Pass": 0.6, "Low Pass": 0.6, "Mod Rate": 0.6, "Attack": 0.6, "Release": 0.6 },
+      "Dual Reverse Delay": { "Delay Time L": 0.6, "Delay Time R": 0.6, "Attack": 0.6, "Release": 0.6, "High Pass": 0.6 },
+      "Tape Delay": { "High Pass": 0.6, "Low Pass": 0.6, "Delay Time": 0.6 },
+      "Ambience": { "Pre Delay": 0.6, "High Pass": 0.6, "Low Pass": 0.6 },
+      "Cave": { "Decay": 0.6, "Pre Delay": 0.6, "High Pass": 0.6, "Low Pass": 0.6 },
+      "Hall": { "Decay": 0.6, "Pre Delay": 0.6, "High Pass": 0.6, "Low Pass": 0.6 },
+      "Mind Hall": { "High Pass": 0.5, "Low Pass": 0.5 },
+      "Modulated": { "Decay": 0.6, "Pre Delay": 0.6, "Mod Speed": 0.6, "High Pass": 0.6, "Low Pass": 0.6 },
+      "Room": { "Decay": 0.6, "High Pass": 0.6, "Low Pass": 0.6 },
+      "Blossom (ST)": { "Decay": 0.4, "Pre Delay": 0.4, "High Pass": 0.5, "Low Pass": 0.5, "E.R. Length": 0.4, "Bass": 2.375, "Treble": 2.375 },
+      "Shimmer": { "Decay": 0.6, "Pre Delay": 0.6, "High Pass": 0.6, "Mod Speed": 0.6 },
+    };
+
     function makeParams(labels, modelName = '') {
       return labels.map((label, index) => {
         const parsed = parseParamLabel(label);
         const meta = inferParamMeta(modelName, parsed.name, parsed.options);
+        const skew = (PARAM_SKEW[modelName] || {})[parsed.name];
+        if (skew && meta.kind === 'range') meta.skew = skew;
         return {
           type: meta.kind === 'enum' ? 'switch' : 'knob',
           name: parsed.name,
@@ -2325,6 +2377,9 @@
       const m = normaliseName(modelName);
 
       if (inlineOptions && inlineOptions.length > 1) return enumMeta(correctOptions(inlineOptions));
+
+      const fixed = (MODEL_PARAM_META[modelName] || {})[paramName];
+      if (fixed) return rangeMeta(...fixed);
 
       if (p.includes('sync note')) return enumMeta(syncNoteOptionsForModel(modelName, paramName));
       if (p === 'sync' || p === 'sync l' || p === 'sync r') return enumMeta(['Off', 'On']);
@@ -2552,7 +2607,11 @@
         device('VCA Comp (M)', 'Compressor', ['Threshold', 'Ratio', 'Attack', 'Release', 'Makeup', 'Mix'], [0x8D, 0x27])
       ],
       pitch: [
-        device('Transpose', 'Pitch', ['Mix', 'Semitones', 'Pitch Fine', 'High Pass', 'Low Pass'], [0xD1, 0x8C, 0x01])
+        device('Transpose', 'Pitch', ['Mix', 'Semitones', 'Pitch Fine', 'High Pass', 'Low Pass'], [0xD1, 0x8C, 0x01]),
+        // NanOS 2.3.0
+        device('Poly Octaver', 'Pitch', ['Dry', 'Oct', 'Sub'], [0xD4, 0x8C, 0x01]),
+        device('Wham', 'Pitch', ['Mix', 'Pedal', 'Heel Pitch 1', 'Toe Pitch 1', 'Heel Pitch 2', 'Toe Pitch 2', 'Blend'], [0xD6, 0x8C, 0x01]),
+        device('Chief OC2', 'Pitch', ['Output', 'Dry', 'Oct 1', 'Oct 2'], [0xDE, 0x8C, 0x01])
       ],
       postUtilityEQ: [
         device('Doubler', 'Utility/EQ', ['Spread', 'Dry Level', 'FX Level'], [0x8B, 0x7D]),
@@ -2584,11 +2643,15 @@
       ],
       reverb: [
         device('Ambience', 'Reverb', ['Mix', 'Size', 'Pre Delay', 'High Pass', 'Low Pass'], [0xC8, 0x3E]),
+        device('Blossom (ST)', 'Reverb', ['Mix', 'Decay', 'Pre Delay', 'High Pass', 'Low Pass', 'Extra E.R. (Off/On)', 'E.R. Length', 'Diffusion',
+          'Bass', 'Treble', 'Ducking', 'Modulation'], [0xDE, 0x3E]),   // NanOS 2.3.0
         device('Cave', 'Reverb', ['Mix', 'Decay', 'Pre Delay', 'Damping', 'High Pass', 'Low Pass'], [0xC9, 0x3E]),
         device('Hall', 'Reverb', ['Mix', 'Decay', 'Pre Delay', 'High Pass', 'Low Pass'], [0xC3, 0x3E]),
         device('Mind Hall', 'Reverb', ['Mix', 'Decay', 'Pre Delay', 'High Pass', 'Low Pass', 'Damping'], [0xCB, 0x3E]),
         device('Modulated', 'Reverb', ['Mix', 'Decay', 'Pre Delay', 'Mod Speed', 'Mod Depth', 'High Pass', 'Low Pass'], [0xC7, 0x3E]),
-        device('Room', 'Reverb', ['Mix', 'Decay', 'Pre Delay', 'High Pass', 'Low Pass'], [0xC0, 0x3E])
+        device('Room', 'Reverb', ['Mix', 'Decay', 'Pre Delay', 'High Pass', 'Low Pass'], [0xC0, 0x3E]),
+        device('Shimmer', 'Reverb', ['Mix', 'Decay', 'Brightness', 'Feedback', 'Pitch', 'Pre Delay', 'Damping', 'High Pass', 'Rand Pitch',
+          'Mod Speed', 'Mod Depth'], [0xCA, 0x3E])   // NanOS 2.3.0
 ]
     };
 
@@ -2636,6 +2699,11 @@
       'Exotic Bass Z Boost': 'img/Xotic Bass.png',
       'Microtubes B3K': 'img/Darkglass.png',
       'Mind Hall': 'img/Lexicon224.png',
+      'Shimmer': 'img/Shimmer Reverb.png',
+      'Blossom (ST)': 'img/Strymon BigSky.png',
+      'Poly Octaver': 'img/EHX Micro POG.png',
+      'Wham': 'img/DigiTech Whammy.png',
+      'Chief OC2': 'img/Boss OC-2.png',
       'Legendary 87 (M)': 'img/UA Comp.png',
       'Chief CE2W (ST)': 'img/Boos CE2w.png',
       'Chief DC2W (ST)': 'img/Boss DC-2w.png',
@@ -2735,7 +2803,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.13.0';
+    const EDITOR_VERSION = '1.14.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -4014,7 +4082,15 @@
         return Math.max(0, Math.min(maxIndex, Math.round(n * maxIndex)));
       }
 
-      return roundToStep(meta.min + (n * (meta.max - meta.min)), meta.step || 0.1);
+      return roundToStep(meta.min + (travelToShare(meta, n) * (meta.max - meta.min)), meta.step || 0.1);
+    }
+
+    // The Nano's value 0-1 (the control's travel) <-> the share of the parameter's range (see PARAM_SKEW)
+    function travelToShare(meta, n) {
+      return meta.skew ? Math.pow(clamp(n, 0, 1), 1 / meta.skew) : n;
+    }
+    function shareToTravel(meta, share) {
+      return meta.skew ? Math.pow(clamp(share, 0, 1), meta.skew) : share;
     }
 
 function parseSelectedCaptureState(payload) {
@@ -5756,7 +5832,7 @@ function parseSelectedCaptureState(payload) {
         return clamp(param.value / maxIndex, 0, 1);
       }
 
-      return clamp((Number(param.value) - meta.min) / (meta.max - meta.min), 0, 1);
+      return shareToTravel(meta, clamp((Number(param.value) - meta.min) / (meta.max - meta.min), 0, 1));
     }
 
     async function setFXParam(blockKey, param, rawValue = null, fromPreset = false) {
@@ -9071,6 +9147,12 @@ function parseSelectedCaptureState(payload) {
       // Pitch
       'Transpose': { cat: 'Pitch', text: 'Pitch shifter for other tunings and octave effects.',
         tips: ['−1 semitone at full Mix plays in Eb tuning without retuning.', 'Pitch Fine detunes; a lower Mix gives harmonies and octaves. Only in Pre FX 1.'] },
+      'Poly Octaver': { cat: 'Pitch', basedOn: 'Electro-Harmonix POG', text: 'Polyphonic octaves: one above and one below, tracking whole chords.',
+        tips: ['Dry, Oct and Sub are three levels: a little Oct gives a 12-string, Sub alone a bass.'] },
+      'Wham': { cat: 'Pitch', basedOn: 'DigiTech Whammy', text: 'Pitch bend between two intervals – the dive bombs and octave jumps of the red pedal.',
+        tips: ['Pedal moves from the heel pitch to the toe pitch: put the expression pedal on it.', 'Blend adds the second pair of pitches for harmonies.'] },
+      'Chief OC2': { cat: 'Pitch', basedOn: 'BOSS OC-2', text: 'Analog-style octaver, one and two octaves down – best on single notes.',
+        tips: ['Oct 1 and Oct 2 are the two lower octaves, Dry the guitar itself.'] },
       // Modulation (Post FX 1)
       'Chief CE2W': { cat: 'Modulation', basedOn: 'BOSS CE-2W', text: 'Warm, lush analog chorus – the CE-2 sound, plus the older CE-1 chorus and vibrato.',
         tips: ['Type switches between the CE-2 chorus and the CE-1 chorus and vibrato.'] },
@@ -9107,7 +9189,11 @@ function parseSelectedCaptureState(payload) {
       'Modulated': { cat: 'Reverb', text: 'Reverb with a modulated, chorus-like tail – lush and wide.', tips: ['Mod Speed and Mod Depth set the movement of the tail.', REVERB_TIP] },
       'Ambience': { cat: 'Reverb', text: 'Early reflections that add space and size without an audible tail.', tips: ['Size sets how big the space feels.', REVERB_TIP] },
       'Cave': { cat: 'Reverb', text: 'Large, dark, cavernous space.', tips: ['Damping darkens the tail further.', REVERB_TIP] },
-      'Mind Hall': { cat: 'Reverb', basedOn: 'Lexicon 224', text: 'Lush hall from the classic digital studio reverb of the late 70s and 80s.', tips: ['Damping darkens the tail.', REVERB_TIP] }
+      'Mind Hall': { cat: 'Reverb', basedOn: 'Lexicon 224', text: 'Lush hall from the classic digital studio reverb of the late 70s and 80s.', tips: ['Damping darkens the tail.', REVERB_TIP] },
+      'Blossom': { cat: 'Reverb', basedOn: 'Strymon BigSky (Bloom mode)', text: 'A reverb that swells and blooms behind the note – large, slow and soft.',
+        tips: ['Diffusion and E.R. Length set how slowly it blooms.', 'Ducking keeps it out of the way while you play.', REVERB_TIP] },
+      'Shimmer': { cat: 'Reverb', text: 'Reverb with a pitch-shifted tail – the octave shimmer of ambient guitar.',
+        tips: ['Pitch sets the interval of the tail (+12 is the classic octave), Feedback how much of it builds up.', REVERB_TIP] }
     };
     const fxInfoOf = model => FX_INFO[String(model || '').replace(/\s*\((M|ST)\)$/, '')] || null;
 
@@ -9938,7 +10024,7 @@ function parseSelectedCaptureState(payload) {
         const param = block && block.params.find(p => p.name === t.param);
         if (!param) return; // the model in this slot has no parameter with this name
         const meta = param.meta || rangeMeta(0, 10, 0.1, '', 1);
-        const raw = meta.kind === 'enum' ? v * (meta.options.length - 1) : meta.min + v * (meta.max - meta.min);
+        const raw = meta.kind === 'enum' ? v * (meta.options.length - 1) : meta.min + travelToShare(meta, v) * (meta.max - meta.min);
         const next = coerceParamValue(param, raw);
         if (next === null || next === param.value) return;
         param.value = next;

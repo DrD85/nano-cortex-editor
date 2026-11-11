@@ -14,6 +14,11 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
 
 ## Features
 
+- **NanOS 2.3.0** (from editor 1.14.0): its five new effects – **Poly Octaver**, **Wham** and **Chief OC2** in
+  Pre FX, **Blossom (ST)** and **Shimmer** in Post FX 3 – with all their controls. Older NanOS versions work as before;
+  they just do not load these five
+- **Values as the Nano means them**: frequencies, times and some tone controls are not linear on the Nano. From
+  1.14.0 the editor converts them the Nano's way (85 controls) – before, a high pass set to 200 Hz was shown as 394 Hz
 - **Signal chain** at the top, as on the Quad Cortex: Gate → Pre FX 1–2 → Capture → Cab → Post FX 1–3, each block in its
   colour – filled when on, outlined when off, dashed when empty. Click a block to make it light up below,
   **double-click** to switch it on or off
