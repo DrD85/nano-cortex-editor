@@ -139,6 +139,11 @@ it has loaded the presets, then click **Connect** and choose **Nano Cortex Contr
 itself). The status shows *Connected via controller*, and editor and controller work at the same time. Without the
 controller, connect to the Nano directly as before.
 
+**Backup of the controller's settings** (controller firmware 1.13.0 or newer): while connected through the
+controller, the **…** menu has *Back up controller settings…* – everything the controller stores (banks, scenes,
+second effects, set list, footswitch order) goes into one file – and *Restore controller settings…*, which writes
+such a file back. A restore replaces what the controller stores now; the controller restarts afterwards.
+
 No board? The controller also runs in the browser:
 [Nano Cortex Controller Web](https://github.com/DrD85/nano-cortex-controller-web).
 
