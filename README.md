@@ -80,7 +80,7 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   name of the capture** it needs – checked against your Nano: on it, in its library (the import loads it), or
   missing, with the name to look for in Cortex Cloud. **Share this preset** puts your own preset there (see *Shared
   presets* below)
-- **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for categories, instruments, tags by amp or pedal (the first two words of the name) and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
+- **Captures**: the symbol shows the capture's type (amp head, combo, amp + cab, cab, pedal …); 25 capture slots plus the capture library on the device, with a browser for Neural Capture version (V1 / V2), categories, instruments, tags by amp or pedal (the first two words of the name) and search; load library captures into a slot of your choice – the editor can show which presets use each slot and suggest a free one
 - **Cab/IR**: slots, level and high / low pass as knobs; for factory cabs a small tile shows the mic and its place –
   a click opens the speaker with the cab's mics (as the Nano names them – they differ from cab to cab, a bass cab
   has others than a guitar cab) and the positions 1–6 – you hear the choice at once, and **Save**

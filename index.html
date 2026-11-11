@@ -2193,6 +2193,7 @@
       <input id="librarySearch" class="lib-search" type="search" placeholder="Search name, tag, author …" autocomplete="off">
       <div class="lib-filters">
         <div id="libSource" class="lib-chip-row"></div>
+        <div id="libVersion" class="lib-chip-row"></div>
         <div id="libTypes" class="lib-chip-row"></div>
         <div id="libInstruments" class="lib-chip-row"></div>
         <div id="libTags" class="lib-chip-row"></div>
@@ -2732,7 +2733,7 @@
       presetSlots: { a1: -1, b1: -1, a2: -1, b2: -1 },
       library: { factory: [], user: [], irFactory: [], irUser: [], loaded: false, requested: false },
       exp: { preset: null, loaded: false, ranges: {}, bypass: {}, saveTimer: null, status: '', pending: null, queue: [] },
-      libBrowser: { q: '', source: 'all', type: 'all', instrument: 'all', tags: new Set() },
+      libBrowser: { q: '', source: 'all', version: 'all', type: 'all', instrument: 'all', tags: new Set() },
       tuner: { open: false, live: true, baseFrequency: 440, muted: false, logged: 0 },
       libraryBytes: [],
       libraryTimer: null,
@@ -4618,8 +4619,16 @@ function parseSelectedCaptureState(payload) {
 
     // RetrieveLibraryContentResponseMessage: 3 factoryCaptures[], 4 factoryImpulseResponses[] (names),
     // 5 userCaptures[], 6 userImpulseResponses[] (names). NeuralCaptureSummaryRecord: 1 hash,
-    // 2 name, 13 isCorrupted. The app addresses library items by their position in these lists,
+    // 2 name, 12 captureVersion, 13 isCorrupted. The app addresses library items by their position in these lists,
     // so the index is kept while the lists are shown alphabetically.
+    // captureVersion is text; the Cortex Cloud app reads an empty one as "1" (captures from before Neural Capture V2).
+    function captureVersionOf(field) {
+      if (!field || !field[0]) return '1';
+      const raw = field[0].wire === 2 ? utf8(field[0].raw).trim() : String(field[0].value ?? '');
+      const digits = raw.match(/\d+/);
+      return digits ? digits[0] : (raw || '1');
+    }
+
     function parseLibraryContent(bytes) {
       state.libraryTimer = null;
       if (state.stateMode === 'library') state.stateMode = 'idle';
@@ -4641,6 +4650,7 @@ function parseSelectedCaptureState(payload) {
             index,
             name: text(2),
             type: text(6) || 'default',
+            version: captureVersionOf(record[12]),
             tags: (record[7] || []).filter(t => t.wire === 2).map(t => utf8(t.raw).trim()).filter(Boolean),
             instrument: text(10),
             author: author[2] && author[2][0] ? utf8(author[2][0].raw).trim() : '',
@@ -4665,6 +4675,9 @@ function parseSelectedCaptureState(payload) {
       };
       state.libraryBytes = [];
       log('Capture library: ' + state.library.factory.length + ' factory, ' + state.library.user.length + ' user captures');
+      const versions = {};
+      state.library.factory.concat(state.library.user).forEach(item => { versions[item.version] = (versions[item.version] || 0) + 1; });
+      log('Capture versions: ' + (Object.keys(versions).sort().map(v => 'V' + v + ' ' + versions[v]).join(', ') || 'none'));
       log('Cab/IR library: ' + state.library.irFactory.length + ' factory, ' + state.library.irUser.length + ' user IRs');
       renderShared();   // what each shared preset needs: on the Nano or not
       renderCaptureIR();
@@ -5058,6 +5071,7 @@ function parseSelectedCaptureState(payload) {
       const q = f.q.trim().toLowerCase();
       return entries.filter(item =>
         (skip === 'source' || f.source === 'all' || item.kind === f.source) &&
+        (skip === 'version' || f.version === 'all' || item.version === f.version) &&
         (skip === 'type' || f.type === 'all' || captureTypeInfo(item.type).key === f.type) &&
         (skip === 'instrument' || f.instrument === 'all' || item.instrument === f.instrument) &&
         (skip === 'tags' || !f.tags.size || f.tags.has(item.groupKey)) &&
@@ -5089,6 +5103,12 @@ function parseSelectedCaptureState(payload) {
         { text: 'Factory', count: bySource.filter(i => i.kind === 'factory').length, active: f.source === 'factory', onClick: () => set({ source: 'factory' }) },
         { text: 'User', count: bySource.filter(i => i.kind === 'user').length, active: f.source === 'user', onClick: () => set({ source: 'user' }) }
       ]);
+
+      // Neural Capture version: V1 and V2 always, any other the Nano names when it is there.
+      const byVersion = filterLibrary(entries, 'version');
+      const versions = Array.from(new Set(['1', '2'].concat(entries.map(i => i.version)))).sort();
+      renderChipRow('libVersion', 'Version', [{ text: 'All', count: byVersion.length, active: f.version === 'all', onClick: () => set({ version: 'all' }) }]
+        .concat(versions.map(v => ({ text: 'V' + v, count: byVersion.filter(i => i.version === v).length, active: f.version === v, onClick: () => set({ version: f.version === v ? 'all' : v }) }))));
 
       const byType = filterLibrary(entries, 'type');
       renderChipRow('libTypes', 'Category', [{ text: 'All', count: byType.length, active: f.type === 'all', onClick: () => set({ type: 'all' }) }]
@@ -5140,7 +5160,7 @@ function parseSelectedCaptureState(payload) {
           list.appendChild(h);
         }
         const type = captureTypeInfo(item.type);
-        const meta = [item.author, capitalize(item.instrument), type.label, item.kind === 'user' ? 'User' : 'Factory'].filter(Boolean)
+        const meta = [item.author, capitalize(item.instrument), type.label, 'V' + item.version, item.kind === 'user' ? 'User' : 'Factory'].filter(Boolean)
           .map(v => '<span>' + escapeHTML(v) + '</span>').join('<span>·</span>');
         const tagsHTML = '<span class="lib-tag' + (f.tags.has(item.groupKey) ? ' hit' : '') + '">' + escapeHTML(item.group) + '</span>';
         const row = document.createElement('button');
