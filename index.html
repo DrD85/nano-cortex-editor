@@ -681,7 +681,7 @@
       width: calc(var(--fold-start) - 24px - var(--app-corner-left, 0px)); bottom: 8px; height: 60px; }
     html[data-duo="book"] #duoStage { display: block; position: fixed; top: 8px; left: calc(var(--fold-start) + var(--fold-size) + 12px);
       right: calc(12px + var(--app-corner, 0px)); height: calc(46% - 8px); }
-    html[data-duo="book"] :is(.top-row, #chain) { position: fixed; top: calc(46% + 8px); left: calc(var(--fold-start) + var(--fold-size) + 12px); right: calc(12px + var(--app-corner, 0px)); bottom: 8px;
+    html[data-duo="book"] :is(.top-row, #chain) { position: fixed; top: calc(46% + 8px); left: calc(var(--fold-start) + var(--fold-size) + 12px); right: 12px; bottom: 8px;
       display: block; overflow: auto; padding: 0; }
     html[data-duo="book"] .jam-dock { right: auto; width: var(--fold-start); }
     html[data-duo="book"] body.jam-open #duoList { bottom: calc(var(--jam-h, 72px) + 76px); }
@@ -842,46 +842,59 @@
       html[data-duo="flat"] .block:not(.eq-graph) .param-grid:has(> :nth-child(7)) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
 
-    /* ---- the Duo layouts draw knobs as sliders: name and value above a bar, the whole row is dragged sideways (its
-       width = the whole range) - the finger does not hide what it changes; a tap without moving asks for the value ---- */
-    html[data-duo]:not([data-duo="outer"]) :is(.param-grid, .amp-knobs) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; align-items: center; align-content: start; }
-    html[data-duo]:not([data-duo="outer"]) .cabinet .cab-controls { grid-template-columns: minmax(0, 1fr) !important; gap: 4px; align-items: center; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 18px 18px; gap: 0 6px; align-items: center;
-      justify-items: stretch; min-width: 0; padding: 0; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .param-name { order: 0; grid-column: 1; grid-row: 1; position: relative; z-index: 1; pointer-events: none; margin: 0; min-height: 0;
-      text-align: left; font-size: 10px; letter-spacing: .08em; color: #aeb3b9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text { order: 0; grid-column: 2; grid-row: 1; position: relative; z-index: 1; pointer-events: none; padding: 0; border-radius: 0;
-      text-align: right; font-size: 12.5px; font-weight: 600; color: #eef0f2; white-space: nowrap; background: none; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob { order: 0; grid-column: 1 / -1; grid-row: 1 / -1; align-self: stretch; position: relative; width: auto; height: auto; margin: 0;
-      border: 0; border-radius: 0; box-shadow: none; background: none; cursor: ew-resize; touch-action: pan-y; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::before { content: ""; display: block; position: absolute; inset: auto 0 5px 0; width: auto; height: 8px; border-radius: 4px;
-      box-shadow: none; background: linear-gradient(90deg, var(--block-color, #e5e5e5) 0 calc(var(--pct, 0%) * 100 / 73), #262a2f 0); }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob.volume::before { background: linear-gradient(90deg, #9aa0a6 0 calc(var(--pct, 0%) * 100 / 73), #262a2f 0); }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::after { display: block; position: absolute; top: auto; bottom: 1px; left: calc(var(--pct, 0%) * 100 / 73); z-index: 1; width: 4px;
-      height: 16px; border-radius: 2px; background: #f4f5f6; box-shadow: 0 0 0 2px rgba(0, 0, 0, .6); transform: translateX(-50%); transform-origin: 50% 50%; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param.dragging > .value-text { color: var(--block-color, #fff); }
-    html[data-duo]:not([data-duo="outer"]) .knob-param.dragging > .knob::before { box-shadow: 0 0 0 1px var(--block-color, #fff); }
-    html[data-duo]:not([data-duo="outer"]) :is(.switch-param, .stepped-param) { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: auto; align-items: center;
-      justify-items: stretch; gap: 0 6px; min-width: 0; }
-    html[data-duo]:not([data-duo="outer"]) :is(.switch-param, .stepped-param) > .param-name { margin: 0; min-height: 0; text-align: left; font-size: 10px; letter-spacing: .08em; color: #aeb3b9;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    html[data-duo]:not([data-duo="outer"]) .switch-pill { min-width: 50px; max-width: 120px; height: 28px; padding: 0 10px; font-size: 11px; }
-    html[data-duo]:not([data-duo="outer"]) .stepped-select { width: auto; min-width: 0; max-width: 120px; height: 28px; padding: 0 8px; font-size: 12px; }
+    /* ---- the Duo layouts draw knobs as fill bars, as the Nano Cortex Controller's FX editor: a frame in the dimmed
+       block colour, filled up to the value with a bright line there, name and value (unit small) inside. The whole bar
+       is dragged sideways (its width = the whole range, from 8 px on), a tap asks for the value; up to three options are
+       a segmented switch. The finger never hides what it changes. ---- */
+    html[data-duo] { --bar-h: 46px; --bar-name: 13.5px; --bar-value: 16px; --bar-pad: 12px; }
+    html[data-duo="flat"] { --bar-h: 40px; --bar-name: 12px; --bar-value: 14px; --bar-pad: 9px; }
+    html[data-duo="half"] { --bar-h: 56px; --bar-name: 15px; --bar-value: 19px; --bar-pad: 16px; }
+    html[data-duo]:not([data-duo="outer"]) :is(.param-grid, .amp-knobs) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; align-content: start; }
+    html[data-duo]:not([data-duo="outer"]) .cabinet .cab-controls { grid-template-columns: minmax(0, 1fr) !important; gap: 6px; align-items: stretch; }
+    html[data-duo]:not([data-duo="outer"]) :is(.knob-param, .switch-param, .stepped-param) { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: auto;
+      align-items: center; justify-items: stretch; gap: 0 8px; min-width: 0; height: var(--bar-h); box-sizing: border-box; padding: 0 var(--bar-pad);
+      border: 2px solid color-mix(in srgb, var(--block-color, #e5e5e5) 42%, #111315); border-radius: 12px; background: #000; overflow: hidden; }
+    html[data-duo]:not([data-duo="outer"]) :is(.knob-param, .switch-param, .stepped-param) > .param-name { order: 0; grid-column: 1; grid-row: 1; position: relative; z-index: 1;
+      pointer-events: none; margin: 0; min-height: 0; text-align: left; text-transform: none; letter-spacing: 0; text-decoration: none; font-size: var(--bar-name);
+      font-weight: 500; color: #e6e8ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text { order: 0; grid-column: 2; grid-row: 1; position: relative; z-index: 1; pointer-events: none; padding: 0;
+      border-radius: 0; background: none; text-align: right; white-space: nowrap; font-size: var(--bar-value); font-weight: 650; color: #f2f2f2; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text b { font-weight: inherit; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text small { margin-left: 3px; font-size: .72em; font-weight: 500; color: #8e9297; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob { position: absolute; inset: 0; z-index: 0; order: 0; width: auto; height: auto; margin: 0; border: 0; border-radius: 0;
+      box-shadow: none; background: none; cursor: ew-resize; touch-action: pan-y; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::before { content: ""; display: block; position: absolute; inset: 0 auto 0 0; width: calc(var(--pct, 0%) * 100 / 73); height: auto;
+      border-radius: 0; box-shadow: none; background: color-mix(in srgb, var(--block-color, #e5e5e5) 30%, #111315); }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob.volume::before { background: color-mix(in srgb, #9aa0a6 30%, #111315); }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::after { display: block; position: absolute; top: 7px; bottom: 7px; height: auto; z-index: 1;
+      left: clamp(4px, calc(var(--pct, 0%) * 100 / 73), calc(100% - 4px)); width: 4px; border-radius: 2px; background: var(--block-color, #e5e5e5);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--block-color, #e5e5e5) 30%, transparent); transform: translateX(-50%); transform-origin: 50% 50%; }
+    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob.volume::after { background: #9aa0a6; box-shadow: 0 0 0 3px rgba(154, 160, 166, .3); }
+    html[data-duo]:not([data-duo="outer"]) .knob-param.dragging { border-color: color-mix(in srgb, var(--block-color, #e5e5e5) 80%, #111315); }
+    html[data-duo]:not([data-duo="outer"]) :is(.knob-param, .switch-param, .stepped-param) { isolation: isolate; }   /* name and value above the fill and the line */
+    html[data-duo]:not([data-duo="outer"]) .knob-param > :is(.param-name, .value-text) { z-index: 2; text-shadow: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000, 0 0 4px #000; }
+    /* options: up to three as a segmented switch (the chosen one filled), more as the value in a field */
+    html[data-duo]:not([data-duo="outer"]) .duo-seg { display: flex; height: calc(var(--bar-h) - 12px); padding: 3px; gap: 2px; box-sizing: border-box; border: 1px solid #2a2e33;
+      border-radius: 10px; background: #0b0c0e; }
+    html[data-duo]:not([data-duo="outer"]) .duo-seg button { flex: 1 1 0; min-width: 44px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: #c8ccd1;
+      font-size: var(--bar-name); font-weight: 600; letter-spacing: 0; text-transform: none; white-space: nowrap; }
+    html[data-duo]:not([data-duo="outer"]) .duo-seg button.on { background: var(--block-color); color: var(--ink, #0b0b0b); }
+    html[data-duo]:not([data-duo="outer"]) .seg-param { cursor: pointer; }
+    html[data-duo]:not([data-duo="outer"]) .switch-pill { height: calc(var(--bar-h) - 12px); min-width: 0; max-width: 150px; padding: 0 12px; border: 1px solid #2a2e33; border-radius: 10px;
+      background: #0b0c0e; color: #f2f2f2; font-size: var(--bar-name); font-weight: 600; text-transform: none; letter-spacing: 0; }
+    html[data-duo]:not([data-duo="outer"]) .stepped-select { width: auto; min-width: 0; max-width: 150px; height: calc(var(--bar-h) - 12px); padding: 0 8px; border: 1px solid #2a2e33;
+      border-radius: 10px; background-color: #0b0c0e; color: #f2f2f2; font-size: var(--bar-name); }
     html[data-duo]:not([data-duo="outer"]) #gateParams { place-items: stretch; align-content: start; width: 100%; }
-    /* half open: three in a row, taller, spread over the lower half - it is held in the hands */
+    /* half open: the lower half is held in the hands - the bars spread over it */
     html[data-duo="half"] .duo-focus.block { grid-template-rows: auto auto minmax(0, 1fr); }
-    html[data-duo="half"] .duo-focus .param-grid:not(.duo-bands) { align-self: stretch; align-content: space-evenly; }
-    html[data-duo="half"] .duo-focus :is(.param-grid:not(.duo-bands), .amp-knobs) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
-    html[data-duo="half"] .duo-focus .knob-param { grid-template-rows: 24px 28px; }
-    html[data-duo="half"] .duo-focus .knob-param > .param-name { font-size: 11px; }
-    html[data-duo="half"] .duo-focus .knob-param > .value-text { font-size: 15px; }
-    html[data-duo="half"] .duo-focus .knob-param > .knob::before { height: 12px; inset: auto 0 7px 0; border-radius: 6px; }
-    html[data-duo="half"] .duo-focus .knob-param > .knob::after { height: 24px; width: 5px; bottom: 1px; }
-    /* an EQ below the fold or on the right page: a row per band (gain, frequency, Q as sliders, type and on / off) */
-    html:is([data-duo="half"], [data-duo="book"]) .duo-focus .param-grid.duo-bands { grid-template-columns: repeat(var(--duo-cols), minmax(0, 1fr));
-      gap: 8px 12px; align-content: start; }
-    html[data-duo]:not([data-duo="outer"]) .duo-bands > :is(.switch-param, .stepped-param) { grid-template-columns: minmax(0, 1fr); grid-template-rows: 14px auto; gap: 3px 0; }
-    html[data-duo]:not([data-duo="outer"]) .duo-bands .switch-pill { max-width: none; width: 100%; height: 24px; padding: 0 4px; }
+    html[data-duo="half"] .duo-focus .param-grid:not(.duo-bands) { align-self: stretch; align-content: space-evenly; gap: 10px; }
+    /* an EQ half open: a row per band; the type and on / off fields need no name there. On the narrower right page of
+       the book the bands simply follow each other in two columns. */
+    html[data-duo="half"] .duo-focus .param-grid.duo-bands { grid-template-columns: repeat(var(--duo-cols), minmax(0, 1fr)); gap: 6px; align-content: start;
+      --bar-h: 46px; --bar-name: 12.5px; --bar-value: 15px; --bar-pad: 10px; }
+    html[data-duo="half"] .duo-bands > :is(.switch-param, .stepped-param) { grid-template-columns: minmax(0, 1fr); padding: 0 4px; }
+    html[data-duo="half"] .duo-bands > :is(.switch-param, .stepped-param) > .param-name { display: none; }
+    html[data-duo="half"] .duo-bands :is(.duo-seg, .switch-pill, .stepped-select) { width: 100%; max-width: none; }
 
     /* shared presets: cards from GitHub, the capture and cab of each checked against the Nano */
     .shared-panel { grid-template-rows: auto auto auto minmax(0, 1fr); }
@@ -1749,6 +1762,7 @@
     </div>
     <div class="tools">
       <input id="importFile" type="file" accept=".json,application/json" hidden>
+      <input id="ctlRestoreFile" type="file" accept=".json,application/json" hidden>
       <button id="tunerBtn" class="icon-btn" data-midi-id="tuner::" data-midi-target='{"kind":"tuner"}' title="Tuner" aria-label="Tuner"><span class="ico" style="--icon: var(--ico-tuner)"></span></button>
       <button id="expBtn" class="icon-btn" title="Expression pedal assignments" aria-label="Expression"><span class="ico" style="--icon: var(--ico-exp)"></span></button>
       <button id="fsBtn" class="icon-btn" title="Footswitches of the Nano: which preset 1A, 1B, 2A and 2B call up" aria-label="Footswitches"><span class="ico" style="--icon: var(--ico-footswitch)"></span></button>
@@ -1764,6 +1778,8 @@
           <button id="sharedBtn" title="Presets others have shared on GitHub – each with the capture it needs, checked against your Nano"><span class="ico" style="--icon: var(--ico-list)"></span>Shared presets…</button>
           <button id="shareBtn" title="Share the current preset on GitHub, with a short description and the exact name of its capture"><span class="ico" style="--icon: var(--ico-share)"></span>Share this preset…</button>
           <div class="menu-sep"></div>
+          <button id="ctlBackupBtn" title="Save everything the controller stores (banks, scenes, second effects, set list …) as a file" hidden><span class="ico" style="--icon: var(--ico-export)"></span>Back up controller settings…</button>
+          <button id="ctlRestoreBtn" title="Write a backup file back to the controller – it replaces what the controller stores now" hidden><span class="ico" style="--icon: var(--ico-import)"></span>Restore controller settings…</button>
           <button id="mc6Btn" title="A bank for the Morningstar MC6 Pro from up to five presets"><span class="ico" style="--icon: var(--ico-controller)"></span>Morningstar MC6 Pro export…</button>
           <button id="muteInBtn" title="The Nano's setting “Mute Guitar Input”: no sound from the guitar input until it is switched back" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteInLabel">Mute guitar input</span></button>
           <button id="muteOutBtn" title="The Nano's setting “Mute Guitar Output”: no guitar at the output jacks until it is switched back – the sound from USB stays" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteOutLabel">Mute guitar output</span></button>
@@ -2719,7 +2735,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.12.2';
+    const EDITOR_VERSION = '1.13.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -2928,6 +2944,7 @@
         try { localStorage.setItem('nanoLastDevice', device.id); } catch (err) { /* no storage */ }
         // "Nano Cortex Controller": the hardware controller passes everything on to the Nano.
         state.viaController = /controller/i.test(device.name || '');
+        showControllerMenu();
         setStatus(state.viaController ? 'Connected via controller' : 'Connected', true);
         log('C305 notifications enabled. Loading metadata and current preset state...');
       } catch (err) {
@@ -3013,6 +3030,8 @@
     function onDisconnected() {
       state.connected = false;
       state.viaController = false;
+      showControllerMenu();
+      ctlMessage(null);   // a backup or restore under way ends
       state.c304 = null;
       state.c305 = null;
       state.protocol.metadataLoaded = false;
@@ -3051,6 +3070,7 @@
       const data = new Uint8Array(event.target.value.buffer.slice(0));
       if (frameType(data) === MSG.TunerMetering) { handleTunerMetering(data); return; }
       if (frameType(data) === MSG.ControllerSwitch) { controllerSwitch(data); return; }
+      if (ctlPacket(data)) return;
       log('RX C305: ' + hex(data.slice(0, 24)) + (data.length > 24 ? ' ...' : ''));
 
       if (data.length === 0) return;
@@ -5797,10 +5817,14 @@ function parseSelectedCaptureState(payload) {
       const el = down.currentTarget, layout = document.documentElement.dataset.duo;
       if (!layout || layout === 'outer') { const y0 = down.clientY; return { delta: m => y0 - m.clientY, end: () => {} }; }
       const row = el.closest('.knob-param') || el, width = Math.max(60, row.getBoundingClientRect().width), x0 = down.clientX, y0 = down.clientY;
-      let moved = 0;
+      let moved = 0, from = null;
       row.classList.add('dragging');
       return {
-        delta: m => { moved = Math.max(moved, Math.abs(m.clientX - x0), Math.abs(m.clientY - y0)); return (m.clientX - x0) / width * 95; },
+        delta: m => {
+          moved = Math.max(moved, Math.abs(m.clientX - x0), Math.abs(m.clientY - y0));
+          if (from === null) { if (Math.abs(m.clientX - x0) < 8) return 0; from = x0 + Math.sign(m.clientX - x0) * 8; }   // a tap or a scroll moves nothing
+          return (m.clientX - from) / width * 95;
+        },
         end: up => {
           row.classList.remove('dragging');
           const value = row.querySelector('.value-text');
@@ -5812,7 +5836,14 @@ function parseSelectedCaptureState(payload) {
     function updateKnobVisual(knobEl, valueEl, normalized, text) {
       knobEl.style.setProperty('--pct', Math.round(normalized * 73) + '%');
       knobEl.style.setProperty('--angle', (-135 + normalized * 270) + 'deg');
-      valueEl.textContent = text;
+      setValueText(valueEl, text);
+    }
+    // the fill bars of the Duo layouts show the unit small next to the number ("-18.2" "dB")
+    function duoBars() { const layout = document.documentElement.dataset.duo; return Boolean(layout) && layout !== 'outer'; }
+    function setValueText(el, text) {
+      const split = duoBars() ? /^(.*\d)\s*([^\d\s][^\d]*)$/.exec(String(text)) : null;
+      if (split) el.innerHTML = '<b>' + escapeHTML(split[1]) + '</b><small>' + escapeHTML(split[2]) + '</small>';
+      else el.textContent = text;
     }
 
     async function promptManualValue(blockKey, param) {
@@ -6378,6 +6409,31 @@ function parseSelectedCaptureState(payload) {
       name.textContent = param.name;
       p.appendChild(name);
 
+      const options = param.meta.options;
+      if (duoBars() && options.length <= 3) {
+        const choose = index => {
+          if (disabled || index === Number(param.value)) return;
+          param.value = index;
+          render();
+          if (canSend && FX_BLOCK_KEYS.includes(blockKey)) setFXParam(blockKey, param);
+        };
+        p.classList.add('seg-param');
+        p.style.setProperty('--ink', iconInk(color));
+        const seg = document.createElement('div');
+        seg.className = 'duo-seg';
+        tagMidi(seg, { kind: 'param', block: blockKey, param: param.name });
+        options.forEach((label, index) => {
+          const option = document.createElement('button');
+          option.textContent = label;
+          if (index === Number(param.value)) option.className = 'on';
+          option.addEventListener('click', e => { e.stopPropagation(); choose(index); });
+          seg.appendChild(option);
+        });
+        p.addEventListener('click', () => choose((Number(param.value) + 1) % options.length));
+        p.appendChild(seg);
+        return p;
+      }
+
       const pill = document.createElement('button');
       pill.className = 'switch-pill';
       tagMidi(pill, { kind: 'param', block: blockKey, param: param.name });
@@ -6455,7 +6511,7 @@ function parseSelectedCaptureState(payload) {
 
       const value = document.createElement('div');
       value.className = 'value-text';
-      value.textContent = paramDisplayValue(param);
+      setValueText(value, paramDisplayValue(param));
 
       // Live update: only this knob is redrawn and the value is sent immediately
       // (coalesced in the write queue), instead of re-rendering the whole editor.
@@ -6623,7 +6679,7 @@ function parseSelectedCaptureState(payload) {
 
       const value = document.createElement('div');
       value.className = 'value-text';
-      value.textContent = ampText(raw);
+      setValueText(value, ampText(raw));
       value.addEventListener('click', async () => {
         const entered = await askText('Enter value for ' + label + ' (0 to 10)', ampText(state.amp[key]));
         if (entered === null) return;
@@ -7230,6 +7286,173 @@ function parseSelectedCaptureState(payload) {
       if (state.cabIR.on && isFactoryCabIR()) Object.assign(data.cab, { mic: state.cabIR.mic, position: state.cabIR.position });
       if (state.exp.loaded && state.exp.preset === preset) data.expression = structuredClone({ ranges: state.exp.ranges, bypass: state.exp.bypass });
       return data;
+    }
+
+    // ---- The controller's own settings: backup and restore (controller firmware 1.13 or later) ----
+    // The controller keeps its banks, scenes, second effects, set list and so on in a small store. Through its bridge
+    // the editor reads every entry into a file and writes such a file back. These messages (types from 60000 on) stay
+    // between the editor and the controller; the Nano never sees them:
+    //   60000 { index u16 } -> 60001 { index u16, count u16, key length u8, key, value }, past the last one 60002
+    //   60003 { entries u16 } -> 60004 { ok }: restore begins, the store is emptied
+    //   60005 { key length u8, key, total u16, offset u16, bytes } -> 60006 { ok }: a value, in pieces
+    //   60007 -> 60008 { ok, entries u16 }: done, the controller restarts
+    //   60002 { entries u16, used u16, capacity u16, version }
+    const CTL_FIRST = 60000;
+    const CTL_PIECE = 180;                                   // bytes of a value per message (a frame holds 251)
+    const ctl = { waiter: null, rx: null, busy: false };
+
+    function showControllerMenu() {
+      $('ctlBackupBtn').hidden = $('ctlRestoreBtn').hidden = !(state.connected && state.viaController);
+    }
+
+    function ctlFrame(type, payload = []) {
+      const frame = new Uint8Array(payload.length + 6);
+      frame[0] = payload.length + 4;
+      frame[1] = 0xC0;
+      frame.set(payload, 2);
+      for (let i = 0; i < 4; i++) frame[2 + payload.length + i] = (type >>> (8 * i)) & 0xFF;
+      return frame;
+    }
+
+    // A message of the controller arrived (null: the connection is gone): to whoever waits for it.
+    function ctlMessage(message) {
+      const waiter = ctl.waiter;
+      ctl.waiter = null;
+      ctl.rx = null;
+      if (!waiter) return;
+      clearTimeout(waiter.timer);
+      if (!message) { waiter.resolve(null); return; }
+      const n = message.length;
+      const type = (message[n - 4] | (message[n - 3] << 8) | (message[n - 2] << 16) | (message[n - 1] << 24)) >>> 0;
+      waiter.resolve({ type, body: message.slice(0, n - 4) });
+    }
+
+    // A packet from C305: true if it belongs to a controller message (long values come in several packets, with the
+    // Nano's own flags: 0x40 first, 0x80 last).
+    function ctlPacket(data) {
+      if (data.length < 2) return false;
+      const first = (data[1] & 0x40) !== 0, last = (data[1] & 0x80) !== 0;
+      if (first && last) {
+        // (not frameType(): a packet of 256 bytes or more carries the high bits of its length in the same byte)
+        const n = data.length;
+        const type = n >= 6 ? (data[n - 4] | (data[n - 3] << 8) | (data[n - 2] << 16) | (data[n - 1] << 24)) >>> 0 : 0;
+        if (type < CTL_FIRST || type > CTL_FIRST + 99) return false;
+        ctlMessage(data.slice(2));
+        return true;
+      }
+      if (!ctl.waiter) return false;                          // nothing asked: the Nano's own long replies
+      if (first) ctl.rx = [];
+      if (!ctl.rx) return false;
+      for (const b of data.slice(2)) ctl.rx.push(b);
+      if (last) {
+        const message = Uint8Array.from(ctl.rx);
+        const n = message.length;
+        const type = n >= 4 ? (message[n - 4] | (message[n - 3] << 8) | (message[n - 2] << 16) | (message[n - 1] << 24)) >>> 0 : 0;
+        if (type >= CTL_FIRST && type <= CTL_FIRST + 99) ctlMessage(message);
+        else ctl.rx = null;                                   // (a long reply of the Nano that came in between)
+      }
+      return true;
+    }
+
+    // Sends a message to the controller and waits for its answer; null if none comes.
+    function ctlRequest(label, type, payload = [], ms = 4000) {
+      return new Promise(resolve => {
+        ctl.waiter = { resolve, timer: setTimeout(() => ctlMessage(null), ms) };
+        writeC304(label, ctlFrame(type, payload));
+      });
+    }
+
+    const b64 = bytes => btoa(String.fromCharCode(...bytes));
+    const unb64 = text => Uint8Array.from(atob(text), c => c.charCodeAt(0));
+
+    async function backupController() {
+      if (!state.connected || !state.viaController) { toast('Connect through the controller first.', 'info'); return; }
+      if (ctl.busy || state.fileBusy) return;
+      ctl.busy = true;
+      $('ctlBackupBtn').disabled = $('ctlRestoreBtn').disabled = true;
+      try {
+        const entries = [];
+        let info = null;
+        for (let index = 0; index < 2000; index++) {
+          const m = await ctlRequest('Controller entry ' + index, 60000, [index & 0xFF, index >> 8]);
+          if (!m) {
+            toast(index ? 'The controller stopped answering - no backup written.'
+                        : 'The controller does not answer - its firmware has to be 1.13 or later for a backup.', 'error', 6000);
+            return;
+          }
+          if (m.type === 60002) { info = m.body; break; }
+          if (m.type !== 60001 || m.body.length < 5) continue;
+          const keyLength = m.body[4];
+          if (!keyLength) continue;                           // an entry the controller could not read
+          const key = new TextDecoder().decode(m.body.slice(5, 5 + keyLength));
+          entries.push({ key, value: b64(m.body.slice(5 + keyLength)) });
+          if (index % 25 === 24) toast('Reading the controller: ' + (index + 1) + ' of ' + (m.body[2] | (m.body[3] << 8)) + ' entries …', 'info', 1500);
+        }
+        if (!info || !entries.length) { toast('Nothing read from the controller.', 'error'); return; }
+        const used = info[2] | (info[3] << 8), capacity = info[4] | (info[5] << 8);
+        const data = {
+          format: 'nano-cortex-controller-settings', version: 1,
+          firmware: new TextDecoder().decode(info.slice(6)), created: new Date().toISOString(),
+          used, capacity, entries
+        };
+        const fileName = 'nano-controller-settings-' + data.created.slice(0, 10) + '.json';
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
+        a.download = fileName;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        const percent = capacity ? Math.round(used * 100 / capacity) : 0;
+        log('Controller backup: ' + entries.length + ' entries, store ' + percent + ' % full, written as ' + fileName);
+        toast(entries.length + ' entries saved as ' + fileName + '. The controller\'s memory is ' + percent + ' % full.', 'ok', 6000);
+      } finally {
+        ctl.busy = false;
+        $('ctlBackupBtn').disabled = $('ctlRestoreBtn').disabled = false;
+      }
+    }
+
+    async function restoreController(file) {
+      if (!state.connected || !state.viaController) { toast('Connect through the controller first.', 'info'); return; }
+      if (ctl.busy || state.fileBusy) return;
+      let data;
+      try { data = JSON.parse(await file.text()); } catch (err) { data = null; }
+      const entries = data && data.format === 'nano-cortex-controller-settings' && Array.isArray(data.entries)
+        ? data.entries.filter(e => e && typeof e.key === 'string' && e.key.length > 0 && e.key.length < 16 && typeof e.value === 'string') : null;
+      if (!entries || !entries.length) { toast('This is not a backup file of the controller.', 'error'); return; }
+      const when = data.created ? ' from ' + String(data.created).slice(0, 10) : '';
+      if (!(await askConfirm('Restore the controller\'s settings?', 'The backup' + when + ' (' + entries.length + ' entries) replaces everything the controller ' +
+          'stores now: banks, scenes, second effects, set list, footswitch order. The controller restarts afterwards.', { ok: 'Restore' }))) return;
+      ctl.busy = true;
+      $('ctlBackupBtn').disabled = $('ctlRestoreBtn').disabled = true;
+      try {
+        let m = await ctlRequest('Controller restore begins', 60003, [entries.length & 0xFF, entries.length >> 8], 8000);
+        if (!m || m.type !== 60004 || !m.body[0]) {
+          toast(m ? 'The controller could not empty its store - nothing was changed.'
+                  : 'The controller does not answer - its firmware has to be 1.13 or later.', 'error', 6000);
+          return;
+        }
+        let done = 0;
+        for (const entry of entries) {
+          const key = new TextEncoder().encode(entry.key), value = unb64(entry.value);
+          for (let offset = 0; offset < value.length || offset === 0; offset += CTL_PIECE) {
+            const piece = value.slice(offset, offset + CTL_PIECE);
+            m = await ctlRequest('Controller entry ' + entry.key, 60005,
+              [key.length, ...key, value.length & 0xFF, value.length >> 8, offset & 0xFF, offset >> 8, ...piece]);
+            if (!m || m.type !== 60006 || !m.body[0]) {
+              toast('Writing "' + entry.key + '" failed - the restore stopped. Run it again: the controller\'s store is incomplete now.', 'error', 9000);
+              return;
+            }
+            if (value.length === 0) break;
+          }
+          if (++done % 25 === 0) toast('Writing to the controller: ' + done + ' of ' + entries.length + ' entries …', 'info', 1500);
+        }
+        m = await ctlRequest('Controller restore done', 60007, [], 8000);
+        const written = m && m.type === 60008 ? m.body[1] | (m.body[2] << 8) : 0;
+        log('Controller restore: ' + written + ' of ' + entries.length + ' entries written');
+        toast(written + ' entries restored. The controller restarts - connect again in a moment.', 'ok', 7000);
+      } finally {
+        ctl.busy = false;
+        $('ctlBackupBtn').disabled = $('ctlRestoreBtn').disabled = false;
+      }
     }
 
     async function exportPresetFile() {
@@ -9065,6 +9288,9 @@ function parseSelectedCaptureState(payload) {
     $('disconnectBtn').addEventListener('click', disconnect);
     $('saveBtn').addEventListener('click', savePreset);
     $('exportBtn').addEventListener('click', exportPresetFile);
+    $('ctlBackupBtn').addEventListener('click', backupController);
+    $('ctlRestoreBtn').addEventListener('click', () => { $('ctlRestoreFile').value = ''; $('ctlRestoreFile').click(); });
+    $('ctlRestoreFile').addEventListener('change', e => { if (e.target.files[0]) restoreController(e.target.files[0]); });
     $('importBtn').addEventListener('click', pickPresetFile);
     $('importFile').addEventListener('change', e => { if (e.target.files[0]) importPresetFile(e.target.files[0]); });
     // A preset file dropped on the window is imported.
