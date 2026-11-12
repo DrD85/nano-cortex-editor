@@ -382,6 +382,7 @@
       --ico-list: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01'/></g></svg>");
       --ico-repeat: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M17 2l4 4-4 4'/><path d='M3 11V9a3 3 0 0 1 3-3h15'/><path d='M7 22l-4-4 4-4'/><path d='M21 13v2a3 3 0 0 1-3 3H3'/></g></svg>");
       --ico-tuner: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2v8a4 4 0 0 0 8 0V2'/><path d='M12 14v8'/></g></svg>");
+      --ico-metronome: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M9 3h6l4 18H5L9 3z'/><path d='M12 17l5-11'/><path d='M8 17h8'/></g></svg>");
       --ico-exp: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 18l14-5'/><path d='M5 21v-3M19 21v-8'/><path d='M6 9a9 9 0 0 1 12-4'/><path d='M15 3l3 2-2 3'/></g></svg>");
       --ico-midi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M10 3.5h4'/><circle cx='7' cy='12' r='0.6'/><circle cx='17' cy='12' r='0.6'/><circle cx='8.5' cy='8.5' r='0.6'/><circle cx='15.5' cy='8.5' r='0.6'/><circle cx='12' cy='16.5' r='0.6'/></g></svg>");
       --ico-export: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12'/><path d='M7 10l5 5 5-5'/><path d='M4 17v3h16v-3'/></g></svg>");
@@ -1751,6 +1752,53 @@
     /* output level: small meter before the OUT of the signal chain, the dialog with the bars and Auto level */
     .sc-node.io.level { cursor: pointer; }
     .sc-node.io.level:hover .sc-tile { color: #fff; border-color: var(--accent); }
+    /* tempo + metronome (NanOS 2.3.0): a tile before the meter, a dialog */
+    .sc-tile.io.tempo { width: 60px; height: 60px; margin-top: 0; border-radius: 14px; display: grid; place-items: center; align-content: center; gap: 6px;
+      border: 1px solid #2c3036; background: transparent; color: #f2f2f2; cursor: pointer; }
+    .sc-tile.io.tempo.on { border-color: #45F862; background: color-mix(in srgb, #45F862 16%, #0b0c0d); }
+    .sc-tile.io.tempo b { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: 0; }
+    .mt-beats { display: flex; gap: 6px; align-items: center; }
+    .mt-beats i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #45494f; flex: none; }
+    .mt-beats i.acc { width: 12px; height: 12px; }
+    .mt-beats i.now { background: #45F862; border-color: #45F862; box-shadow: 0 0 10px #45F86288; }
+    .sc-tile.io.tempo .mt-beats { gap: 3px; }
+    .sc-tile.io.tempo .mt-beats i { width: 5px; height: 5px; border-width: 1px; }
+    .sc-tile.io.tempo .mt-beats i.acc { width: 6px; height: 6px; }
+    .mt-panel { width: min(760px, calc(100vw - 32px)); padding: 22px 24px 24px; border-radius: 20px; border: 1px solid #2a2e33; background: #121417; box-shadow: 0 30px 60px rgba(0,0,0,.6); }
+    .mt-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .mt-head h2 { margin: 0; font-size: 18px; font-weight: 650; color: #f2f2f2; display: flex; align-items: center; gap: 10px; }
+    .mt-head .mt-tools { display: flex; align-items: center; gap: 10px; }
+    .mt-body { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; }
+    .mt-dial { position: relative; width: 300px; height: 300px; touch-action: none; cursor: ns-resize; outline: none; }
+    .mt-dial:focus-visible { border-radius: 50%; box-shadow: 0 0 0 2px #45F86266; }
+    .mt-dial svg { position: absolute; inset: 0; }
+    .mt-dial .c { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 6px; text-align: center; pointer-events: none; }
+    .mt-dial input { pointer-events: auto; width: 190px; border: 0; background: transparent; text-align: center; font: inherit; font-size: 64px; font-weight: 700;
+      font-variant-numeric: tabular-nums; color: #f2f2f2; line-height: 1; padding: 0; -moz-appearance: textfield; cursor: text; }
+    .mt-dial input::-webkit-inner-spin-button, .mt-dial input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .mt-dial .c small { font-size: 11px; letter-spacing: .16em; color: #8e9297; }
+    .mt-dial .c .mt-beats { margin-top: 8px; flex-wrap: wrap; justify-content: center; max-width: 200px; }
+    .mt-tap { width: 100%; height: 64px; margin-top: 6px; border-radius: 12px; border: 1px solid #3a3f45; background: #16191c; color: #f2f2f2; font: inherit;
+      font-weight: 700; letter-spacing: .14em; font-size: 14px; cursor: pointer; }
+    .mt-tap:active, .mt-tap.hit { background: #23272b; border-color: #45F862; }
+    .mt-side { display: grid; gap: 14px; align-content: start; }
+    .mt-side .row { display: grid; gap: 6px; }
+    .mt-side .row.line { display: flex; align-items: center; justify-content: space-between; }
+    .mt-q { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; }
+    .mt-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; padding: 3px; border: 1px solid #2a2e33; border-radius: 10px; }
+    .mt-seg button { padding: 6px 10px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 12.5px; font-weight: 600; color: #c8ccd1; cursor: pointer; }
+    .mt-seg button.on { background: #e6e8ea; color: #0b0b0b; }
+    .mt-bar { position: relative; height: 34px; border-radius: 10px; border: 1px solid #2a2e33; background: #0b0c0d; overflow: hidden; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 12px; font-size: 13px; font-weight: 600; color: #e6e8ea; cursor: ew-resize; touch-action: none; outline: none; }
+    .mt-bar:focus-visible { border-color: #45F862; }
+    .mt-bar i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--v); background: color-mix(in srgb, #45F862 30%, #0b0c0d); border-right: 3px solid #45F862; }
+    .mt-bar.off i { background: #1b1e21; border-right-color: #5e6369; }
+    .mt-bar span, .mt-bar b { position: relative; pointer-events: none; }
+    .mt-bar b { font-variant-numeric: tabular-nums; }
+    .mt-bar b small { color: #8e9297; font-size: 10.5px; margin-left: 2px; font-weight: 500; }
+    .mt-side select { width: 100%; }
+    .mt-note { font-size: 11px; color: #5e6369; line-height: 1.45; }
+    @media (max-width: 760px) { .mt-body { grid-template-columns: 1fr; } .mt-dial { margin: 0 auto; } }
     .sc-tile.io.meter { width: 38px; height: 60px; margin-top: 0; border-radius: 12px; display: flex; align-items: stretch; justify-content: center; gap: 5px; padding: 8px 0; }
     .sc-tile.io.meter .vu { position: relative; width: 7px; border-radius: 3px; background: #23272b; overflow: hidden; }
     .sc-tile.io.meter .vu i { position: absolute; inset: 0; background: linear-gradient(to top, #45F862 0, #45F862 70%, #f2d14b 70%, #f2d14b 90%, #ff5a4d 90%);
@@ -3329,6 +3377,7 @@
     // connect card comes up behind them). The meter, MIDI and the jam tracks do not need the connection.
     function closeDeviceDialogs() {
       closeTuner(false);
+      closeMetro(false);
       closeExpPanel();
       closeFootswitches();
       closeLibraryBrowser();
@@ -3453,6 +3502,16 @@
         state.tuner.baseFrequency = Math.round(new DataView(Uint8Array.from(tunerFreq.raw).buffer).getFloat32(0, true)) || 440;
       }
       state.tuner.muted = Boolean(varintField(63, 0));
+      // 24 firmwareVersion ("2.3.0+05c36621"), 55 tempoIsGlobal, 56 tempo (float32), 61 externalMidiClockRunning
+      if (fields[24] && fields[24][0] && fields[24][0].wire === 2) metro.firmware = utf8(fields[24][0].raw);
+      const tempoField = fields[56] && fields[56][0];
+      if (tempoField && tempoField.wire === 5) {
+        const bpm = new DataView(Uint8Array.from(tempoField.raw).buffer).getFloat32(0, true);
+        if (bpm >= 20 && bpm <= 400 && !metro.editing) metro.tempo = Math.round(bpm * 10) / 10;
+      }
+      if (!metro.editing) metro.global = Boolean(varintField(55, 0));
+      metro.extClock = Boolean(varintField(61, 0));
+      metroRefresh();
       log('Current preset: ' + state.selectedPreset + (state.presetDirty ? ' (edited)' : ''));
       if ((!$('expOverlay').hidden || state.mc6.mixSlot >= 0) && (state.exp.preset !== state.selectedPreset || !state.exp.loaded)) requestExpAssignments();
 
@@ -4541,6 +4600,7 @@ function parseSelectedCaptureState(payload) {
       RetrieveExpAssignmentsResponse: 61,
       SaveExpAssignmentsRequest: 62,
       TunerMetering: 128,
+      TempoScreen: 145,
       RetrieveSettingsRequest: 65,
       RetrieveSettingsResponse: 66,
       UpdateSettingsRequest: 67,
@@ -4722,6 +4782,11 @@ function parseSelectedCaptureState(payload) {
 
       if (type === MSG.SetCabinetSlotContentResponse) {
         handleCabinetSlotContentResponse(data);
+        return true;
+      }
+
+      if (type === MSG.TempoScreen) {
+        handleTempoScreen(data);
         return true;
       }
 
@@ -5652,6 +5717,262 @@ function parseSelectedCaptureState(payload) {
       state.tuner.open = false;
       $('tunerOverlay').hidden = true;
       if (send && state.connected) writeC304('Tuner off', tunerModeFrame(false));
+    }
+
+    // ---- Tempo and metronome (NanOS 2.3.0; TempoScreenMessage 145, as Cortex Cloud 2.8.3 uses it) ----
+    // The tempo comes with every state: 55 tempoIsGlobal, 56 tempo (float32), 61 externalMidiClockRunning.
+    // TempoScreenMessage { 3 tempoScreenActive, 4 tempoIsGlobal, 5 tempo (float32), 6 externalMidiClockRunning,
+    // 7 volume (float32, dB), 8 muteMetronome, 9 timeSignature, 10 noteLength, 11 metronomeSound }.
+    // The app sends the whole message when its Tempo page opens and with every change (the metronome settings from
+    // what it knows: the Nano's last 145, else its own), and { 3: false } when the page closes. The Nano sends a 145
+    // with tempoScreenActive when its own tempo screen opens (the app then opens its page). A tapped tempo is not
+    // reported - it is in the next state. Ranges as in the app: 40-240 BPM, volume -60 to +9 dB.
+    const METRO_STORE = 'nanoMetronome';
+    const METRO_TIME_SIGS = ['2/4', '3/4', '4/4', '5/4', '6/4', '7/4', '8/4', '9/4', '10/4', '11/4', '12/4', '13/4', '3/8', '6/8', '9/8', '12/8',
+      '5/8 (3+2)', '5/8 (2+3)', '7/8 (3+2+2)', '7/8 (2+3+2)', '7/8 (2+2+3)'];
+    const METRO_NOTES = ['1/4', '1/8', '1/8T', '1/16'];
+    const METRO_SOUNDS = ['Blip', 'Digital'];
+    const METRO_BPM = [40, 240], METRO_VOL = [-60, 9];
+    const metro = { firmware: '', tempo: 120, global: true, extClock: false, open: false, editing: false, sendTimer: null, taps: [], beat: 0, beatTimer: null,
+      settings: { muted: true, volume: 0, timeSig: 2, note: 0, sound: 0 } };   // the app's defaults
+    try {
+      const saved = JSON.parse(localStorage.getItem(METRO_STORE) || '{}');
+      const s = metro.settings;
+      if (typeof saved.muted === 'boolean') s.muted = saved.muted;
+      if (Number.isFinite(saved.volume)) s.volume = clamp(saved.volume, METRO_VOL[0], METRO_VOL[1]);
+      if (Number.isInteger(saved.timeSig) && METRO_TIME_SIGS[saved.timeSig]) s.timeSig = saved.timeSig;
+      if (Number.isInteger(saved.note) && METRO_NOTES[saved.note]) s.note = saved.note;
+      if (Number.isInteger(saved.sound) && METRO_SOUNDS[saved.sound]) s.sound = saved.sound;
+    } catch (e) { /* storage unavailable */ }
+    const saveMetro = () => { try { localStorage.setItem(METRO_STORE, JSON.stringify(metro.settings)); } catch (e) { /* storage unavailable */ } };
+
+    // the metronome came with NanOS 2.3.0 (the app checks the firmware as well)
+    function metroSupported() {
+      const m = /^(\d+)\.(\d+)/.exec(metro.firmware || '');
+      return Boolean(state.connected && m && (Number(m[1]) > 2 || (Number(m[1]) === 2 && Number(m[2]) >= 3)));
+    }
+
+    function tempoFrame(active) {
+      if (!active) return buildFrame([0x18, 0x00], MSG.TempoScreen);
+      const s = metro.settings;
+      return buildFrame([0x18, 0x01, 0x20, metro.global ? 1 : 0, 0x2D, ...float32LE(metro.tempo), 0x30, metro.extClock ? 1 : 0,
+        0x3D, ...float32LE(s.volume), 0x40, s.muted ? 1 : 0, 0x48, s.timeSig, 0x50, s.note, 0x58, s.sound], MSG.TempoScreen);
+    }
+    function metroSend(now = false) {
+      if (!metro.open || !state.connected) return;
+      clearTimeout(metro.sendTimer);
+      const send = () => {
+        const s = metro.settings;
+        writeC304('Tempo ' + metro.tempo.toFixed(1) + ' BPM' + (metro.global ? ' (global)' : ' (preset)') + ', metronome ' + (s.muted ? 'off' : 'on ' + s.volume.toFixed(1) + ' dB') +
+          ', ' + METRO_TIME_SIGS[s.timeSig] + ', ' + METRO_NOTES[s.note] + ', ' + METRO_SOUNDS[s.sound], tempoFrame(true), 'tempo');
+      };
+      if (now) send(); else metro.sendTimer = setTimeout(send, 120);
+    }
+
+    function handleTempoScreen(data) {
+      const fields = framePayloadFields(data);
+      const num = n => (fields[n] && fields[n][0] && fields[n][0].wire === 0 ? fields[n][0].value : 0);
+      const f32 = n => (fields[n] && fields[n][0] && fields[n][0].wire === 5 ? new DataView(Uint8Array.from(fields[n][0].raw).buffer).getFloat32(0, true) : null);
+      log('RX tempo screen: ' + hex(data));
+      const tempo = f32(5), volume = f32(7);
+      if (tempo !== null && tempo >= 20 && tempo <= 400) metro.tempo = Math.round(tempo * 10) / 10;
+      if (fields[4]) metro.global = Boolean(num(4));
+      if (fields[6]) metro.extClock = Boolean(num(6));
+      if (volume !== null) {   // a whole message from the Nano: its metronome settings
+        const s = metro.settings;
+        Object.assign(s, { volume: clamp(Math.round(volume * 10) / 10, METRO_VOL[0], METRO_VOL[1]), muted: Boolean(num(8)),
+          timeSig: METRO_TIME_SIGS[num(9)] ? num(9) : s.timeSig, note: METRO_NOTES[num(10)] ? num(10) : s.note, sound: METRO_SOUNDS[num(11)] ? num(11) : s.sound });
+        saveMetro();
+      }
+      const active = Boolean(num(3));
+      if (active && !metro.open) openMetro(true);
+      else if (!active && metro.open && fields[3]) closeMetro(false);
+      else metroRefresh();
+    }
+
+    // the beats of a bar and how many per minute: x/8 counts eighths
+    function metroBar() {
+      const ts = METRO_TIME_SIGS[metro.settings.timeSig];
+      const m = /^(\d+)\/(\d+)/.exec(ts);
+      return { beats: Math.min(13, Number(m[1])), perMinute: metro.tempo * (Number(m[2]) / 4) };
+    }
+    const metroBeats = (count, now) => '<span class="mt-beats">' +
+      Array.from({ length: count }, (_, i) => '<i class="' + (i === 0 ? 'acc' : '') + (i === now ? ' now' : '') + '"></i>').join('') + '</span>';
+    // the dots move with the tempo while the metronome is on - a picture only, not in step with the Nano's click
+    function metroAnimate() {
+      clearInterval(metro.beatTimer);
+      metro.beatTimer = null;
+      const running = !metro.settings.muted && metroSupported() && !metro.extClock;
+      document.querySelectorAll('.mt-beats').forEach(el => el.querySelectorAll('i').forEach(i => i.classList.remove('now')));
+      if (!running) return;
+      const bar = metroBar();
+      metro.beat = 0;
+      const step = () => {
+        document.querySelectorAll('.mt-beats').forEach(el => el.querySelectorAll('i').forEach((dot, i) => dot.classList.toggle('now', i === metro.beat % bar.beats)));
+        metro.beat++;
+      };
+      step();
+      metro.beatTimer = setInterval(step, 60000 / bar.perMinute);
+    }
+
+    function renderTempoNode(node) {
+      node.id = 'tempoNode';
+      const s = metro.settings, bar = metroBar();
+      node.title = 'Tempo ' + metro.tempo.toFixed(1) + ' BPM (' + (metro.global ? 'global' : 'this preset') + '), metronome ' + (s.muted ? 'off' : 'on') +
+        (metro.extClock ? ' – MIDI clock from outside' : '') + ' – click for tempo and metronome';
+      node.innerHTML = '<div class="sc-tile io tempo' + (s.muted ? '' : ' on') + '"><b>' + Math.round(metro.tempo) + '</b>' + metroBeats(Math.min(8, bar.beats), -1) + '</div>' +
+        '<span class="sc-lbl">Tempo</span><span class="sc-sub">' + escapeHTML(METRO_TIME_SIGS[s.timeSig].split(' ')[0]) + '</span>';   // filled = metronome on
+      node.addEventListener('click', () => openMetro(false));
+      if (metro.beatTimer || !s.muted) setTimeout(metroAnimate, 0);   // once the tile is in the page
+    }
+
+    // the dialog, built once
+    function metroDialog() {
+      let overlay = $('metroOverlay');
+      if (overlay) return overlay;
+      overlay = document.createElement('div');
+      overlay.id = 'metroOverlay';
+      overlay.className = 'ask-overlay';
+      overlay.hidden = true;
+      overlay.innerHTML = '<div class="mt-panel" role="dialog" aria-label="Tempo and metronome">' +
+        '<div class="mt-head"><h2><span class="ico" style="--icon: var(--ico-metronome);width:18px;height:18px"></span>Tempo &amp; metronome</h2>' +
+        '<div class="mt-tools"><span class="mt-seg" id="mtScope" role="group" aria-label="Tempo for"><button data-v="1" title="One tempo for all presets">Global</button>' +
+        '<button data-v="0" title="Each preset keeps its own tempo (saved with the preset)">Preset</button></span>' +
+        '<button id="mtClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button></div></div>' +
+        '<div class="mt-body"><div><div class="mt-dial" id="mtDial" tabindex="0" title="Drag up / down or scroll; arrow keys: 1 BPM, with Shift 0.1">' +
+        '<svg viewBox="0 0 300 300"><path id="mtTrack" stroke="#1d2024" stroke-width="10" fill="none" stroke-linecap="round"/>' +
+        '<path id="mtArc" stroke="#45F862" stroke-width="10" fill="none" stroke-linecap="round"/></svg>' +
+        '<div class="c"><input id="mtBpm" type="text" inputmode="decimal" aria-label="Tempo (BPM)"><small>BPM · DRAG OR SCROLL</small><span id="mtBeats"></span></div></div>' +
+        '<button class="mt-tap" id="mtTap" title="Tap the tempo (T)">TAP</button></div>' +
+        '<div class="mt-side"><div class="row"><div class="row line"><span class="mt-q">Metronome</span>' +
+        '<div id="mtOn" class="toggle-switch" role="switch" aria-label="Metronome" style="--block-color:#45F862"><div class="toggle-dot"></div></div></div>' +
+        '<div class="mt-bar" id="mtVol" tabindex="0" role="slider" aria-label="Metronome volume" aria-valuemin="-60" aria-valuemax="9"><i></i><span>Volume</span><b></b></div></div>' +
+        '<div class="row"><span class="mt-q">Time signature</span><select id="mtSig" aria-label="Time signature">' +
+        METRO_TIME_SIGS.map((t, i) => '<option value="' + i + '">' + t + '</option>').join('') + '</select></div>' +
+        '<div class="row"><span class="mt-q">Note</span><span class="mt-seg" id="mtNote">' + METRO_NOTES.map((t, i) => '<button data-v="' + i + '">' + t + '</button>').join('') + '</span></div>' +
+        '<div class="row"><span class="mt-q">Sound</span><span class="mt-seg" id="mtSound">' + METRO_SOUNDS.map((t, i) => '<button data-v="' + i + '">' + t + '</button>').join('') + '</span></div>' +
+        '<div class="mt-note" id="mtNoteText"></div></div></div></div>';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeMetro(); });
+      overlay.querySelector('#mtClose').addEventListener('click', () => closeMetro());
+      const set = (fn, now) => { fn(); saveMetro(); metroRefresh(); metroSend(now); };
+      const setTempo = bpm => { metro.tempo = Math.round(clamp(bpm, METRO_BPM[0], METRO_BPM[1]) * 10) / 10; metro.editing = true; metroRefresh(); metroSend(); };
+      overlay.querySelector('#mtScope').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { metro.global = b.dataset.v === '1'; metro.editing = true; metroRefresh(); metroSend(true); } });
+      overlay.querySelector('#mtOn').addEventListener('click', () => set(() => { metro.settings.muted = !metro.settings.muted; }, true));
+      overlay.querySelector('#mtSig').addEventListener('change', e => set(() => { metro.settings.timeSig = Number(e.target.value); }, true));
+      overlay.querySelector('#mtNote').addEventListener('click', e => { const b = e.target.closest('button'); if (b) set(() => { metro.settings.note = Number(b.dataset.v); }, true); });
+      overlay.querySelector('#mtSound').addEventListener('click', e => { const b = e.target.closest('button'); if (b) set(() => { metro.settings.sound = Number(b.dataset.v); }, true); });
+      const bpmInput = overlay.querySelector('#mtBpm');
+      bpmInput.addEventListener('change', () => { const v = parseFloat(bpmInput.value.replace(',', '.')); if (Number.isFinite(v)) setTempo(v); else metroRefresh(); });
+      bpmInput.addEventListener('keydown', e => { if (e.key === 'Enter') bpmInput.blur(); e.stopPropagation(); });
+      // the dial: drag up / down (1 BPM per 4 px), the wheel, the arrow keys
+      const dial = overlay.querySelector('#mtDial');
+      dial.addEventListener('pointerdown', e => {
+        if (e.target === bpmInput) return;
+        const y0 = e.clientY, t0 = metro.tempo;
+        dial.setPointerCapture(e.pointerId);
+        const move = ev => setTempo(t0 + Math.round((y0 - ev.clientY) / 4) * (ev.shiftKey ? 0.1 : 1));
+        const up = () => { dial.removeEventListener('pointermove', move); dial.removeEventListener('pointerup', up); dial.removeEventListener('pointercancel', up); };
+        dial.addEventListener('pointermove', move);
+        dial.addEventListener('pointerup', up);
+        dial.addEventListener('pointercancel', up);
+      });
+      dial.addEventListener('wheel', e => { e.preventDefault(); setTempo(metro.tempo + (e.deltaY < 0 ? 1 : -1) * (e.shiftKey ? 0.1 : 1)); }, { passive: false });
+      dial.addEventListener('keydown', e => {
+        const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[e.key];
+        if (d) { e.preventDefault(); setTempo(metro.tempo + d * (e.shiftKey ? 0.1 : 1)); }
+      });
+      // tap: the mean of the last intervals (as the app: 40-240 BPM, a pause of 2 s starts again)
+      const tap = () => {
+        const now = performance.now();
+        if (metro.taps.length && now - metro.taps[metro.taps.length - 1] > 2000) metro.taps = [];
+        metro.taps.push(now);
+        if (metro.taps.length > 6) metro.taps.shift();
+        const btn = overlay.querySelector('#mtTap');
+        btn.classList.add('hit');
+        setTimeout(() => btn.classList.remove('hit'), 90);
+        if (metro.taps.length < 2) return;
+        const ms = (metro.taps[metro.taps.length - 1] - metro.taps[0]) / (metro.taps.length - 1);
+        setTempo(Math.round(60000 / ms * 10) / 10);
+      };
+      overlay.querySelector('#mtTap').addEventListener('pointerdown', e => { e.preventDefault(); tap(); });
+      overlay.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { e.stopPropagation(); closeMetro(); }
+        else if ((e.key === 't' || e.key === 'T') && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') { e.preventDefault(); tap(); }
+      });
+      // volume: a fill bar, drag or arrow keys (0.5 dB)
+      const vol = overlay.querySelector('#mtVol');
+      const volFrom = x => { const r = vol.getBoundingClientRect(); return METRO_VOL[0] + clamp((x - r.left) / r.width, 0, 1) * (METRO_VOL[1] - METRO_VOL[0]); };
+      vol.addEventListener('pointerdown', e => {
+        vol.setPointerCapture(e.pointerId);
+        const apply = ev => set(() => { metro.settings.volume = Math.round(volFrom(ev.clientX) * 2) / 2; }, false);
+        apply(e);
+        const up = () => { vol.removeEventListener('pointermove', apply); vol.removeEventListener('pointerup', up); vol.removeEventListener('pointercancel', up); };
+        vol.addEventListener('pointermove', apply);
+        vol.addEventListener('pointerup', up);
+        vol.addEventListener('pointercancel', up);
+      });
+      vol.addEventListener('keydown', e => {
+        const d = { ArrowUp: 0.5, ArrowRight: 0.5, ArrowDown: -0.5, ArrowLeft: -0.5 }[e.key];
+        if (d) { e.preventDefault(); set(() => { metro.settings.volume = clamp(metro.settings.volume + d, METRO_VOL[0], METRO_VOL[1]); }, false); }
+      });
+      return overlay;
+    }
+
+    // the tile and, while open, the dialog show what is known now
+    function metroRefresh() {
+      const node = $('tempoNode');
+      if (Boolean(node) !== metroSupported()) renderSignalChain();
+      else if (node) { const fresh = node.cloneNode(false); node.replaceWith(fresh); renderTempoNode(fresh); }
+      const overlay = $('metroOverlay');
+      if (!overlay || overlay.hidden) return;
+      const s = metro.settings, bar = metroBar();
+      if (document.activeElement !== $('mtBpm')) $('mtBpm').value = metro.tempo.toFixed(1);
+      const R = 130, cx = 150, cy = 150, a0 = Math.PI * 0.75, a1 = Math.PI * 2.25;
+      const arc = (from, to) => { const p = a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]; const [x0, y0] = p(from), [x1, y1] = p(to);
+        return 'M' + x0.toFixed(1) + ',' + y0.toFixed(1) + ' A' + R + ',' + R + ' 0 ' + (to - from > Math.PI ? 1 : 0) + ' 1 ' + x1.toFixed(1) + ',' + y1.toFixed(1); };
+      $('mtTrack').setAttribute('d', arc(a0, a1));
+      $('mtArc').setAttribute('d', arc(a0, a0 + Math.max(0.001, (a1 - a0) * (clamp(metro.tempo, METRO_BPM[0], METRO_BPM[1]) - METRO_BPM[0]) / (METRO_BPM[1] - METRO_BPM[0]))));
+      $('mtBeats').innerHTML = metroBeats(bar.beats, -1);
+      $('mtScope').querySelectorAll('button').forEach(b => b.classList.toggle('on', (b.dataset.v === '1') === metro.global));
+      $('mtOn').classList.toggle('on', !s.muted);
+      $('mtOn').setAttribute('aria-checked', String(!s.muted));
+      const vol = $('mtVol');
+      vol.classList.toggle('off', s.muted);
+      vol.style.setProperty('--v', ((s.volume - METRO_VOL[0]) / (METRO_VOL[1] - METRO_VOL[0]) * 100).toFixed(1) + '%');
+      vol.querySelector('b').innerHTML = dbText(s.volume, true) + '<small>dB</small>';
+      vol.setAttribute('aria-valuenow', String(s.volume));
+      $('mtSig').value = String(s.timeSig);
+      $('mtNote').querySelectorAll('button').forEach(b => b.classList.toggle('on', Number(b.dataset.v) === s.note));
+      $('mtSound').querySelectorAll('button').forEach(b => b.classList.toggle('on', Number(b.dataset.v) === s.sound));
+      $('mtNoteText').textContent = (metro.extClock ? 'The tempo comes from an external MIDI clock. ' : '') +
+        'The metronome plays on the Nano\'s outputs. Global: one tempo for all presets · Preset: each preset keeps its own (saved with the preset).';
+      metroAnimate();
+    }
+
+    // fromDevice: the Nano opened its own tempo screen (it already shows it - nothing to send)
+    function openMetro(fromDevice) {
+      if (!metroSupported()) return;
+      const overlay = metroDialog();
+      metro.open = true;
+      overlay.hidden = false;
+      metroRefresh();
+      $('mtClose').focus();
+      if (!fromDevice) metroSend(true);
+    }
+
+    function closeMetro(send = true) {
+      if (!metro.open) return;
+      metro.open = false;
+      clearTimeout(metro.sendTimer);
+      const overlay = $('metroOverlay');
+      if (overlay) overlay.hidden = true;
+      if (send && state.connected) {
+        writeC304('Tempo screen off', tempoFrame(false));
+        if (metro.editing) setTimeout(() => { if (state.connected) requestCurrentPresetState(); }, 300);   // the preset may be marked edited now
+      }
+      metro.editing = false;
+      metroRefresh();
     }
 
     // TunerMeteringMessage { 4: note, 5: deviation (cents, float32), 6: isDeviationValid, 7: centered }.
@@ -9994,15 +10315,17 @@ function parseSelectedCaptureState(payload) {
           name: state.cabIR.on ? state.currentIR.shortName || 'Cab / IR' : 'Bypassed', icon: 'cab', color: '#F2F2F2',
           state: state.cabIR.on ? 'on' : 'off', target: 'cabCard', toggle: () => $('cabIRToggle').click() },
         fx('post1'), fx('post2'), fx('post3'),
+        ...(metroSupported() ? [{ tempo: true }] : []),
         { meter: true },
         { io: 'OUT' }
       ];
       box.innerHTML = '';
       nodes.forEach(n => {
         const node = document.createElement('div');
-        if (n.io || n.meter) {
+        if (n.io || n.meter || n.tempo) {
           node.className = 'sc-node io';
           if (n.meter) renderMeterNode(node);
+          else if (n.tempo) renderTempoNode(node);
           else {
             node.innerHTML = '<div class="sc-tile io">' + n.io + '</div>';
             if (state.connected) renderMuteNode(node, n.io === 'IN' ? 'in' : 'out');
