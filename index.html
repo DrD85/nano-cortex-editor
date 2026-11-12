@@ -1039,6 +1039,20 @@
     .fs-pop .seg button { padding: 7px 4px; border: 0; border-radius: 8px; background: none; font-size: 12.5px; font-weight: 600; color: #c8ccd1; cursor: pointer; }
     .fs-pop .seg button.on { background: #e6e8ea; color: #0b0b0b; }
     .fs-pop select { width: 100%; }
+    .fs-pop .swatches { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+    .fs-pop .swatches button { aspect-ratio: 1; border-radius: 8px; border: 2px solid transparent; background: var(--c); cursor: pointer; }
+    .fs-pop .swatches button.on { border-color: #fff; box-shadow: 0 0 0 2px #121417 inset; }
+    .fs-pop .symbols { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+    .fs-pop .symbols button { aspect-ratio: 1; display: grid; place-items: center; padding: 0; border: 1px solid #2a2e33; border-radius: 8px; background: none; color: #e6e8ea; cursor: pointer; }
+    .fs-pop .symbols button.on { background: #e6e8ea; color: #0b0b0b; border-color: #e6e8ea; --sym-bg: #e6e8ea; }
+    .bank-sym { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .bank-sym .cut { stroke: var(--sym-bg, #121417); fill: var(--sym-bg, #121417); stroke-width: 2.2; }
+    .ft .cap { display: flex; align-items: center; gap: 6px; }
+    .ft .cap .bank-sym { width: 16px; height: 16px; }
+    .ft.on .bank-sym .cut { stroke: var(--c); fill: var(--c); }
+    .ft:not(.on) .bank-sym .cut { stroke: #0b0c0d; fill: #0b0c0d; }
+    .fs-strip .bank-nav { display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; color: #cfd3d7; letter-spacing: .1em; }
+    .fs-strip .bank-nav button { padding: 2px 9px; font-size: 14px; line-height: 1; }
     .fs-pop .hint { margin: 8px 2px 0; font-size: 12px; line-height: 1.45; color: #8e9297; }
 
     /* shared presets: cards from GitHub, the capture and cab of each checked against the Nano */
@@ -7757,6 +7771,31 @@ function parseSelectedCaptureState(payload) {
     const fsLink = { tiles: {}, settings: null, asked: false, open: 0, folded: false, synced: false };
     try { fsLink.folded = localStorage.getItem('nanoFsStripFolded') === '1'; } catch (e) {}
     const SWITCH1_NAMES = ['FX / presets', 'FX / scenes', 'Presets / scenes', 'Presets, scenes, FX'];
+    // The own banks' colours and symbols as on the board (its ui.c BANK_COLORS and tools/preset_icons.py - own drawings,
+    // 24 x 24, stroked; keep the order: the board stores the position)
+    const BANK_COLORS = ['#F2F2F2', '#FF4D4D', '#FF7000', '#FFD236', '#45F862', '#00FFDD', '#3D8BFF', '#8A5CFF', '#FF5CC8', '#9A9A9A'];
+    const BANK_SYMBOLS = [
+      ["Clean", "<path d=\"M11 3Q12 11 20 12Q12 13 11 21Q10 13 2 12Q10 11 11 3Z\"/><path d=\"M19 2.5Q19.4 4.6 21.5 5Q19.4 5.4 19 7.5Q18.6 5.4 16.5 5Q18.6 4.6 19 2.5Z\"/>"],
+      ["Edge", "<path d=\"M2.00 12.00L2.25 10.72L2.50 9.55L2.75 8.54L3.00 7.73L3.25 7.11L3.50 6.65L3.75 6.31L4.00 6.07L4.25 5.90L4.50 5.78L4.75 5.70L5.00 5.64L5.25 5.59L5.50 5.56L5.75 5.54L6.00 5.52L6.25 5.51L6.50 5.51L6.75 5.50L7.00 5.50L7.25 5.50L7.50 5.51L7.75 5.51L8.00 5.52L8.25 5.54L8.50 5.56L8.75 5.59L9.00 5.64L9.25 5.70L9.50 5.78L9.75 5.90L10.00 6.07L10.25 6.31L10.50 6.65L10.75 7.11L11.00 7.73L11.25 8.54L11.50 9.55L11.75 10.72L12.00 12.00L12.25 13.28L12.50 14.45L12.75 15.46L13.00 16.27L13.25 16.89L13.50 17.35L13.75 17.69L14.00 17.93L14.25 18.10L14.50 18.22L14.75 18.30L15.00 18.36L15.25 18.41L15.50 18.44L15.75 18.46L16.00 18.48L16.25 18.49L16.50 18.49L16.75 18.50L17.00 18.50L17.25 18.50L17.50 18.49L17.75 18.49L18.00 18.48L18.25 18.46L18.50 18.44L18.75 18.41L19.00 18.36L19.25 18.30L19.50 18.22L19.75 18.10L20.00 17.93L20.25 17.69L20.50 17.35L20.75 16.89L21.00 16.27L21.25 15.46L21.50 14.45L21.75 13.28L22.00 12.00\"/>"],
+      ["Drive", "<path d=\"M12 22C7.8 22 5.5 19 5.5 15.6C5.5 12.2 8 10.3 9 7.8C9.8 9.6 10.6 10.5 11.6 11C11.4 7.6 13 4.6 15.4 2.5C15.2 5.6 16.6 7.6 17.6 9.4C18.3 10.8 18.5 12.2 18.5 13.8C18.5 18.8 15.8 22 12 22Z\"/><path d=\"M12 22C10.2 22 9 20.7 9 19C9 17.2 10.4 16.1 11.2 14.4C11.8 15.6 12.5 16.2 13.4 16.6C13.9 15.8 14.2 15 14.3 14C15.2 15.2 15.8 16.5 15.8 17.9C15.8 20.3 14.2 22 12 22Z\"/>"],
+      ["Solo", "<path d=\"M12.00 2.80L14.41 9.48L21.51 9.71L15.90 14.07L17.88 20.89L12.00 16.90L6.12 20.89L8.10 14.07L2.49 9.71L9.59 9.48Z\"/>"],
+      ["Fuzz", "<path d=\"M12.00 2.00L13.33 5.33L15.83 2.76L15.78 6.35L19.07 4.93L17.65 8.22L21.24 8.17L18.67 10.67L22.00 12.00L18.67 13.33L21.24 15.83L17.65 15.78L19.07 19.07L15.78 17.65L15.83 21.24L13.33 18.67L12.00 22.00L10.67 18.67L8.17 21.24L8.22 17.65L4.93 19.07L6.35 15.78L2.76 15.83L5.33 13.33L2.00 12.00L5.33 10.67L2.76 8.17L6.35 8.22L4.93 4.93L8.22 6.35L8.17 2.76L10.67 5.33Z\"/>"],
+      ["Atmospheric", "<path d=\"M19.5 15.5A8.5 8.5 0 1 1 9 4.2A7 7 0 0 0 19.5 15.5Z\"/><circle cx=\"16.5\" cy=\"4.5\" r=\"1\" fill=\"currentColor\"/><circle cx=\"21\" cy=\"9.5\" r=\"0.8\" fill=\"currentColor\"/><circle cx=\"13\" cy=\"9\" r=\"0.6\" fill=\"currentColor\"/>"],
+      ["Metal", "<path d=\"M13.5 2L5 13.5H11.5L10.5 22L19 10.5H12.5Z\"/>"],
+      ["Boost", "<path d=\"M5 12.5L12 5.5L19 12.5\"/><path d=\"M5 19L12 12L19 19\"/>"],
+      ["Rhythm", "<path d=\"M9.8 3H14.2L17.5 21H6.5Z\"/><path d=\"M12 17.5L17.5 6\"/><path d=\"M5 21H19\"/><circle cx=\"15.6\" cy=\"10\" r=\"1.3\" fill=\"currentColor\"/>"],
+      ["Bass", "<path d=\"M5.2 8.6C5.2 5.6 7.6 3.5 10.6 3.5C14.2 3.5 16.2 6 16.2 9.6C16.2 15 11.4 19.4 5 21.5\"/><circle cx=\"6.6\" cy=\"8.6\" r=\"1.7\" fill=\"currentColor\"/><circle cx=\"19.4\" cy=\"7\" r=\"1\" fill=\"currentColor\"/><circle cx=\"19.4\" cy=\"12\" r=\"1\" fill=\"currentColor\"/>"],
+      ["Acoustic", "<path d=\"M12 8.2C9.3 8.2 8.2 9.6 8.6 11.2C8.9 12.3 8.1 12.8 7.3 13.7C6 15.1 5.8 17.1 6.6 18.9C7.6 21 9.8 22 12 22C14.2 22 16.4 21 17.4 18.9C18.2 17.1 18 15.1 16.7 13.7C15.9 12.8 15.1 12.3 15.4 11.2C15.8 9.6 14.7 8.2 12 8.2Z\"/><circle cx=\"12\" cy=\"15.2\" r=\"1.9\"/><path d=\"M11 8.2V2H13V8.2\"/><path d=\"M10.2 19.2H13.8\"/>"],
+      ["Blues", "<circle cx=\"9.5\" cy=\"17.5\" r=\"3\"/><path d=\"M12.5 17.5V3C12.5 6 18 6.5 18 11\"/>"],
+      ["Live", "<rect x=\"9\" y=\"2.5\" width=\"6\" height=\"11\" rx=\"3\"/><path d=\"M6 10.5A6 6 0 0 0 18 10.5\"/><path d=\"M12 16.5V21\"/><path d=\"M8.5 21H15.5\"/>"],
+      ["Favorite", "<path d=\"M12 20.5C6.2 16.6 3 13.1 3 9.3C3 6.6 5 4.5 7.6 4.5C9.5 4.5 11 5.5 12 7.1C13 5.5 14.5 4.5 16.4 4.5C19 4.5 21 6.6 21 9.3C21 13.1 17.8 16.6 12 20.5Z\"/>"],
+      ["Fuzz Wave", "<path d=\"M2 12V6.6L2.00 6.60L3.25 5.75L4.50 7.45L5.75 5.75L7.00 7.45L8.25 5.75L9.50 7.45L10.75 5.75L12.00 6.60\"/><path d=\"M12 6.6V17.4L12.00 17.40L13.25 16.55L14.50 18.25L15.75 16.55L17.00 18.25L18.25 16.55L19.50 18.25L20.75 16.55L22.00 17.40\"/><path d=\"M22 17.4V12\"/>"],
+      ["Guitarist", "<path fill=\"currentColor\" d=\"M6.2 11.6C6.2 10.2 7.2 9.8 9.0 9.8H13.8C15.6 9.8 16.6 10.2 16.6 11.6L13.8 15.6H9.2Z\"/><path fill=\"currentColor\" d=\"M9.2 15.0H11.4L8.2 23.0H6.2Z\"/><path fill=\"currentColor\" d=\"M11.8 15.0H13.8L17.2 23.0H15.2Z\"/><path stroke-width=\"1.6\" d=\"M6.8 11.6L6.0 14.0L9.8 15.6\"/><path stroke-width=\"1.4\" d=\"M16.0 11.6L17.4 13.4L19.8 10.6\"/><path class=\"cut\" stroke-width=\"1.1\" fill=\"currentColor\" d=\"M11.21 4.22L11.28 4.03L11.37 3.86L11.48 3.70L11.59 3.54L11.73 3.40L11.88 3.27L12.03 3.15L12.21 3.06L12.39 2.97L12.57 2.92L12.76 2.88L12.95 2.84L13.15 2.84L13.35 2.86L13.54 2.89L13.73 2.94L13.92 3.01L14.09 3.10L14.26 3.20L14.42 3.32L14.55 3.46L14.68 3.60L14.80 3.76L14.89 3.93L14.98 4.11L15.04 4.30L15.08 4.49L15.11 4.68L15.11 4.88L15.10 5.07L15.07 5.26L15.02 5.46L14.94 5.75L14.87 6.02L14.80 6.27L14.74 6.50L14.69 6.73L14.63 6.93L14.58 7.12L14.53 7.31L14.48 7.48L14.44 7.65L14.41 7.82L14.37 7.97L14.33 8.13L14.29 8.27L14.25 8.43L14.21 8.58L14.18 8.75L14.13 8.91L14.10 9.09L14.06 9.27L14.01 9.46L13.96 9.67L13.92 9.90L13.87 10.13L13.05 8.60L11.92 9.50L11.62 8.14L10.58 9.06L10.38 7.74L9.40 8.68L9.49 8.46L9.59 8.25L9.67 8.05L9.74 7.87L9.82 7.70L9.89 7.54L9.96 7.38L10.03 7.22L10.09 7.07L10.14 6.92L10.20 6.78L10.26 6.64L10.32 6.49L10.39 6.33L10.45 6.17L10.52 6.00L10.59 5.83L10.66 5.64L10.73 5.44L10.82 5.23L10.90 5.01L11.00 4.76L11.10 4.50L11.21 4.22Z\"/><path fill=\"currentColor\" d=\"M11.21 4.22L11.28 4.03L11.37 3.86L11.48 3.70L11.59 3.54L11.73 3.40L11.88 3.27L12.03 3.15L12.21 3.06L12.39 2.97L12.57 2.92L12.76 2.88L12.95 2.84L13.15 2.84L13.35 2.86L13.54 2.89L13.73 2.94L13.92 3.01L14.09 3.10L14.26 3.20L14.42 3.32L14.55 3.46L14.68 3.60L14.80 3.76L14.89 3.93L14.98 4.11L15.04 4.30L15.08 4.49L15.11 4.68L15.11 4.88L15.10 5.07L15.07 5.26L15.02 5.46L14.94 5.75L14.87 6.02L14.80 6.27L14.74 6.50L14.69 6.73L14.63 6.93L14.58 7.12L14.53 7.31L14.48 7.48L14.44 7.65L14.41 7.82L14.37 7.97L14.33 8.13L14.29 8.27L14.25 8.43L14.21 8.58L14.18 8.75L14.13 8.91L14.10 9.09L14.06 9.27L14.01 9.46L13.96 9.67L13.92 9.90L13.87 10.13L13.05 8.60L11.92 9.50L11.62 8.14L10.58 9.06L10.38 7.74L9.40 8.68L9.49 8.46L9.59 8.25L9.67 8.05L9.74 7.87L9.82 7.70L9.89 7.54L9.96 7.38L10.03 7.22L10.09 7.07L10.14 6.92L10.20 6.78L10.26 6.64L10.32 6.49L10.39 6.33L10.45 6.17L10.52 6.00L10.59 5.83L10.66 5.64L10.73 5.44L10.82 5.23L10.90 5.01L11.00 4.76L11.10 4.50L11.21 4.22Z\"/><path class=\"cut\" stroke-width=\"2.2\" fill=\"currentColor\" d=\"M7.73 15.63C7.31 14.10 8.62 12.92 10.01 13.19C10.42 12.01 12.08 10.89 13.33 11.85C15.07 13.09 15.50 15.52 13.71 17.33C11.91 19.14 9.49 19.57 8.51 18.12C7.95 17.29 7.95 16.39 7.73 15.63Z\"/><path class=\"cut\" stroke-width=\"2.4\" d=\"M14.20 13.14L20.87 8.64\"/><path fill=\"currentColor\" d=\"M7.73 15.63C7.31 14.10 8.62 12.92 10.01 13.19C10.42 12.01 12.08 10.89 13.33 11.85C15.07 13.09 15.50 15.52 13.71 17.33C11.91 19.14 9.49 19.57 8.51 18.12C7.95 17.29 7.95 16.39 7.73 15.63Z\"/><path stroke-width=\"0.95\" d=\"M14.20 13.14L20.87 8.64\"/><path stroke-width=\"1.6\" d=\"M20.87 8.64L22.20 7.74\"/>"],
+      ["Rocket", "<path d=\"M19.48 4.52C20.02 8.41 17.88 12.08 12.76 16.73L7.27 11.24C11.92 6.12 15.59 3.98 19.48 4.52Z\"/><path d=\"M10.32 8.49L5.13 9.10L2.84 11.39L6.50 12.00\"/><path d=\"M15.51 13.68L14.90 18.87L12.61 21.16L12.00 17.50\"/><path d=\"M7.11 14.44Q5.28 16.89 4.36 19.64Q7.11 18.72 9.56 16.89\"/><circle cx=\"14.60\" cy=\"9.40\" r=\"1.7\"/>"],
+      ["Space", "<path d=\"M17.71 14.35L17.60 14.65L17.48 14.94L17.35 15.22L17.20 15.50L17.03 15.77L16.85 16.03L16.66 16.28L16.46 16.51L16.24 16.74L16.01 16.96L15.78 17.16L15.53 17.35L15.27 17.53L15.00 17.70L14.72 17.85L14.44 17.98L14.15 18.10L13.85 18.21L13.55 18.30L13.25 18.37L12.94 18.43L12.63 18.47L12.31 18.49L12.00 18.50L11.69 18.49L11.37 18.47L11.06 18.43L10.75 18.37L10.45 18.30L10.15 18.21L9.85 18.10L9.56 17.98L9.28 17.85L9.00 17.70L8.73 17.53L8.47 17.35\"/><path d=\"M7.15 16.03L6.97 15.77L6.80 15.50L6.65 15.22L6.52 14.94L6.40 14.65L6.29 14.35L6.20 14.05L6.13 13.75L6.07 13.44L6.03 13.13L6.01 12.81L6.00 12.50L6.01 12.19L6.03 11.87L6.07 11.56L6.13 11.25L6.20 10.95L6.29 10.65L6.40 10.35L6.52 10.06L6.65 9.78L6.80 9.50L6.97 9.23L7.15 8.97L7.34 8.72L7.54 8.49L7.76 8.26L7.99 8.04L8.22 7.84L8.47 7.65L8.73 7.47L9.00 7.30L9.28 7.15L9.56 7.02L9.85 6.90L10.15 6.79L10.45 6.70L10.75 6.63L11.06 6.57L11.37 6.53L11.69 6.51L12.00 6.50L12.31 6.51L12.63 6.53L12.94 6.57L13.25 6.63L13.55 6.70L13.85 6.79L14.15 6.90L14.44 7.02L14.72 7.15L15.00 7.30L15.27 7.47L15.53 7.65L15.78 7.84L16.01 8.04L16.24 8.26L16.46 8.49L16.66 8.72L16.85 8.97L17.03 9.23L17.20 9.50L17.35 9.78L17.48 10.06L17.60 10.35L17.71 10.65L17.80 10.95L17.87 11.25L17.93 11.56L17.97 11.87L17.99 12.19L18.00 12.50\"/><path d=\"M22.08 9.22L22.12 9.38L22.13 9.55L22.11 9.73L22.06 9.91L21.99 10.10L21.88 10.30L21.75 10.50L21.60 10.71L21.42 10.92L21.21 11.14L20.98 11.36L20.72 11.58L20.44 11.81L20.13 12.04L19.81 12.27L19.46 12.50L19.09 12.73L18.70 12.96L18.29 13.19L17.87 13.42L17.43 13.64L16.98 13.86L16.51 14.08L16.03 14.29L15.53 14.50L15.03 14.70L14.52 14.90L14.01 15.09L13.48 15.27L12.96 15.45L12.43 15.62L11.90 15.77L11.37 15.92L10.84 16.06L10.32 16.20L9.80 16.32L9.28 16.43L8.77 16.53L8.28 16.61L7.79 16.69L7.31 16.76L6.85 16.81L6.40 16.85L5.97 16.88L5.55 16.90L5.15 16.91L4.77 16.90L4.41 16.88L4.07 16.85L3.75 16.81L3.45 16.76L3.18 16.69L2.93 16.61L2.71 16.53L2.51 16.43L2.34 16.32L2.19 16.20L2.07 16.07L1.98 15.93L1.92 15.78L1.88 15.62L1.87 15.45L1.89 15.27L1.94 15.09L2.01 14.90L2.12 14.70L2.25 14.50L2.40 14.29L2.58 14.08L2.79 13.86L3.02 13.64L3.28 13.42L3.56 13.19L3.87 12.96L4.19 12.73L4.54 12.50L4.91 12.27\"/><path d=\"M17.60 8.15L18.03 8.12L18.45 8.10L18.85 8.09L19.23 8.10L19.59 8.12L19.93 8.15L20.25 8.19L20.55 8.24L20.82 8.31L21.07 8.39L21.29 8.47L21.49 8.57L21.66 8.68L21.81 8.80L21.93 8.93L22.02 9.07L22.08 9.22\"/><circle cx=\"20\" cy=\"4\" r=\"0.9\" fill=\"currentColor\"/><circle cx=\"4.5\" cy=\"20\" r=\"0.7\" fill=\"currentColor\"/><circle cx=\"5\" cy=\"5.5\" r=\"0.6\" fill=\"currentColor\"/>"],
+      ["Swell", "<path d=\"M2.50 6.50L2.71 6.33L2.92 6.17L3.13 6.01L3.34 5.86L3.56 5.73L3.77 5.61L3.98 5.51L4.19 5.42L4.40 5.36L4.61 5.32L4.82 5.30L5.03 5.31L5.24 5.34L5.46 5.39L5.67 5.46L5.88 5.55L6.09 5.67L6.30 5.79L6.51 5.94L6.72 6.09L6.93 6.25L7.14 6.42L7.36 6.58L7.57 6.75L7.78 6.91L7.99 7.06L8.20 7.21L8.41 7.33L8.62 7.45L8.83 7.54L9.04 7.61L9.26 7.66L9.47 7.69L9.68 7.70L9.89 7.68L10.10 7.64L10.31 7.58L10.52 7.49L10.73 7.39L10.94 7.27L11.16 7.14L11.37 6.99L11.58 6.83L11.79 6.67L12.00 6.50L12.21 6.33L12.42 6.17L12.63 6.01L12.84 5.86L13.06 5.73L13.27 5.61L13.48 5.51L13.69 5.42L13.90 5.36L14.11 5.32L14.32 5.30L14.53 5.31L14.74 5.34L14.96 5.39L15.17 5.46L15.38 5.55L15.59 5.67L15.80 5.79L16.01 5.94L16.22 6.09L16.43 6.25L16.64 6.42L16.86 6.58L17.07 6.75L17.28 6.91L17.49 7.06L17.70 7.21L17.91 7.33L18.12 7.45L18.33 7.54L18.54 7.61L18.76 7.66L18.97 7.69L19.18 7.70L19.39 7.68L19.60 7.64L19.81 7.58L20.02 7.49L20.23 7.39L20.44 7.27L20.66 7.14L20.87 6.99L21.08 6.83L21.29 6.67L21.50 6.50\"/><path d=\"M2.50 12.00L2.71 11.75L2.92 11.50L3.13 11.27L3.34 11.05L3.56 10.84L3.77 10.66L3.98 10.51L4.19 10.38L4.40 10.29L4.61 10.23L4.82 10.20L5.03 10.21L5.24 10.25L5.46 10.33L5.67 10.44L5.88 10.58L6.09 10.75L6.30 10.94L6.51 11.15L6.72 11.38L6.93 11.63L7.14 11.87L7.36 12.13L7.57 12.37L7.78 12.62L7.99 12.85L8.20 13.06L8.41 13.25L8.62 13.42L8.83 13.56L9.04 13.67L9.26 13.75L9.47 13.79L9.68 13.80L9.89 13.77L10.10 13.71L10.31 13.62L10.52 13.49L10.73 13.34L10.94 13.16L11.16 12.95L11.37 12.73L11.58 12.50L11.79 12.25L12.00 12.00L12.21 11.75L12.42 11.50L12.63 11.27L12.84 11.05L13.06 10.84L13.27 10.66L13.48 10.51L13.69 10.38L13.90 10.29L14.11 10.23L14.32 10.20L14.53 10.21L14.74 10.25L14.96 10.33L15.17 10.44L15.38 10.58L15.59 10.75L15.80 10.94L16.01 11.15L16.22 11.38L16.43 11.63L16.64 11.87L16.86 12.13L17.07 12.37L17.28 12.62L17.49 12.85L17.70 13.06L17.91 13.25L18.12 13.42L18.33 13.56L18.54 13.67L18.76 13.75L18.97 13.79L19.18 13.80L19.39 13.77L19.60 13.71L19.81 13.62L20.02 13.49L20.23 13.34L20.44 13.16L20.66 12.95L20.87 12.73L21.08 12.50L21.29 12.25L21.50 12.00\"/><path d=\"M2.50 17.50L2.71 17.17L2.92 16.84L3.13 16.52L3.34 16.23L3.56 15.96L3.77 15.72L3.98 15.51L4.19 15.34L4.40 15.22L4.61 15.14L4.82 15.10L5.03 15.11L5.24 15.17L5.46 15.27L5.67 15.42L5.88 15.61L6.09 15.83L6.30 16.09L6.51 16.37L6.72 16.68L6.93 17.00L7.14 17.33L7.36 17.67L7.57 18.00L7.78 18.32L7.99 18.63L8.20 18.91L8.41 19.17L8.62 19.39L8.83 19.58L9.04 19.73L9.26 19.83L9.47 19.89L9.68 19.90L9.89 19.86L10.10 19.78L10.31 19.66L10.52 19.49L10.73 19.28L10.94 19.04L11.16 18.77L11.37 18.48L11.58 18.16L11.79 17.83L12.00 17.50L12.21 17.17L12.42 16.84L12.63 16.52L12.84 16.23L13.06 15.96L13.27 15.72L13.48 15.51L13.69 15.34L13.90 15.22L14.11 15.14L14.32 15.10L14.53 15.11L14.74 15.17L14.96 15.27L15.17 15.42L15.38 15.61L15.59 15.83L15.80 16.09L16.01 16.37L16.22 16.68L16.43 17.00L16.64 17.33L16.86 17.67L17.07 18.00L17.28 18.32L17.49 18.63L17.70 18.91L17.91 19.17L18.12 19.39L18.33 19.58L18.54 19.73L18.76 19.83L18.97 19.89L19.18 19.90L19.39 19.86L19.60 19.78L19.81 19.66L20.02 19.49L20.23 19.28L20.44 19.04L20.66 18.77L20.87 18.48L21.08 18.16L21.29 17.83L21.50 17.50\"/>"]
+    ];
+    const bankSymbol = n => n > 0 && BANK_SYMBOLS[n - 1] ? '<svg class="bank-sym" viewBox="0 0 24 24" aria-hidden="true">' + BANK_SYMBOLS[n - 1][1] + '</svg>' : '';
     const AB_MODES = [['Tap: on / off', 'hold swaps A / B'], ['Tap: A / B', 'hold switches on / off'], ['Press: A / B', 'at once, no hold']];
     const FX_SLOT_KEYS = ['pre1', 'pre2', 'post1', 'post2', 'post3'];
 
@@ -7789,11 +7828,13 @@ function parseSelectedCaptureState(payload) {
       },
       60013: body => {   // the settings behind the fields
         const words = [];
-        for (let i = 0; i < 7; i++) words.push(u32(body, 16 + 4 * i));
-        const names = readTexts(body, 49, 2).texts;
-        fsLink.settings = { count: body[0], order: [...body.slice(1, 9)], switch1: body[9], fxMode: !!body[10],
+        for (let i = 0; i < 7; i++) words.push(u32(body, 15 + 4 * i));
+        const { texts: names, next } = readTexts(body, 48, 2);
+        const bank = body.length >= next + 22 ? { bank: body[next], presets: [...body.slice(next + 1, next + 7)], colors: [...body.slice(next + 7, next + 13)],
+          icons: [...body.slice(next + 13, next + 19)], scenes: !!body[next + 19], setlist: !!body[next + 20], looper: !!body[next + 21] } : null;
+        fsLink.settings = { bank, count: body[0], order: [...body.slice(1, 9)], switch1: body[9], fxMode: !!body[10],
           mixSlot: body[11] > 127 ? body[11] - 256 : body[11], mixKnown: !!body[12], rpUsed: !!body[13], rpSet: body[14],
-          revB: words[0], revBKept: words[1], abB: words.slice(2), abMode: [...body.slice(44, 49)], rpNames: names };
+          revB: words[0], revBKept: words[1], abB: words.slice(2), abMode: [...body.slice(43, 48)], rpNames: names };
         renderFsStrip();
       },
       60023: body => { fxpFromBoard(u32(body, 0)); }   // an FX preset was saved on the board
@@ -7833,16 +7874,26 @@ function parseSelectedCaptureState(payload) {
         const rows = t.flags & 4 ? '<div class="rows">' + t.rows.map((r, i) => '<span' + (i === t.row ? ' class="act"' : '') + '>' + escapeHTML(r) + '</span>').join('') + '</div>' : '';
         tiles.push('<div class="ft' + (on ? ' on' : '') + (empty ? ' empty' : '') + (fsLink.open === sw ? ' sel' : '') + '" data-sw="' + sw + '" role="button" tabindex="0"' +
           ' style="--c:' + t.color + ';--ink:' + iconInk(t.color) + '" title="Footswitch ' + (p + 1) + ': click presses it, the gear (or a right-click) sets it">' +
-          '<div class="cap">' + escapeHTML(t.caption) + '</div><span class="num">' + (p + 1) + '</span>' +
+          '<div class="cap">' + (bankMode() && sw >= 3 ? bankSymbol(st.bank.icons[sw - 3]) : '') + escapeHTML(t.caption) + '</div><span class="num">' + (p + 1) + '</span>' +
           '<span class="gear" data-gear="1"><span class="ico" style="--icon: var(--ico-more)"></span></span>' +
           (t.note ? '<div class="note">' + escapeHTML(t.note) + '</div>' : '<div></div>') +
           (rows || '<div class="nm">' + escapeHTML(t.name) + '</div>') + '</div>');
       }
       box.innerHTML = '<div class="fs-head"><span class="dot"></span><b>Controller</b> · Footswitches' + (st.fxMode ? ' · FX mode' : '') +
+        (bankMode() ? '<span class="bank-nav"><button data-act="bank-1" aria-label="Previous bank">‹</button>Bank ' + (st.bank.bank + 1) +
+          '<button data-act="bank+1" aria-label="Next bank">›</button></span>' : '') +
         '<span class="sp"></span><button data-act="count">' + (st.count === 8 ? '6 fields' : '8 fields') + '</button>' +
         '<button data-act="fold">' + (fsLink.folded ? 'Show' : 'Hide') + '</button></div><div class="fs-tiles">' + tiles.join('') + '</div>' +
         '<div class="fs-pop" id="fsPop" hidden></div>';
       if (fsLink.open) renderFsPop();
+    }
+
+    // The own bank's fields: preset mode (not scenes, not the set list, not the looper)
+    function bankMode() { const st = fsLink.settings; return Boolean(st && st.bank && !st.fxMode && !st.bank.scenes && !st.bank.setlist && !st.bank.looper); }
+    // 'B': symbol << 18 | bank << 14 | slot << 11 | colour << 7 | preset (0 = the default preset of the field)
+    function bankSet(slot, preset, color, icon) {
+      const b = fsLink.settings.bank;
+      fsCommand('bank field', 'B', ((icon & 0x1F) << 18 | (b.bank & 0xF) << 14 | (slot & 7) << 11 | (color & 0xF) << 7 | (preset & 0x7F)) >>> 0);
     }
 
     function layoutPacked(count, order, switch1) {
@@ -7861,6 +7912,16 @@ function parseSelectedCaptureState(payload) {
         '<div class="seg"><button data-act="press">Press</button><button data-act="hold">Hold</button></div>';
       if (sw === 1) {
         html += '<div class="q">Switches between</div>' + SWITCH1_NAMES.map((n, i) => opt('s1:' + i, n, '', st.switch1 === i)).join('');
+      } else if (sw >= 3 && bankMode()) {
+        const i = sw - 3, b = st.bank;
+        html += '<div class="q">Preset · Bank ' + (b.bank + 1) + '</div><select data-act="bp">' +
+          '<option value="0">Default (' + (b.bank * 6 + i + 1) + ')</option>' +
+          Array.from({ length: 64 }, (_, n) => '<option value="' + (n + 1) + '"' + (n + 1 === b.presets[i] ? ' selected' : '') + '>' + (n + 1) + '  ·  ' +
+            escapeHTML(state.presetNames.get(n + 1) || 'Preset ' + (n + 1)) + '</option>').join('') + '</select>' +
+          '<div class="q">Colour</div><div class="swatches">' + BANK_COLORS.map((c, n) => '<button data-act="bc:' + n + '" class="' + (n === b.colors[i] ? 'on' : '') +
+            '" style="--c:' + c + '" aria-label="Colour ' + (n + 1) + '"></button>').join('') + '</div>' +
+          '<div class="q">Symbol</div><div class="symbols"><button data-act="bi:0" class="' + (!b.icons[i] ? 'on' : '') + '" title="No symbol">–</button>' +
+          BANK_SYMBOLS.map(([name], n) => '<button data-act="bi:' + (n + 1) + '" class="' + (n + 1 === b.icons[i] ? 'on' : '') + '" title="' + escapeHTML(name) + '">' + bankSymbol(n + 1) + '</button>').join('') + '</div>';
       } else if (sw >= 3 && sw <= 7) {
         const slot = sw - 3, key = FX_SLOT_KEYS[slot], block = state.blocks[key], b = st.abB[slot];
         const models = block.models.filter(m => m.id);
@@ -7911,6 +7972,12 @@ function parseSelectedCaptureState(payload) {
         if (a.startsWith('s1:')) { fsCommand('footswitch 1', ']', layoutPacked(st.count, st.order, Number(a.slice(3)))); return; }
         if (a.startsWith('ab:')) { fsCommand('second effect switch', '>', ((sw - 3) << 8) | Number(a.slice(3))); return; }
         if (a === 'rp1' || a === 'rp2') { fsCommand('reverb setting', '-', a === 'rp1' ? 1 : 2); return; }
+        if (a === 'bank-1' || a === 'bank+1') { fsCommand('bank', 'k', a === 'bank-1' ? -1 : 1); return; }
+        if (a.startsWith('bc:') || a.startsWith('bi:')) {
+          const i = sw - 3, b = st.bank;
+          bankSet(i, b.presets[i] || b.bank * 6 + i + 1, a.startsWith('bc:') ? Number(a.slice(3)) : b.colors[i], a.startsWith('bi:') ? Number(a.slice(3)) : b.icons[i]);
+          return;
+        }
         if (a.startsWith('fs8:')) {
           const mode = a.slice(4), kept = st.revB || st.revBKept;
           (async () => {
@@ -7942,7 +8009,8 @@ function parseSelectedCaptureState(payload) {
       const sel = e.target.closest('select[data-act]'), st = fsLink.settings, sw = fsLink.open;
       if (!sel || !st) return;
       const v = Number(sel.value);
-      if (sel.dataset.act === 'b') fsCommand('second effect', 'A', (((8 + sw - 3) << 24) | v) >>> 0);
+      if (sel.dataset.act === 'bp') { const i = sw - 3; bankSet(i, v, st.bank.colors[i], st.bank.icons[i]); }
+      else if (sel.dataset.act === 'b') fsCommand('second effect', 'A', (((8 + sw - 3) << 24) | v) >>> 0);
       else if (sel.dataset.act === 'revb') {
         // a B chosen while the switch is the mix switch is kept for later (w 2); while it swaps A / B it changes B
         const parked = !st.revB;
