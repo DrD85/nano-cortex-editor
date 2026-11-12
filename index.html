@@ -922,6 +922,7 @@
     html.bars .pedal-thumb.empty { height: 40px; }
     html.bars .model-row { gap: 8px; margin-bottom: 8px; }
     html.bars .fxp { grid-template-columns: minmax(0, 1fr) auto; margin-bottom: 10px; }
+    html.bars .fxp:has(.fxp-fav button:not(.empty)) { grid-template-columns: minmax(0, 1fr); }   /* favourites: their own row */
     html.bars .fxp-fav { grid-template-columns: none; grid-auto-flow: column; }
     html.bars .fxp-fav button.empty.wide { font-size: 0; width: 32px; text-align: center; }
     html.bars .fxp-fav button.empty.wide::after { content: "+"; font-size: 14px; }
@@ -991,6 +992,54 @@
     .pd .cab { width: 140px; height: 150px; border-radius: 10px; background: linear-gradient(180deg, #1d1f22, #0f1012); border: 1px solid #2d3034; box-shadow: 0 10px 16px rgba(0,0,0,.7);
       display: grid; place-items: center; }
     .pd .cab i { width: 104px; height: 104px; border-radius: 50%; background: radial-gradient(circle, #2a2d30 0 18%, #121314 19% 22%, #1a1c1e 23% 70%, #0a0b0c 71%); box-shadow: inset 0 0 0 3px #2c2f33; }
+
+
+    /* ---- the controller's footswitches (connected through it): its eight fields as on its screen, a click presses
+       the footswitch, the gear (or a right-click) opens what can be set for it ---- */
+    .fs-strip { padding: 10px 14px 14px; border: 1px solid #23262a; border-radius: 16px; background: #0d0e10; position: relative; }
+    .fs-strip[hidden] { display: none; }
+    html.view-mini .fs-strip { display: none; }
+    .fs-strip .fs-head { display: flex; align-items: center; gap: 10px; margin: 0 2px 10px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #8e9297; }
+    .fs-strip .fs-head b { color: #cfd3d7; font-weight: 700; }
+    .fs-strip .fs-head .dot { width: 8px; height: 8px; border-radius: 50%; background: #45F862; }
+    .fs-strip .fs-head .sp { flex: 1; }
+    .fs-strip .fs-head button { padding: 5px 10px; border: 1px solid #2a2e33; border-radius: 8px; background: none; color: #c8ccd1; font-size: 11.5px; letter-spacing: 0; text-transform: none; font-weight: 600; cursor: pointer; }
+    .fs-strip .fs-head button.on { background: #e6e8ea; color: #0b0b0b; border-color: #e6e8ea; }
+    .fs-strip.folded .fs-tiles { display: none; }
+    .fs-tiles { display: grid; grid-template-columns: repeat(var(--fs-count, 8), minmax(0, 1fr)); gap: 10px; }
+    .ft { position: relative; height: 92px; box-sizing: border-box; padding: 8px 11px; border-radius: 12px; border: 2px solid color-mix(in srgb, var(--c) 42%, #111315);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--c) 24%, #0b0c0d) 0 32px, #0b0c0d 32px); color: #f2f2f2; display: grid; grid-template-rows: auto auto 1fr;
+      cursor: pointer; user-select: none; text-align: left; font: inherit; min-width: 0; }
+    .ft.on { background: var(--c); border-color: var(--c); color: var(--ink, #0b0b0b); }
+    .ft.empty { background: #0d0e10; border-color: #24272b; color: #5d6267; }
+    .ft:active { transform: translateY(1px); }
+    .ft .cap { padding-right: 34px; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; font-weight: 700; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ft .num { position: absolute; top: 5px; right: 30px; font-size: 14px; font-weight: 700; opacity: .8; }
+    .ft .gear { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; opacity: .65; }
+    .ft .gear:hover { opacity: 1; background: rgba(127,127,127,.2); }
+    .ft .gear .ico { width: 13px; height: 13px; }
+    .ft .note { font-size: 10.5px; font-weight: 600; opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ft .nm { align-self: end; font-size: 15.5px; font-weight: 700; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ft .rows { align-self: end; display: grid; gap: 3px; }
+    .ft .rows span { padding: 1px 7px; border-radius: 6px; border: 1.5px solid currentColor; font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ft.on .rows span.act { background: #0b0b0b; color: var(--c); border-color: #0b0b0b; }
+    .ft:not(.on) .rows span.act { background: #e6e8ea; color: #0b0b0b; border-color: #e6e8ea; }
+    .ft.sel { outline: 2px solid #fff; outline-offset: 3px; }
+    .fs-pop { position: absolute; bottom: calc(100% + 8px); width: 340px; max-width: calc(100vw - 40px); padding: 14px 16px 16px; border-radius: 16px; border: 1px solid #2a2e33; background: #121417;
+      box-shadow: 0 18px 40px rgba(0,0,0,.6); z-index: 40; }
+    .fs-pop[hidden] { display: none; }
+    .fs-pop h3 { margin: 0 0 10px; display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 650; color: #f2f2f2; letter-spacing: 0; text-transform: none; }
+    .fs-pop .q { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; margin: 12px 0 6px; }
+    .fs-pop .opt { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 10px; border: 1px solid #2a2e33;
+      margin-bottom: 6px; background: none; color: #e6e8ea; font-size: 13.5px; font-weight: 600; text-align: left; cursor: pointer; }
+    .fs-pop .opt small { color: #8e9297; font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fs-pop .opt.on { border-color: #45F862; background: color-mix(in srgb, #45F862 14%, #0b0c0d); }
+    .fs-pop .opt:disabled { opacity: .45; cursor: default; }
+    .fs-pop .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; padding: 3px; border: 1px solid #2a2e33; border-radius: 10px; }
+    .fs-pop .seg button { padding: 7px 4px; border: 0; border-radius: 8px; background: none; font-size: 12.5px; font-weight: 600; color: #c8ccd1; cursor: pointer; }
+    .fs-pop .seg button.on { background: #e6e8ea; color: #0b0b0b; }
+    .fs-pop select { width: 100%; }
+    .fs-pop .hint { margin: 8px 2px 0; font-size: 12px; line-height: 1.45; color: #8e9297; }
 
     /* shared presets: cards from GitHub, the capture and cab of each checked against the Nano */
     .shared-panel { grid-template-rows: auto auto auto minmax(0, 1fr); }
@@ -1963,6 +2012,7 @@
     </section>
 
     <section class="chain" id="chain"></section>
+    <section id="fsStrip" class="fs-strip" hidden aria-label="Footswitches of the controller"></section>
 
     <footer class="beta-footer">
       <strong>Nano Cortex Web Editor</strong><br>
@@ -2925,7 +2975,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.14.1';
+    const EDITOR_VERSION = '1.15.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -3226,6 +3276,7 @@
       state.libraryTimer = null;
       showControllerMenu();
       ctlMessage(null);   // a backup or restore under way ends
+      fsLinkEnd();
       state.c304 = null;
       state.c305 = null;
       state.protocol.metadataLoaded = false;
@@ -4875,6 +4926,7 @@ function parseSelectedCaptureState(payload) {
       renderShared();   // what each shared preset needs: on the Nano or not
       renderCaptureIR();
       if (!$('libraryOverlay').hidden) renderLibraryBrowser();
+      if (state.viaController) setTimeout(fsLinkStart, 500);   // the controller's footswitches and FX presets
     }
 
     // Loads a library capture into a slot the user chooses (with the presets that use each slot) and uses that slot in
@@ -7279,11 +7331,16 @@ function parseSelectedCaptureState(payload) {
       return (fxpLibrary()[model] || []).slice();
     }
 
-    function storeFxPresets(model, list) {
+    function fxpStoreLocal(model, list) {
       const lib = fxpLibrary();
       if (list.length) lib[model] = list;
       else delete lib[model];
       try { localStorage.setItem(FXP_STORE, JSON.stringify(lib)); } catch (e) { log('FX presets not stored: ' + e.message); }
+    }
+    // ... and the favourites to the controller's FX presets of that model (connected through it)
+    function storeFxPresets(model, list) {
+      fxpStoreLocal(model, list);
+      if (typeof fxpToBoard === 'function') fxpToBoard(model);
     }
 
     const fxpFavourites = list => list.filter(p => p.fav).slice(0, FXP_FAVOURITES);
@@ -7636,6 +7693,12 @@ function parseSelectedCaptureState(payload) {
 
     // A message of the controller arrived (null: the connection is gone): to whoever waits for it.
     function ctlMessage(message) {
+      // what the board sends on its own (the footswitch strip, a changed FX preset) is not an answer
+      if (message && message.length >= 4) {
+        const n = message.length;
+        const type = (message[n - 4] | (message[n - 3] << 8) | (message[n - 2] << 16) | (message[n - 1] << 24)) >>> 0;
+        if (CTL_PUSHES[type]) { CTL_PUSHES[type](message.slice(0, n - 4)); return; }
+      }
       const waiter = ctl.waiter;
       ctl.waiter = null;
       ctl.rx = null;
@@ -7660,7 +7723,7 @@ function parseSelectedCaptureState(payload) {
         ctlMessage(data.slice(2));
         return true;
       }
-      if (!ctl.waiter) return false;                          // nothing asked: the Nano's own long replies
+      if (!ctl.waiter || state.libraryRx) return false;      // nothing asked, or the library coming: the Nano's own long replies
       if (first) ctl.rx = [];
       if (!ctl.rx) return false;
       for (const b of data.slice(2)) ctl.rx.push(b);
@@ -7676,10 +7739,326 @@ function parseSelectedCaptureState(payload) {
 
     // Sends a message to the controller and waits for its answer; null if none comes.
     function ctlRequest(label, type, payload = [], ms = 4000) {
-      return new Promise(resolve => {
+      // one at a time (the strip, the FX presets and a backup may ask at the same time)
+      const run = () => new Promise(resolve => {
         ctl.waiter = { resolve, timer: setTimeout(() => ctlMessage(null), ms) };
         writeC304(label, ctlFrame(type, payload));
       });
+      const done = (ctl.queue || Promise.resolve()).then(run, run);
+      ctl.queue = done.catch(() => {});
+      return done;
+    }
+
+
+    // ---- The controller's footswitches and the FX presets shared with it (connected through the controller) ----
+    // The board sends its eight fields as its screen shows them (60011 each, 60013 its settings) whenever they change;
+    // the strip gives the screen's own commands back (60014, only those the board accepts from the editor). The four
+    // favourite FX presets of each effect are the board's four FX presets of that model (60016-60023).
+    const fsLink = { tiles: {}, settings: null, asked: false, open: 0, folded: false, synced: false };
+    try { fsLink.folded = localStorage.getItem('nanoFsStripFolded') === '1'; } catch (e) {}
+    const SWITCH1_NAMES = ['FX / presets', 'FX / scenes', 'Presets / scenes', 'Presets, scenes, FX'];
+    const AB_MODES = [['Tap: on / off', 'hold swaps A / B'], ['Tap: A / B', 'hold switches on / off'], ['Press: A / B', 'at once, no hold']];
+    const FX_SLOT_KEYS = ['pre1', 'pre2', 'post1', 'post2', 'post3'];
+
+    // The Nano's number of a model: its id bytes are a varint
+    function modelType(model) {
+      if (!model || !model.id) return 0;
+      let value = 0, shift = 0;
+      for (const b of model.id) { value += (b & 0x7F) * 2 ** shift; shift += 7; if (!(b & 0x80)) break; }
+      return value;
+    }
+    function modelOfType(type, slotKey) {
+      const keys = slotKey ? [slotKey] : FX_SLOT_KEYS;
+      for (const key of keys) { const m = state.blocks[key].models.find(x => x.id && modelType(x) === type); if (m) return m; }
+      return null;
+    }
+    const u32 = (b, o) => (b[o] | (b[o + 1] << 8) | (b[o + 2] << 16) | (b[o + 3] << 24)) >>> 0;
+    const u32bytes = v => [v & 0xFF, (v >>> 8) & 0xFF, (v >>> 16) & 0xFF, (v >>> 24) & 0xFF];
+    function readTexts(body, at, count) {
+      const out = [];
+      for (let i = 0; i < count; i++) { const n = body[at] || 0; out.push(new TextDecoder().decode(body.slice(at + 1, at + 1 + n))); at += 1 + n; }
+      return { texts: out, next: at };
+    }
+
+    const CTL_PUSHES = {
+      60011: body => {   // a field
+        const flags = body[1], { texts } = readTexts(body, 6, 5);
+        fsLink.tiles[body[0]] = { flags, color: '#' + [body[4], body[3], body[2]].map(x => x.toString(16).padStart(2, '0')).join(''),
+          row: body[5] > 127 ? body[5] - 256 : body[5], caption: texts[0], name: texts[1], note: texts[2], rows: [texts[3], texts[4]] };
+        renderFsStrip();
+      },
+      60013: body => {   // the settings behind the fields
+        const words = [];
+        for (let i = 0; i < 7; i++) words.push(u32(body, 16 + 4 * i));
+        const names = readTexts(body, 49, 2).texts;
+        fsLink.settings = { count: body[0], order: [...body.slice(1, 9)], switch1: body[9], fxMode: !!body[10],
+          mixSlot: body[11] > 127 ? body[11] - 256 : body[11], mixKnown: !!body[12], rpUsed: !!body[13], rpSet: body[14],
+          revB: words[0], revBKept: words[1], abB: words.slice(2), abMode: [...body.slice(44, 49)], rpNames: names };
+        renderFsStrip();
+      },
+      60023: body => { fxpFromBoard(u32(body, 0)); }   // an FX preset was saved on the board
+    };
+
+    async function fsLinkStart() {
+      if (!state.connected || !state.viaController || fsLink.asked) return;
+      fsLink.asked = true;
+      await ctlRequest('Controller: footswitches', 60010, [], 1500);   // (the fields come as pushes, no answer)
+      fxpSyncAll();
+    }
+    function fsLinkEnd() {
+      fsLink.tiles = {};
+      fsLink.settings = null;
+      fsLink.asked = fsLink.synced = false;
+      renderFsStrip();
+    }
+
+    async function fsCommand(label, c, arg) {
+      const m = await ctlRequest('Controller: ' + label, 60014, [c.charCodeAt(0), ...u32bytes(arg >>> 0)]);
+      if (!m || !m.body[0]) toast('The controller did not take that.', 'info');
+    }
+
+    function renderFsStrip() {
+      const box = $('fsStrip');
+      const st = fsLink.settings;
+      const show = state.connected && state.viaController && st && Object.keys(fsLink.tiles).length;
+      box.hidden = !show;
+      if (!show) return;
+      box.classList.toggle('folded', fsLink.folded);
+      box.style.setProperty('--fs-count', st.count);
+      const tiles = [];
+      for (let p = 0; p < st.count; p++) {
+        const sw = st.order[p], t = fsLink.tiles[sw];
+        if (!t) continue;
+        const on = (t.flags & 1) !== 0, empty = (t.flags & 2) !== 0;
+        const rows = t.flags & 4 ? '<div class="rows">' + t.rows.map((r, i) => '<span' + (i === t.row ? ' class="act"' : '') + '>' + escapeHTML(r) + '</span>').join('') + '</div>' : '';
+        tiles.push('<div class="ft' + (on ? ' on' : '') + (empty ? ' empty' : '') + (fsLink.open === sw ? ' sel' : '') + '" data-sw="' + sw + '" role="button" tabindex="0"' +
+          ' style="--c:' + t.color + ';--ink:' + iconInk(t.color) + '" title="Footswitch ' + (p + 1) + ': click presses it, the gear (or a right-click) sets it">' +
+          '<div class="cap">' + escapeHTML(t.caption) + '</div><span class="num">' + (p + 1) + '</span>' +
+          '<span class="gear" data-gear="1"><span class="ico" style="--icon: var(--ico-more)"></span></span>' +
+          (t.note ? '<div class="note">' + escapeHTML(t.note) + '</div>' : '<div></div>') +
+          (rows || '<div class="nm">' + escapeHTML(t.name) + '</div>') + '</div>');
+      }
+      box.innerHTML = '<div class="fs-head"><span class="dot"></span><b>Controller</b> · Footswitches' + (st.fxMode ? ' · FX mode' : '') +
+        '<span class="sp"></span><button data-act="count">' + (st.count === 8 ? '6 fields' : '8 fields') + '</button>' +
+        '<button data-act="fold">' + (fsLink.folded ? 'Show' : 'Hide') + '</button></div><div class="fs-tiles">' + tiles.join('') + '</div>' +
+        '<div class="fs-pop" id="fsPop" hidden></div>';
+      if (fsLink.open) renderFsPop();
+    }
+
+    function layoutPacked(count, order, switch1) {
+      let packed = (count << 24) | (switch1 << 28);
+      order.forEach((sw, p) => { packed |= (sw - 1) << (3 * p); });
+      return packed >>> 0;
+    }
+
+    function renderFsPop() {
+      const pop = $('fsPop'), st = fsLink.settings, sw = fsLink.open, t = fsLink.tiles[sw];
+      if (!pop || !st || !t) return;
+      const pos = st.order.indexOf(sw);
+      const opt = (act, text, small, on, disabled) => '<button class="opt' + (on ? ' on' : '') + '" data-act="' + act + '"' + (disabled ? ' disabled' : '') + '>' +
+        escapeHTML(text) + (small ? '<small>' + escapeHTML(small) + '</small>' : '') + '</button>';
+      let html = '<h3>Footswitch ' + (pos + 1) + ' · ' + escapeHTML(t.caption || '') + '<button class="dlg-close" data-act="close" aria-label="Close">×</button></h3>' +
+        '<div class="seg"><button data-act="press">Press</button><button data-act="hold">Hold</button></div>';
+      if (sw === 1) {
+        html += '<div class="q">Switches between</div>' + SWITCH1_NAMES.map((n, i) => opt('s1:' + i, n, '', st.switch1 === i)).join('');
+      } else if (sw >= 3 && sw <= 7) {
+        const slot = sw - 3, key = FX_SLOT_KEYS[slot], block = state.blocks[key], b = st.abB[slot];
+        const models = block.models.filter(m => m.id);
+        html += '<div class="q">Second effect (B) in this preset</div><select data-act="b">' +
+          '<option value="0">None</option>' + models.map(m => '<option value="' + modelType(m) + '"' + (modelType(m) === b ? ' selected' : '') + '>' + escapeHTML(m.name) + '</option>').join('') + '</select>';
+        if (b) html += '<div class="q">The footswitch</div>' + AB_MODES.map(([a, z], m) => opt('ab:' + m, a, z, st.abMode[slot] === m)).join('');
+        else html += '<p class="hint">With a second effect the footswitch swaps between the two (A is the preset\'s own).</p>';
+      } else if (sw === 8) {
+        if (st.mixSlot < 0) html += '<p class="hint">This preset has no reverb in an FX slot.</p>';
+        else {
+          const ab = st.revB !== 0, mode = st.rpUsed ? 'rp' : ab ? 'ab' : 'mix';
+          const kept = st.revB || st.revBKept, keptModel = kept ? modelOfType(kept, FX_SLOT_KEYS[st.mixSlot]) : null;
+          html += '<div class="q">Switches</div>' +
+            opt('fs8:mix', 'Reverb mix', st.mixKnown ? 'Pos 1 · Pos 2' : 'set on the board', mode === 'mix') +
+            opt('fs8:ab', 'Reverb A / B', keptModel ? keptModel.name : 'choose B below', mode === 'ab', !kept) +
+            opt('fs8:rp', 'Two reverb settings', (st.rpNames[0] || 'Setting 1') + ' · ' + (st.rpNames[1] || 'Setting 2'), mode === 'rp', (st.rpSet & 3) !== 3);
+          const reverbs = state.blocks[FX_SLOT_KEYS[st.mixSlot]].models.filter(m => m.id && /reverb/i.test(m.category));
+          html += '<div class="q">Reverb B</div><select data-act="revb"><option value="0">None</option>' +
+            reverbs.map(m => '<option value="' + modelType(m) + '"' + (modelType(m) === kept ? ' selected' : '') + '>' + escapeHTML(m.name) + '</option>').join('') + '</select>' +
+            '<div class="q">Two settings: take the reverb as it is now</div><div class="seg"><button data-act="rp1">As setting 1</button><button data-act="rp2">As setting 2</button></div>';
+        }
+      } else {
+        html += '<p class="hint">' + escapeHTML(t.note || 'Nothing to set for this footswitch.') + '</p>';
+      }
+      html += '<div class="q">Position on the board</div><select data-act="pos">' +
+        st.order.slice(0, st.count).map((s2, p) => '<option value="' + p + '"' + (p === pos ? ' selected' : '') + '>' + (p + 1) +
+          (s2 === sw ? '' : ' (swap with ' + escapeHTML((fsLink.tiles[s2] || {}).caption || '') + ')') + '</option>').join('') + '</select>';
+      pop.innerHTML = html;
+      pop.hidden = false;
+      // above the field, inside the strip
+      const tile = $('fsStrip').querySelector('.ft[data-sw="' + sw + '"]'), strip = $('fsStrip').getBoundingClientRect();
+      if (tile) {
+        const r = tile.getBoundingClientRect();
+        pop.style.left = Math.max(8, Math.min(r.left - strip.left, strip.width - pop.offsetWidth - 8)) + 'px';
+      }
+    }
+
+    $('fsStrip').addEventListener('click', e => {
+      const act = e.target.closest('[data-act]');
+      const st = fsLink.settings;
+      if (act && act.tagName !== 'SELECT') {
+        const a = act.dataset.act, sw = fsLink.open;
+        if (a === 'fold') { fsLink.folded = !fsLink.folded; try { localStorage.setItem('nanoFsStripFolded', fsLink.folded ? '1' : '0'); } catch (err) {} renderFsStrip(); return; }
+        if (a === 'count') { fsCommand('6 / 8 fields', ']', layoutPacked(st.count === 8 ? 6 : 8, st.order, st.switch1)); return; }
+        if (a === 'close') { fsLink.open = 0; renderFsStrip(); return; }
+        if (a === 'press') { fsCommand('footswitch ' + sw, 'w', sw); return; }
+        if (a === 'hold') { fsCommand('footswitch ' + sw + ' held', 'w', 0x100 | sw); return; }
+        if (a.startsWith('s1:')) { fsCommand('footswitch 1', ']', layoutPacked(st.count, st.order, Number(a.slice(3)))); return; }
+        if (a.startsWith('ab:')) { fsCommand('second effect switch', '>', ((sw - 3) << 8) | Number(a.slice(3))); return; }
+        if (a === 'rp1' || a === 'rp2') { fsCommand('reverb setting', '-', a === 'rp1' ? 1 : 2); return; }
+        if (a.startsWith('fs8:')) {
+          const mode = a.slice(4), kept = st.revB || st.revBKept;
+          (async () => {
+            if (mode !== 'rp' && st.rpUsed) await fsCommand('reverb settings off', '-', 16);
+            if (mode === 'mix' && st.revB) await fsCommand('reverb B kept', 'A', ((2 << 24) | st.revB) >>> 0);
+            if (mode === 'ab' && kept && !st.revB) await fsCommand('reverb A / B', 'A', kept);
+            if (mode === 'rp') await fsCommand('reverb settings on', '-', 17);
+          })();
+          return;
+        }
+        return;
+      }
+      if (act) return;   // a select: its change event
+      const tile = e.target.closest('.ft');
+      if (!tile) return;
+      const sw = Number(tile.dataset.sw);
+      if (e.target.closest('[data-gear]')) { fsLink.open = fsLink.open === sw ? 0 : sw; renderFsStrip(); return; }
+      fsCommand('footswitch ' + sw, 'w', sw);
+    });
+    $('fsStrip').addEventListener('contextmenu', e => {
+      const tile = e.target.closest('.ft');
+      if (!tile) return;
+      e.preventDefault();
+      const sw = Number(tile.dataset.sw);
+      fsLink.open = fsLink.open === sw ? 0 : sw;
+      renderFsStrip();
+    });
+    $('fsStrip').addEventListener('change', e => {
+      const sel = e.target.closest('select[data-act]'), st = fsLink.settings, sw = fsLink.open;
+      if (!sel || !st) return;
+      const v = Number(sel.value);
+      if (sel.dataset.act === 'b') fsCommand('second effect', 'A', (((8 + sw - 3) << 24) | v) >>> 0);
+      else if (sel.dataset.act === 'revb') {
+        // a B chosen while the switch is the mix switch is kept for later (w 2); while it swaps A / B it changes B
+        const parked = !st.revB;
+        fsCommand('reverb B', 'A', v ? ((((parked ? 2 : 0) << 24) | v) >>> 0) : 0);
+      } else if (sel.dataset.act === 'pos') {
+        const order = st.order.slice(), from = order.indexOf(sw);
+        [order[from], order[v]] = [order[v], order[from]];
+        fsCommand('field position', ']', layoutPacked(st.count, order, st.switch1));
+      }
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && fsLink.open) { fsLink.open = 0; renderFsStrip(); } });
+    // (a click inside the strip redraws it: its target is gone from the page by now)
+    document.addEventListener('click', e => { if (fsLink.open && e.target.isConnected && !e.target.closest('#fsStrip')) { fsLink.open = 0; renderFsStrip(); } });
+
+    // -- FX presets: the board keeps four per model (name 16 bytes, count u8, spare u8, values u16 x 24, 0-65535) --
+    const FXP_BOARD_PARAMS = 24, FXP_BOARD_SIZE = 16 + 2 + 2 * FXP_BOARD_PARAMS;
+    function fxpDecode(bytes) {
+      bytes = Uint8Array.from(bytes);
+      const list = [];
+      for (let i = 0; i < FXP_FAVOURITES; i++) {
+        const at = i * FXP_BOARD_SIZE, raw = bytes.slice(at, at + 16), end = raw.indexOf(0);
+        const name = new TextDecoder().decode(raw.slice(0, end < 0 ? 16 : end));
+        if (!name) continue;
+        const count = Math.min(bytes[at + 16], FXP_BOARD_PARAMS), values = [];
+        for (let v = 0; v < count; v++) values.push((bytes[at + 18 + 2 * v] | (bytes[at + 19 + 2 * v] << 8)) / 65535);
+        list.push({ name, values });
+      }
+      return list;
+    }
+    function fxpEncode(favs) {
+      const out = new Uint8Array(FXP_BOARD_SIZE * FXP_FAVOURITES);
+      favs.slice(0, FXP_FAVOURITES).forEach((p, i) => {
+        const at = i * FXP_BOARD_SIZE, name = new TextEncoder().encode(p.name).slice(0, 15);
+        out.set(name, at);
+        const values = (p.values || []).slice(0, FXP_BOARD_PARAMS);
+        out[at + 16] = values.length;
+        values.forEach((v, n) => { const x = Math.round(Math.min(1, Math.max(0, v)) * 65535); out[at + 18 + 2 * n] = x & 0xFF; out[at + 19 + 2 * n] = x >> 8; });
+      });
+      return out;
+    }
+    const sameValues = (a, b) => a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) < 1 / 30000);
+
+    async function fxpBoardRead(type) {
+      const m = await ctlRequest('Controller: FX presets ' + type, 60016, u32bytes(type));
+      return m && m.type === 60017 && u32(m.body, 0) === type ? fxpDecode(m.body.slice(4)) : null;
+    }
+    async function fxpBoardWrite(type, favs) {
+      const m = await ctlRequest('Controller: store FX presets ' + type, 60020, [...u32bytes(type), ...fxpEncode(favs)]);
+      return Boolean(m && m.type === 60021 && m.body[0]);
+    }
+
+    // The board's list is what the favourites are: the same names get its values, its new ones are added, the editor's
+    // favourites it does not have stay in the list (not as favourites) - nothing is lost on either side.
+    function fxpTakeBoard(modelName, board) {
+      const list = fxPresetsOf(modelName);
+      list.forEach(p => { p.fav = false; });
+      const favs = board.map(b => {
+        let p = list.find(x => x.name === b.name);
+        if (!p) { p = { id: fxpId(), name: b.name, values: b.values }; list.push(p); }
+        p.values = b.values;
+        p.fav = true;
+        return p;
+      });
+      const ordered = favs.concat(list.filter(p => !p.fav));
+      fxpStoreLocal(modelName, ordered);
+    }
+
+    // On connecting: for every model either side has presets for, the board's four come first, then the editor's
+    // favourites the board does not have (while there is room) - stored on both.
+    async function fxpSyncAll() {
+      if (!state.viaController) return;
+      const m = await ctlRequest('Controller: models with FX presets', 60018);
+      if (!m || m.type !== 60019) { log('FX presets: the controller does not share them (older version?)'); return; }
+      const types = new Set();
+      for (let i = 0; i < (m.body[0] | (m.body[1] << 8)); i++) types.add(u32(m.body, 2 + 4 * i));
+      const lib = fxpLibrary();
+      Object.entries(lib).forEach(([name, list]) => { if (fxpFavourites(list).length) { const model = FX_SLOT_KEYS.map(k => state.blocks[k].models.find(x => x.name === name && x.id)).find(Boolean); if (model) types.add(modelType(model)); } });
+      let changed = 0;
+      for (const type of types) {
+        const model = modelOfType(type);
+        if (!model || !state.viaController) continue;
+        const board = await fxpBoardRead(type);
+        if (!board) continue;
+        const mine = fxpFavourites(fxPresetsOf(model.name));
+        const merged = board.slice();
+        mine.forEach(p => { if (merged.length < FXP_FAVOURITES && !merged.some(b => b.name === p.name)) merged.push({ name: p.name, values: p.values }); });
+        fxpTakeBoard(model.name, merged);
+        if (merged.length !== board.length) { await fxpBoardWrite(type, merged); changed++; }
+      }
+      fsLink.synced = true;
+      log('FX presets shared with the controller: ' + types.size + ' models' + (changed ? ', ' + changed + ' written to it' : ''));
+      render();
+    }
+
+    async function fxpFromBoard(type) {
+      const model = modelOfType(type);
+      if (!model) return;
+      const board = await fxpBoardRead(type);
+      if (!board) return;
+      fxpTakeBoard(model.name, board);
+      log('FX presets of ' + model.name + ' changed on the controller');
+      render();
+    }
+
+    // A change of the favourites in the editor goes to the board (shortly after, several changes at once).
+    const fxpPending = new Map();
+    function fxpToBoard(modelName) {
+      if (!state.connected || !state.viaController || !fsLink.synced) return;
+      const model = FX_SLOT_KEYS.map(k => state.blocks[k].models.find(x => x.name === modelName && x.id)).find(Boolean);
+      if (!model) return;
+      clearTimeout(fxpPending.get(modelName));
+      fxpPending.set(modelName, setTimeout(async () => {
+        fxpPending.delete(modelName);
+        const ok = await fxpBoardWrite(modelType(model), fxpFavourites(fxPresetsOf(modelName)).map(p => ({ name: p.name, values: p.values })));
+        if (!ok) toast('The controller did not store the FX presets.', 'info');
+      }, 600));
     }
 
     const b64 = bytes => btoa(String.fromCharCode(...bytes));
