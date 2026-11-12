@@ -2737,6 +2737,8 @@
       tuner: { open: false, live: true, baseFrequency: 440, muted: false, logged: 0 },
       libraryBytes: [],
       libraryTimer: null,
+      libraryRx: null,      // the library reply: 'waiting' after the request, 'receiving' from its first packet, null otherwise
+      libraryTries: 0,      // requests for the current reading (an incomplete reply is asked for again)
       presetDirty: false,   // the Nano's own mark: the loaded preset has unsaved changes
       localEdit: false,     // a change the Nano does not mark (the cab's mic, position, level and filters), until Save or another preset
       ab: { active: false, side: 'B', A: null, B: null, preset: 0, busy: false },   // A/B compare
@@ -2804,7 +2806,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.14.0';
+    const EDITOR_VERSION = '1.14.1';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -3099,6 +3101,10 @@
     function onDisconnected() {
       state.connected = false;
       state.viaController = false;
+      state.library.requested = false;   // read again on the next connection: Cortex Cloud may have changed it
+      state.libraryRx = null;
+      if (state.libraryTimer) clearTimeout(state.libraryTimer);
+      state.libraryTimer = null;
       showControllerMenu();
       ctlMessage(null);   // a backup or restore under way ends
       state.c304 = null;
@@ -3156,15 +3162,13 @@
 
       if (handleTypedMessage(data)) return;
 
+      if (libraryPacket(data)) return;
+
       if (isFEStreamPacket(data)) {
         // The last packet of a reply carries 0x80 in its second byte: the reply is parsed at once then (the timers
         // remain for a lost last packet).
         const last = (data[1] & 0x80) === 0x80;
-        if (state.stateMode === 'library') {
-          for (const b of data.slice(2)) state.libraryBytes.push(b);
-          if (state.libraryTimer) clearTimeout(state.libraryTimer);
-          state.libraryTimer = setTimeout(() => parseLibraryContent(state.libraryBytes), 1500);
-        } else if (state.stateMode === 'current') {
+        if (state.stateMode === 'current') {
           appendCurrentStatePayload(data);
           if (last) {
             if (state.stateTimer) clearTimeout(state.stateTimer);
@@ -4591,15 +4595,17 @@ function parseSelectedCaptureState(payload) {
 
     // ---- Capture library (RetrieveLibraryContent 76/77, SetCaptureSlotContent 80/81) ----
 
-    function requestLibraryContent() {
+    function requestLibraryContent(retry) {
       if (!state.connected) return;
-      if (state.stateMode !== 'idle' || state.pendingParamBlock) {
-        setTimeout(requestLibraryContent, 1000);
+      if (state.stateMode !== 'idle' || state.pendingParamBlock || state.libraryRx) {
+        setTimeout(() => requestLibraryContent(retry), 1000);
         return;
       }
 
+      state.libraryTries = retry ? state.libraryTries + 1 : 1;
       state.stateMode = 'library';
       state.libraryBytes = [];
+      state.libraryRx = 'waiting';
       // { 3: includeFactoryCaptures, 4: includeFactoryImpulseResponses, 5: includeUserCaptures, 6: includeUserImpulseResponses }
       writeC304('Library content request', buildFrame([0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x30, 0x01], MSG.RetrieveLibraryContentRequest));
 
@@ -4607,10 +4613,78 @@ function parseSelectedCaptureState(payload) {
       // packet comes only once the Nano has sent the whole reply (about 3.3 s for 27 KB) - after 4 s the reply was
       // taken for something else and lost.
       setTimeout(() => {
-        if (state.stateMode !== 'library' || state.libraryBytes.length !== 0) return;
-        state.stateMode = 'idle';
+        if (state.libraryRx !== 'waiting') return;
+        state.libraryRx = null;
+        if (state.stateMode === 'library') state.stateMode = 'idle';
         log('Library content: no reply');
       }, state.viaController ? 15000 : 4000);
+    }
+
+    // The library reply is long (22 KB with 130 captures: several seconds over Bluetooth). Its packets are collected
+    // from the first packet (0x40 in the second byte) to the last (0x80), whatever else the editor starts meanwhile -
+    // a preset change on the Nano used to switch the receiving over to a state read, and the rest of the library (the
+    // later captures, all user IRs) was lost. The Nano sends one reply after the other, so the first long reply after
+    // the request is the library.
+    function libraryPacket(data) {
+      if (!state.libraryRx || data.length < 3 || data[1] === 0xC0) return false;
+      const first = (data[1] & 0x40) !== 0, last = (data[1] & 0x80) !== 0;
+      if (state.libraryRx === 'waiting') {
+        if (!first) return false;
+        state.libraryRx = 'receiving';
+        state.libraryBytes = [];
+      } else if (first) {
+        // a new long reply: the last packet of the library got lost
+        finishLibrary(false);
+        return false;
+      }
+      for (const b of data.slice(2)) state.libraryBytes.push(b);
+      if (state.libraryTimer) clearTimeout(state.libraryTimer);
+      state.libraryTimer = null;
+      if (last) finishLibrary(true);
+      else state.libraryTimer = setTimeout(() => finishLibrary(false), 5000);   // only if the last packet got lost
+      return true;
+    }
+
+    // True when the bytes are whole protobuf fields to the very end (nothing cut off).
+    function protoComplete(bytes) {
+      let i = 0;
+      while (i < bytes.length) {
+        const tag = readVarint(bytes, i);
+        if (!tag) return false;
+        i = tag.next;
+        const wire = tag.value & 7;
+        if (wire === 0) { const v = readVarint(bytes, i); if (!v) return false; i = v.next; }
+        else if (wire === 2) { const len = readVarint(bytes, i); if (!len) return false; i = len.next + len.value; }
+        else if (wire === 1) i += 8;
+        else if (wire === 5) i += 4;
+        else return false;
+      }
+      return i === bytes.length;
+    }
+
+    // The reply is complete when it ends in its type (77) and the fields before it are whole. An incomplete one is
+    // asked for again (twice); only then is the part that came shown, so that a cut list does not pass for the library.
+    function finishLibrary(lastSeen) {
+      if (state.libraryTimer) clearTimeout(state.libraryTimer);
+      state.libraryTimer = null;
+      state.libraryRx = null;
+      const bytes = state.libraryBytes;
+      const n = bytes.length;
+      const typed = n >= 4 && bytes[n - 4] === MSG.RetrieveLibraryContentResponse && !bytes[n - 3] && !bytes[n - 2] && !bytes[n - 1];
+      const complete = lastSeen && typed && protoComplete(bytes.slice(0, n - 4));
+      if (!complete) {
+        log('Library content incomplete (' + n + ' bytes' + (lastSeen ? '' : ', last packet missing') + ')' +
+          (state.libraryTries < 3 ? ' - asking again' : ' - showing what came'));
+        if (state.libraryTries < 3) {
+          state.libraryBytes = [];
+          if (state.stateMode === 'library') state.stateMode = 'idle';
+          setTimeout(() => requestLibraryContent(true), 500);
+          return;
+        }
+      } else {
+        log('Library content: ' + n + ' bytes, complete');
+      }
+      parseLibraryContent(bytes);
     }
 
     function utf8(bytes) {
