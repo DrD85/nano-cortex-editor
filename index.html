@@ -922,7 +922,8 @@
     .gr-meter { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 8px; margin: 0 0 8px; padding: 7px 10px;
       border-radius: 10px; border: 1px solid #23272b; background: #0b0c0d; }
     .gr-meter .lbl { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; line-height: 1.15; min-width: 0; }
-    .gr-meter .lbl small { display: block; letter-spacing: .06em; text-transform: none; font-size: 9.5px; color: #5e6369; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gr-meter .src { grid-column: 1 / -1; grid-row: 3; letter-spacing: .04em; font-size: 9.5px; color: #5e6369; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; }
+    .gr-meter.off .src { grid-row: auto; grid-column: 1; }
     .gr-meter .bar { grid-column: 1 / -1; grid-row: 2; position: relative; height: 10px; border-radius: 5px; background: #1b1e21; overflow: hidden; }
     .gr-meter .bar i { position: absolute; top: 0; bottom: 0; right: 0; width: var(--gr, 0%); background: var(--block-color); border-radius: 5px 0 0 5px; }
     .gr-meter .bar b { position: absolute; top: -1px; bottom: -1px; right: var(--grp, 0%); width: 2px; background: #fff; opacity: 0; }
@@ -9326,6 +9327,7 @@ function parseSelectedCaptureState(payload) {
         if (peak >= 0.999) m.clipAt = now;
         if (peak > m.blockPeak) m.blockPeak = peak;
       }
+      m.lastPeak = Math.max(...peaks.slice(0, m.channels).map(Number).filter(Number.isFinite), 0);   // for the compressor meters
       m.energy += energy;
       m.frames += frames;
       if (m.frames >= rate / 10) {   // a block of about 100 ms: the energy of all channels together
@@ -12706,26 +12708,34 @@ function parseSelectedCaptureState(payload) {
       const el = document.createElement('div');
       el.className = 'gr-meter' + (meter.on ? '' : ' off');
       el.dataset.key = key;
-      el.title = 'Gain reduction of this compressor, worked out from the Nano\'s USB audio and its knobs – the Nano does not report it';
-      el.innerHTML = '<span class="lbl">Gain reduction<small>' + (meter.on ? 'estimated · USB' : 'measured over USB-C') + '</small></span>' +
-        '<span class="val">–<small>dB</small></span><button type="button" class="gr-start">Measure</button><span class="bar">' +
-        [25, 50, 75].map(x => '<span class="tick" style="right:' + x + '%"></span>').join('') + '<i></i><b></b></span>';
+      el.title = 'Gain reduction of this compressor, estimated from the Nano\'s USB audio and its knobs – the Nano does not report it. ' +
+        'Below: where the level comes from (DI = the dry input on USB 1/2, out = the output on 3/4; ≈ rough), the level the compressor sees ' +
+        'and its threshold (dB). Legendary 87 has no threshold knob; its threshold is guessed from Input.';
+      el.innerHTML = '<span class="lbl">Gain reduction</span><span class="val">–<small>dB</small></span><button type="button" class="gr-start">Measure</button>' +
+        '<span class="bar">' + [25, 50, 75].map(x => '<span class="tick" style="right:' + x + '%"></span>').join('') + '<i></i><b></b></span>' +
+        '<span class="src">' + (meter.on ? 'estimated · USB' : 'measured over USB-C') + '</span>';
       el.querySelector('.gr-start').addEventListener('click', e => { e.stopPropagation(); meterStart(''); });
       return el;
     }
 
-    // the level (dB, RMS) the compressor in block "key" sees, and where it was taken from
+    // The level (dB) the compressor in block "key" sees, and where it was taken from: RMS of the last 25 ms, or the peak
+    // for a fast compressor (attack up to 10 ms - it catches the pick attack, as the 1176 does).
     function grInput(key, c) {
       const m = meter;
-      const rms = ms => (ms > 0 ? 10 * Math.log10(ms) : -Infinity);
-      const dry = m.di && m.di.n > 0 ? (Array.isArray(m.di.s) ? Math.max(...m.di.s.map(Number)) / m.di.n : (Number(m.di.e) || 0) / (2 * m.di.n))
-        : meterIsDry() && m.plainMs !== undefined ? m.plainMs : undefined;
-      if (key.startsWith('pre') && dry !== undefined) return { db: rms(dry), from: 'DI ' + (m.di ? '1/2' : pairText(m.first, m.total)) };
-      if (dry !== undefined && meterIsDry()) return { db: rms(dry), from: 'DI ' + pairText(m.first, m.total) + ', rough' };
+      const db = a => (a > 0 ? 20 * Math.log10(a) : -Infinity);
+      const fast = c.attack <= 0.01;
+      const level = (ms, peak) => (fast && peak !== undefined ? db(peak) : ms > 0 ? 10 * Math.log10(ms) : -Infinity);
+      if (m.di && m.di.n > 0) {   // the Mac app's helper: 1/2 sent along with the measured pair
+        const ms = Array.isArray(m.di.s) ? Math.max(...m.di.s.map(Number)) / m.di.n : (Number(m.di.e) || 0) / (2 * m.di.n);
+        const peak = Array.isArray(m.di.p) ? Math.max(...m.di.p.map(Number)) : undefined;
+        if (key.startsWith('pre')) return { db: level(ms, peak), from: 'DI 1/2' };
+      } else if (meterIsDry() && m.plainMs !== undefined) {   // measuring 1/2 itself (a browser gets only those)
+        return { db: level(m.plainMs, m.lastPeak), from: (key.startsWith('pre') ? '' : '≈') + 'DI ' + pairText(m.first, m.total) };
+      }
       if (m.plainMs === undefined) return { db: -Infinity, from: 'USB' };
       // the output without the make-up gain taken as the compressor's input (turning it back through the curve would
       // be more exact, but the Level and the effects after it are in that signal, and with a high ratio that blows up)
-      return { db: rms(m.plainMs) - c.makeup, from: 'output ' + pairText(m.first, m.total) + ', rough' };
+      return { db: level(m.plainMs, m.lastPeak) - c.makeup, from: '≈out ' + pairText(m.first, m.total) };   // ≈: rough
     }
 
     function grDraw() {
@@ -12737,13 +12747,20 @@ function parseSelectedCaptureState(payload) {
         const c = block && duoCompModel(block);
         if (!c) return;
         el.classList.toggle('off', !meter.on);
-        const note = el.querySelector('.lbl small');
+        const note = el.querySelector('.src');
         if (!meter.on) {
           note.textContent = meter.starting ? 'starting…' : 'measured over USB-C';
           el.grLive = null;
           return;
         }
-        const live = el.grLive || (el.grLive = { gr: 0, peak: 0, peakAt: 0, frame: 0 });   // the moving parts, kept with the element
+        const live = el.grLive || (el.grLive = { gr: 0, peak: 0, peakAt: 0, frame: 0, shown: -Infinity });   // the moving parts, kept with the element
+        if (!NANO_AUDIO.test(meter.label)) {   // the level meter listens to another interface
+          el.querySelector('.val').firstChild.textContent = '–';
+          el.querySelector('.bar').style.setProperty('--gr', '0%');
+          const text = 'measuring ' + meter.label + ', not the Nano';
+          if (note.textContent !== text) note.textContent = text;
+          return;
+        }
         const input = grInput(key, c);
         const target = Number.isFinite(input.db) ? Math.max(0, input.db - duoCompOut(c, input.db)) : 0;
         const dt = live.frame ? Math.min(0.2, (now - live.frame) / 1000) : 0.025;
@@ -12757,7 +12774,10 @@ function parseSelectedCaptureState(payload) {
         bar.style.setProperty('--grp', share(live.peak));
         bar.querySelector('b').classList.toggle('show', live.peak >= 0.3);
         el.querySelector('.val').firstChild.textContent = live.gr >= 0.05 ? '−' + live.gr.toFixed(1) : '0.0';
-        const text = 'estimated · ' + input.from;
+        // what it sees against its threshold, so a reading of 0 can be understood (the level held a moment for reading)
+        if (input.db >= live.shown || now - (live.shownAt || 0) > 400) { live.shown = input.db; live.shownAt = now; }
+        const whole = db => String(Math.round(db)).replace('-', '−');
+        const text = input.from + ' · in ' + (live.shown > -90 ? whole(live.shown) : '–') + ' / thr ' + whole(c.thr);
         if (note.textContent !== text) note.textContent = text;
       });
     }
