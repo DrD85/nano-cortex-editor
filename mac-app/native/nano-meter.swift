@@ -10,7 +10,10 @@
 //
 // Lines while measuring:
 //   {"start":{"name":"Nano Cortex","channels":8,"rate":48000,"first":3,"count":2}}
-//   {"p":[0.1,0.1],"e":0.0199,"n":1200}       every 25 ms: peaks, sum of the weighted squares of both channels, frames
+//   {"p":[0.1,0.1],"e":0.0199,"n":1200,"s":[0.006,0.006]}   every 25 ms: peaks, sum of the weighted squares of both
+//                                             channels, frames, sum of the plain squares of each channel
+//   ...,"d":{"p":..,"e":..,"n":..,"s":..}}    measuring 3/4 or higher: channels 1/2 as well (the Nano's dry signal,
+//                                             which the editor's compressor meter needs)
 //   {"error":"..."}                           and the tool ends
 import AudioToolbox
 import CoreAudio
@@ -135,6 +138,7 @@ final class Meter {
     private var high: [Biquad]
     private var peaks: [Float] = [0, 0]
     private var energy = 0.0
+    private var squares = [0.0, 0.0]
     private var frames = 0
     let count: Int
 
@@ -146,11 +150,12 @@ final class Meter {
 
     // Called on the audio thread with one or two channels
     func consume(_ left: UnsafePointer<Float32>, _ right: UnsafePointer<Float32>?, _ n: Int) {
-        var sum = 0.0
+        var sum = 0.0, plainL = 0.0, plainR = 0.0
         var peakL: Float = 0, peakR: Float = 0
         for i in 0..<n {
             let x = left[i]
             peakL = max(peakL, abs(x))
+            plainL += Double(x) * Double(x)
             let y = high[0].process(shelf[0].process(Double(x)))
             sum += y * y
         }
@@ -158,6 +163,7 @@ final class Meter {
             for i in 0..<n {
                 let x = right[i]
                 peakR = max(peakR, abs(x))
+                plainR += Double(x) * Double(x)
                 let y = high[1].process(shelf[1].process(Double(x)))
                 sum += y * y
             }
@@ -166,26 +172,31 @@ final class Meter {
         peaks[0] = max(peaks[0], peakL)
         peaks[1] = max(peaks[1], peakR)
         energy += sum
+        squares[0] += plainL
+        squares[1] += plainR
         frames += n
         os_unfair_lock_unlock(&lock)
     }
 
     func take() -> String? {
         os_unfair_lock_lock(&lock)
-        let p = peaks, e = energy, n = frames
+        let p = peaks, e = energy, n = frames, q = squares
         peaks = [0, 0]
         energy = 0
+        squares = [0, 0]
         frames = 0
         os_unfair_lock_unlock(&lock)
         guard n > 0 else { return nil }
         let list = (0..<count).map { number(Double(p[$0])) }.joined(separator: ",")
-        return "{\"p\":[" + list + "],\"e\":" + number(e) + ",\"n\":\(n)}"
+        let plain = (0..<count).map { number(q[$0]) }.joined(separator: ",")
+        return "{\"p\":[" + list + "],\"e\":" + number(e) + ",\"n\":\(n),\"s\":[" + plain + "]}"
     }
 }
 
 // ---- the audio input (HAL unit with the input side only) ----
 final class Capture {
     let meter: Meter
+    var dry: Meter?     // channels 1/2 as well, when the measured pair is a later one
     let first: Int      // index of the first channel
     let count: Int
     var unit: AudioUnit?
@@ -210,6 +221,9 @@ final class Capture {
         guard status == noErr, let left = buffers[first].mData else { return status }
         let right = count > 1 ? buffers[first + 1].mData : nil
         meter.consume(UnsafePointer(left.assumingMemoryBound(to: Float32.self)), right.map { UnsafePointer($0.assumingMemoryBound(to: Float32.self)) }, Int(frameCount))
+        if let dry = dry, let one = buffers[0].mData, let two = buffers[1].mData {
+            dry.consume(UnsafePointer(one.assumingMemoryBound(to: Float32.self)), UnsafePointer(two.assumingMemoryBound(to: Float32.self)), Int(frameCount))
+        }
         return noErr
     }
 }
@@ -249,6 +263,7 @@ func openInput(_ device: AudioDeviceID, first: Int) -> (Capture, Double, Int, In
     check(AudioUnitSetProperty(unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, &wanted, size), "channel format")
 
     let capture = Capture(meter: Meter(rate: rate, count: count), channels: channels, first: first, count: count)
+    if first >= 2 { capture.dry = Meter(rate: rate, count: 2) }
     capture.unit = unit
     var callback = AURenderCallbackStruct(inputProc: { refCon, flags, time, bus, frameCount, _ in
         Unmanaged<Capture>.fromOpaque(refCon).takeUnretainedValue().render(flags, time, bus, frameCount)
@@ -279,6 +294,7 @@ while !arguments.isEmpty {
 if uid.isEmpty { fail("usage: nano-meter --list | --device <uid> [--first <channel>]") }
 
 var meter: Meter
+var dryMeter: Meter?
 var keep: AnyObject?   // the capture stays alive while the tool runs
 
 if selfTest && uid == selfTestUID {
@@ -293,6 +309,8 @@ if selfTest && uid == selfTestUID {
     var phase = 0.0
     var block = [Float32](repeating: 0, count: 480)
     let tone = meter
+    let dryTone: Meter? = firstChannel >= 3 ? Meter(rate: rate, count: 2) : nil
+    dryMeter = dryTone
     source.schedule(deadline: .now(), repeating: .milliseconds(10))
     source.setEventHandler {
         for i in 0..<block.count {
@@ -300,6 +318,10 @@ if selfTest && uid == selfTestUID {
             phase += 2 * Double.pi * 1000 / rate
         }
         block.withUnsafeBufferPointer { tone.consume($0.baseAddress!, count > 1 ? $0.baseAddress! : nil, block.count) }
+        if let dryTone = dryTone {   // the dry signal: half of the tone
+            let half = block.map { $0 * 0.5 }
+            half.withUnsafeBufferPointer { dryTone.consume($0.baseAddress!, $0.baseAddress!, half.count) }
+        }
     }
     source.resume()
     keep = source as AnyObject
@@ -307,6 +329,7 @@ if selfTest && uid == selfTestUID {
     guard let device = allDevices().first(where: { text($0, kAudioDevicePropertyDeviceUID) == uid }) else { fail("This audio input is not there (any more).") }
     let (capture, rate, channels, count) = openInput(device, first: firstChannel - 1)
     meter = capture.meter
+    dryMeter = capture.dry
     keep = capture
     emit("{\"start\":{\"name\":" + jsonString(text(device, kAudioObjectPropertyName)) + ",\"channels\":\(channels),\"rate\":" + number(rate) +
          ",\"first\":\(firstChannel),\"count\":\(count)}}")
@@ -329,6 +352,10 @@ Thread.detachNewThread {
 
 let printer = DispatchSource.makeTimerSource(queue: DispatchQueue(label: "print"))
 printer.schedule(deadline: .now() + .milliseconds(25), repeating: .milliseconds(25))
-printer.setEventHandler { if let line = meter.take() { emit(line) } }
+printer.setEventHandler {
+    guard var line = meter.take() else { return }
+    if let dry = dryMeter?.take() { line = String(line.dropLast()) + ",\"d\":" + dry + "}" }
+    emit(line)
+}
 printer.resume()
 dispatchMain()

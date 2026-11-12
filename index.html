@@ -918,6 +918,23 @@
     html.bars #chain .param-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; }
     html.bars:not(.view-pedals, .view-mini) #chain .block:not(.eq-graph):has(.param-grid > :nth-child(9)) { grid-column: span 2; }
     html.bars:not(.view-pedals, .view-mini) #chain .block:not(.eq-graph) .param-grid:has(> :nth-child(9)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* a compressor's gain reduction, worked out from the Nano's USB audio (the Nano does not report it) */
+    .gr-meter { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 8px; margin: 0 0 8px; padding: 7px 10px;
+      border-radius: 10px; border: 1px solid #23272b; background: #0b0c0d; }
+    .gr-meter .lbl { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; line-height: 1.15; min-width: 0; }
+    .gr-meter .lbl small { display: block; letter-spacing: .06em; text-transform: none; font-size: 9.5px; color: #5e6369; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gr-meter .bar { grid-column: 1 / -1; grid-row: 2; position: relative; height: 10px; border-radius: 5px; background: #1b1e21; overflow: hidden; }
+    .gr-meter .bar i { position: absolute; top: 0; bottom: 0; right: 0; width: var(--gr, 0%); background: var(--block-color); border-radius: 5px 0 0 5px; }
+    .gr-meter .bar b { position: absolute; top: -1px; bottom: -1px; right: var(--grp, 0%); width: 2px; background: #fff; opacity: 0; }
+    .gr-meter .bar b.show { opacity: 1; }
+    .gr-meter .bar .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: #2c3035; }
+    .gr-meter .val { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: #f2f2f2; min-width: 58px; text-align: right; }
+    .gr-meter .val small { font-size: 10px; color: #8e9297; margin-left: 2px; }
+    .gr-meter .gr-start { display: none; font: inherit; font-size: 11px; padding: 3px 9px; border-radius: 7px; border: 1px solid #2c3035; background: transparent; color: #cfd2d6; cursor: pointer; }
+    .gr-meter .gr-start:hover { border-color: #45494f; color: #fff; }
+    .gr-meter.off { grid-template-columns: minmax(0, 1fr) auto; }
+    .gr-meter.off :is(.bar, .val) { display: none; }
+    .gr-meter.off .gr-start { display: inline-block; }
     html.bars .pedal-thumb { width: 30px; height: 42px; }
     html.bars .pedal-thumb.empty { height: 40px; }
     html.bars .model-row { gap: 8px; margin-bottom: 8px; }
@@ -2989,7 +3006,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.15.0';
+    const EDITOR_VERSION = '1.16.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -7303,6 +7320,8 @@ function parseSelectedCaptureState(payload) {
 
       orderedParams.forEach(param => grid.appendChild(renderParam(key, param, style.color, FX_BLOCK_KEYS.includes(key), block)));
 
+      const grMeter = renderGrMeter(key, block);
+      if (grMeter) el.appendChild(grMeter);
       el.appendChild(grid);
       const mc6Exp = renderMc6ExpControls(key, block, style.color);
       if (mc6Exp) el.appendChild(mc6Exp);
@@ -9175,7 +9194,9 @@ function parseSelectedCaptureState(payload) {
           renderLevel();
           renderSignalChain();
         } else if (Array.isArray(data.p)) {
-          m.di = data.d || null;   // the iPhone app: the dry signal on channels 1/2 as well (the Duo's compressor view)
+          m.di = data.d || null;   // the dry signal on channels 1/2 as well, when 3/4 are measured (the compressor meters)
+          // the louder channel's mean square, unweighted (the helper of the Mac app sends "s" since 1.16.0)
+          m.plainMs = Array.isArray(data.s) && data.n > 0 ? Math.max(...data.s.map(Number)) / data.n : undefined;
           meterFeed(data.p, Number(data.e) || 0, Number(data.n) || 0, m.rate);
         }
       });
@@ -9261,7 +9282,7 @@ function parseSelectedCaptureState(payload) {
       if (m.native && nativeMeter()) nativeMeter().stop();
       if (m.stream) m.stream.getTracks().forEach(track => track.stop());
       if (m.ctx) m.ctx.close().catch(() => {});
-      Object.assign(m, { on: false, native: false, ctx: null, stream: null, raw: [], weighted: [], timer: null, peakDb: [-Infinity, -Infinity],
+      Object.assign(m, { on: false, native: false, di: null, plainMs: undefined, ctx: null, stream: null, raw: [], weighted: [], timer: null, peakDb: [-Infinity, -Infinity],
         holdDb: [-Infinity, -Infinity], clipAt: 0, energy: 0, frames: 0, blockPeak: 0, blocks: [] });
     }
 
@@ -9275,15 +9296,17 @@ function parseSelectedCaptureState(payload) {
       if (frames <= 0) return;
       m.lastTime = time;
       const peaks = [];
-      let sum = 0;
+      let sum = 0, plain = 0;
       for (let ch = 0; ch < m.channels; ch++) {
         m.raw[ch].getFloatTimeDomainData(m.buf);
-        let peak = 0;
-        for (let i = size - frames; i < size; i++) { const a = Math.abs(m.buf[i]); if (a > peak) peak = a; }
+        let peak = 0, squares = 0;
+        for (let i = size - frames; i < size; i++) { const a = Math.abs(m.buf[i]); if (a > peak) peak = a; squares += a * a; }
         peaks.push(peak);
+        plain = Math.max(plain, squares / frames);
         m.weighted[ch].getFloatTimeDomainData(m.buf);
         for (let i = size - frames; i < size; i++) sum += m.buf[i] * m.buf[i];
       }
+      m.plainMs = plain;
       meterFeed(peaks, sum * WEB_K_GAIN, frames, m.ctx.sampleRate);
     }
 
@@ -9334,6 +9357,7 @@ function parseSelectedCaptureState(payload) {
       const read = $('outRead');
       if (read) read.textContent = loud > -70 ? dbText(loud) : '–';
       if (duoLayout()) duoMeterDraw();
+      grDraw();
       if (!dialog) return;
       $('lvBarLoud').style.setProperty('--v', meterPos(loud));
       $('lvNumLoud').textContent = loud > -70 ? dbText(loud) : '–';
@@ -9356,6 +9380,7 @@ function parseSelectedCaptureState(payload) {
 
     function renderLevel() {
       const m = meter;
+      grDraw();
       $('levelToggle').classList.toggle('on', m.on);
       $('levelToggle').setAttribute('aria-checked', String(m.on));
       const select = $('levelInput');
@@ -12668,6 +12693,74 @@ function parseSelectedCaptureState(payload) {
       if (over >= c.knee / 2) return c.thr + over / c.ratio;
       return level + (1 / c.ratio - 1) * Math.pow(over + c.knee / 2, 2) / (2 * c.knee);
     };
+
+    // ---- Gain reduction of a compressor in its card (desktop) ----
+    // The Nano does not report it, so it is worked out: the level the compressor sees, through its curve (threshold,
+    // ratio, a soft knee), following attack and release. The level comes from the Nano's USB audio:
+    // - before the capture: the dry signal on channels 1/2 (the Mac app's helper sends it along with 3/4; a browser
+    //   gets only 1/2 anyway) - a good estimate;
+    // - after the capture: the output on 3/4 - a rough one, as the capture, the effects after it and the Level are in
+    //   that signal too.
+    function renderGrMeter(key, block) {
+      if (!FX_BLOCK_KEYS.includes(key) || !duoCompModel(block)) return null;
+      const el = document.createElement('div');
+      el.className = 'gr-meter' + (meter.on ? '' : ' off');
+      el.dataset.key = key;
+      el.title = 'Gain reduction of this compressor, worked out from the Nano\'s USB audio and its knobs – the Nano does not report it';
+      el.innerHTML = '<span class="lbl">Gain reduction<small>' + (meter.on ? 'estimated · USB' : 'measured over USB-C') + '</small></span>' +
+        '<span class="val">–<small>dB</small></span><button type="button" class="gr-start">Measure</button><span class="bar">' +
+        [25, 50, 75].map(x => '<span class="tick" style="right:' + x + '%"></span>').join('') + '<i></i><b></b></span>';
+      el.querySelector('.gr-start').addEventListener('click', e => { e.stopPropagation(); meterStart(''); });
+      return el;
+    }
+
+    // the level (dB, RMS) the compressor in block "key" sees, and where it was taken from
+    function grInput(key, c) {
+      const m = meter;
+      const rms = ms => (ms > 0 ? 10 * Math.log10(ms) : -Infinity);
+      const dry = m.di && m.di.n > 0 ? (Array.isArray(m.di.s) ? Math.max(...m.di.s.map(Number)) / m.di.n : (Number(m.di.e) || 0) / (2 * m.di.n))
+        : meterIsDry() && m.plainMs !== undefined ? m.plainMs : undefined;
+      if (key.startsWith('pre') && dry !== undefined) return { db: rms(dry), from: 'DI ' + (m.di ? '1/2' : pairText(m.first, m.total)) };
+      if (dry !== undefined && meterIsDry()) return { db: rms(dry), from: 'DI ' + pairText(m.first, m.total) + ', rough' };
+      if (m.plainMs === undefined) return { db: -Infinity, from: 'USB' };
+      // the output without the make-up gain taken as the compressor's input (turning it back through the curve would
+      // be more exact, but the Level and the effects after it are in that signal, and with a high ratio that blows up)
+      return { db: rms(m.plainMs) - c.makeup, from: 'output ' + pairText(m.first, m.total) + ', rough' };
+    }
+
+    function grDraw() {
+      const meters = document.querySelectorAll('.gr-meter');
+      if (!meters.length) return;
+      const now = performance.now();
+      meters.forEach(el => {
+        const key = el.dataset.key, block = state.blocks[key];
+        const c = block && duoCompModel(block);
+        if (!c) return;
+        el.classList.toggle('off', !meter.on);
+        const note = el.querySelector('.lbl small');
+        if (!meter.on) {
+          note.textContent = meter.starting ? 'starting…' : 'measured over USB-C';
+          el.grLive = null;
+          return;
+        }
+        const live = el.grLive || (el.grLive = { gr: 0, peak: 0, peakAt: 0, frame: 0 });   // the moving parts, kept with the element
+        const input = grInput(key, c);
+        const target = Number.isFinite(input.db) ? Math.max(0, input.db - duoCompOut(c, input.db)) : 0;
+        const dt = live.frame ? Math.min(0.2, (now - live.frame) / 1000) : 0.025;
+        live.frame = now;
+        live.gr += (target - live.gr) * (1 - Math.exp(-dt / (target > live.gr ? c.attack : c.release)));
+        if (live.gr >= live.peak) { live.peak = live.gr; live.peakAt = now; }
+        else if (now - live.peakAt > 1500) live.peak = Math.max(live.gr, live.peak - 10 * dt);   // held 1.5 s, then falls
+        const share = db => (clamp(db / 20, 0, 1) * 100).toFixed(1) + '%';   // the bar: 0 to -20 dB, from the right
+        const bar = el.querySelector('.bar');
+        bar.style.setProperty('--gr', share(live.gr));
+        bar.style.setProperty('--grp', share(live.peak));
+        bar.querySelector('b').classList.toggle('show', live.peak >= 0.3);
+        el.querySelector('.val').firstChild.textContent = live.gr >= 0.05 ? '−' + live.gr.toFixed(1) : '0.0';
+        const text = 'estimated · ' + input.from;
+        if (note.textContent !== text) note.textContent = text;
+      });
+    }
 
     // the level the compressor sees: the dry signal for one before the capture (the app sends channels 1/2 with the
     // meter), else the output
