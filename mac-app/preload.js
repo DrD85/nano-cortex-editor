@@ -39,3 +39,8 @@ contextBridge.exposeInMainWorld('nanoJam', {
   // { data: Uint8Array } or { error }. The path stays here - the page only gets the sound.
   convert: file => ipcRenderer.invoke('jam:convert', webUtils.getPathForFile(file))
 });
+
+// The minimal view makes the window small (and gives it its size back afterwards).
+contextBridge.exposeInMainWorld('nanoWindow', {
+  mini: on => ipcRenderer.invoke('window:mini', Boolean(on))
+});

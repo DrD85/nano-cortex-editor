@@ -816,8 +816,8 @@
     html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > .block-head { display: contents; }
     html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > .block-head > .block-title { grid-column: 1; grid-row: 1; }
     html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > .block-head > :last-child { grid-column: 3; grid-row: 1; }
-    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > select { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; }
-    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > :not(.block-head):not(select) { grid-column: 1 / -1; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > :is(select, .capture-row) { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; }
+    html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) :is(.capture-card, .cab-card) > :not(.block-head):not(select):not(.capture-row) { grid-column: 1 / -1; }
     html[data-duo="flat"] .block.eq-graph .param-grid { display: none; }   /* an EQ: its curve is the overview, a tap opens it large */
     html[data-duo="flat"] .top-card :is(.amp-face, .cabinet) { padding: 6px 4px; }
     html:is([data-duo="flat"], [data-duo="half"], [data-duo="book"]) .gate-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 8px; row-gap: 8px; align-content: start; }
@@ -846,45 +846,46 @@
        block colour, filled up to the value with a bright line there, name and value (unit small) inside. The whole bar
        is dragged sideways (its width = the whole range, from 8 px on), a tap asks for the value; up to three options are
        a segmented switch. The finger never hides what it changes. ---- */
+    html.bars { --bar-h: 34px; --bar-name: 12.5px; --bar-value: 14px; --bar-pad: 10px; }
     html[data-duo] { --bar-h: 46px; --bar-name: 13.5px; --bar-value: 16px; --bar-pad: 12px; }
     html[data-duo="flat"] { --bar-h: 40px; --bar-name: 12px; --bar-value: 14px; --bar-pad: 9px; }
     html[data-duo="half"] { --bar-h: 56px; --bar-name: 15px; --bar-value: 19px; --bar-pad: 16px; }
-    html[data-duo]:not([data-duo="outer"]) :is(.param-grid, .amp-knobs) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; align-content: start; }
-    html[data-duo]:not([data-duo="outer"]) .cabinet .cab-controls { grid-template-columns: minmax(0, 1fr) !important; gap: 6px; align-items: stretch; }
-    html[data-duo]:not([data-duo="outer"]) :is(.knob-param, .switch-param, .stepped-param) { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: auto;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) :is(.param-grid, .amp-knobs) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; align-content: start; }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .cabinet .cab-controls { grid-template-columns: minmax(0, 1fr) !important; gap: 6px; align-items: stretch; }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) :is(.knob-param, .switch-param, .stepped-param) { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: auto;
       align-items: center; justify-items: stretch; gap: 0 8px; min-width: 0; height: var(--bar-h); box-sizing: border-box; padding: 0 var(--bar-pad);
       border: 2px solid color-mix(in srgb, var(--block-color, #e5e5e5) 42%, #111315); border-radius: 12px; background: #000; overflow: hidden; }
-    html[data-duo]:not([data-duo="outer"]) :is(.knob-param, .switch-param, .stepped-param) > .param-name { order: 0; grid-column: 1; grid-row: 1; position: relative; z-index: 1;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) :is(.knob-param, .switch-param, .stepped-param) > .param-name { order: 0; grid-column: 1; grid-row: 1; position: relative; z-index: 1;
       pointer-events: none; margin: 0; min-height: 0; text-align: left; text-transform: none; letter-spacing: 0; text-decoration: none; font-size: var(--bar-name);
       font-weight: 500; color: #e6e8ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text { order: 0; grid-column: 2; grid-row: 1; position: relative; z-index: 1; pointer-events: none; padding: 0;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .value-text { order: 0; grid-column: 2; grid-row: 1; position: relative; z-index: 1; pointer-events: none; padding: 0;
       border-radius: 0; background: none; text-align: right; white-space: nowrap; font-size: var(--bar-value); font-weight: 650; color: #f2f2f2; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text b { font-weight: inherit; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .value-text small { margin-left: 3px; font-size: .72em; font-weight: 500; color: #8e9297; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob { position: absolute; inset: 0; z-index: 0; order: 0; width: auto; height: auto; margin: 0; border: 0; border-radius: 0;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .value-text b { font-weight: inherit; }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .value-text small { margin-left: 3px; font-size: .72em; font-weight: 500; color: #8e9297; }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .knob { position: absolute; inset: 0; z-index: 0; order: 0; width: auto; height: auto; margin: 0; border: 0; border-radius: 0;
       box-shadow: none; background: none; cursor: ew-resize; touch-action: pan-y; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::before { content: ""; display: block; position: absolute; inset: 0 auto 0 0; width: calc(var(--pct, 0%) * 100 / 73); height: auto;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .knob::before { content: ""; display: block; position: absolute; inset: 0 auto 0 0; width: calc(var(--pct, 0%) * 100 / 73); height: auto;
       border-radius: 0; box-shadow: none; background: color-mix(in srgb, var(--block-color, #e5e5e5) 30%, #111315); }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob.volume::before { background: color-mix(in srgb, #9aa0a6 30%, #111315); }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob::after { display: block; position: absolute; top: 7px; bottom: 7px; height: auto; z-index: 1;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .knob.volume::before { background: color-mix(in srgb, #9aa0a6 30%, #111315); }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .knob::after { display: block; position: absolute; top: 7px; bottom: 7px; height: auto; z-index: 1;
       left: clamp(4px, calc(var(--pct, 0%) * 100 / 73), calc(100% - 4px)); width: 4px; border-radius: 2px; background: var(--block-color, #e5e5e5);
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--block-color, #e5e5e5) 30%, transparent); transform: translateX(-50%); transform-origin: 50% 50%; }
-    html[data-duo]:not([data-duo="outer"]) .knob-param > .knob.volume::after { background: #9aa0a6; box-shadow: 0 0 0 3px rgba(154, 160, 166, .3); }
-    html[data-duo]:not([data-duo="outer"]) .knob-param.dragging { border-color: color-mix(in srgb, var(--block-color, #e5e5e5) 80%, #111315); }
-    html[data-duo]:not([data-duo="outer"]) :is(.knob-param, .switch-param, .stepped-param) { isolation: isolate; }   /* name and value above the fill and the line */
-    html[data-duo]:not([data-duo="outer"]) .knob-param > :is(.param-name, .value-text) { z-index: 2; text-shadow: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000, 0 0 4px #000; }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > .knob.volume::after { background: #9aa0a6; box-shadow: 0 0 0 3px rgba(154, 160, 166, .3); }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param.dragging { border-color: color-mix(in srgb, var(--block-color, #e5e5e5) 80%, #111315); }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) :is(.knob-param, .switch-param, .stepped-param) { isolation: isolate; }   /* name and value above the fill and the line */
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .knob-param > :is(.param-name, .value-text) { z-index: 2; text-shadow: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000, 0 0 4px #000; }
     /* options: up to three as a segmented switch (the chosen one filled), more as the value in a field */
-    html[data-duo]:not([data-duo="outer"]) .duo-seg { display: flex; height: calc(var(--bar-h) - 12px); padding: 3px; gap: 2px; box-sizing: border-box; border: 1px solid #2a2e33;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .duo-seg { display: flex; height: calc(var(--bar-h) - 12px); padding: 3px; gap: 2px; box-sizing: border-box; border: 1px solid #2a2e33;
       border-radius: 10px; background: #0b0c0e; }
-    html[data-duo]:not([data-duo="outer"]) .duo-seg button { flex: 1 1 0; min-width: 44px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: #c8ccd1;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .duo-seg button { flex: 1 1 0; min-width: 44px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: #c8ccd1;
       font-size: var(--bar-name); font-weight: 600; letter-spacing: 0; text-transform: none; white-space: nowrap; }
-    html[data-duo]:not([data-duo="outer"]) .duo-seg button.on { background: var(--block-color); color: var(--ink, #0b0b0b); }
-    html[data-duo]:not([data-duo="outer"]) .seg-param { cursor: pointer; }
-    html[data-duo]:not([data-duo="outer"]) .switch-pill { height: calc(var(--bar-h) - 12px); min-width: 0; max-width: 150px; padding: 0 12px; border: 1px solid #2a2e33; border-radius: 10px;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .duo-seg button.on { background: var(--block-color); color: var(--ink, #0b0b0b); }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .seg-param { cursor: pointer; }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .switch-pill { height: calc(var(--bar-h) - 12px); min-width: 0; max-width: 150px; padding: 0 12px; border: 1px solid #2a2e33; border-radius: 10px;
       background: #0b0c0e; color: #f2f2f2; font-size: var(--bar-name); font-weight: 600; text-transform: none; letter-spacing: 0; }
-    html[data-duo]:not([data-duo="outer"]) .stepped-select { width: auto; min-width: 0; max-width: 150px; height: calc(var(--bar-h) - 12px); padding: 0 8px; border: 1px solid #2a2e33;
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) .stepped-select { width: auto; min-width: 0; max-width: 150px; height: calc(var(--bar-h) - 12px); padding: 0 8px; border: 1px solid #2a2e33;
       border-radius: 10px; background-color: #0b0c0e; color: #f2f2f2; font-size: var(--bar-name); }
-    html[data-duo]:not([data-duo="outer"]) #gateParams { place-items: stretch; align-content: start; width: 100%; }
+    :is(html[data-duo]:not([data-duo="outer"]), html.bars) #gateParams { place-items: stretch; align-content: start; width: 100%; }
     /* half open: the lower half is held in the hands - the bars spread over it */
     html[data-duo="half"] .duo-focus.block { grid-template-rows: auto auto minmax(0, 1fr); }
     html[data-duo="half"] .duo-focus .param-grid:not(.duo-bands) { align-self: stretch; align-content: space-evenly; gap: 10px; }
@@ -895,6 +896,101 @@
     html[data-duo="half"] .duo-bands > :is(.switch-param, .stepped-param) { grid-template-columns: minmax(0, 1fr); padding: 0 4px; }
     html[data-duo="half"] .duo-bands > :is(.switch-param, .stepped-param) > .param-name { display: none; }
     html[data-duo="half"] .duo-bands :is(.duo-seg, .switch-pill, .stepped-select) { width: 100%; max-width: none; }
+
+    /* ---- the Mac / browser window with sliders (html.bars, the default; the knobs stay as a choice in the "…" menu):
+       the whole preset fits a 1440 x 900 window - a compact chain and cards, a block with nine or more controls takes
+       two columns with its sliders in two columns ---- */
+    html.bars main { gap: 12px; }
+    html.bars .signal-chain { padding: 10px 20px 8px; }
+    html.bars .sc-node { gap: 4px; }
+    html.bars .sc-tile { width: 46px; height: 46px; border-radius: 12px; }
+    html.bars .sc-tile .ico { width: 22px; height: 22px; }
+    html.bars .sc-tile.io { margin-top: 4px; }
+    html.bars .sc-tile.io.meter { height: 46px; padding: 6px 0; }
+    html.bars .sc-node.wide .sc-tile { height: 46px; }
+    html.bars .top-row > * { padding-top: 10px; padding-bottom: 10px; }
+    html.bars .amp-knobs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    html.bars .cabinet .cab-controls { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    html.bars #chain { display: grid; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 14px; }
+    html.bars #chain .block { padding: 10px 12px 12px; }
+    html.bars #chain .block h2 { white-space: nowrap; letter-spacing: .1em; font-size: 12.5px; }
+    html.bars #chain .block-title { gap: 8px; }
+    html.bars #chain .param-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    html.bars:not(.view-pedals, .view-mini) #chain .block:not(.eq-graph):has(.param-grid > :nth-child(9)) { grid-column: span 2; }
+    html.bars:not(.view-pedals, .view-mini) #chain .block:not(.eq-graph) .param-grid:has(> :nth-child(9)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    html.bars .pedal-thumb { width: 30px; height: 42px; }
+    html.bars .pedal-thumb.empty { height: 40px; }
+    html.bars .model-row { gap: 8px; margin-bottom: 8px; }
+    html.bars .fxp { grid-template-columns: minmax(0, 1fr) auto; margin-bottom: 10px; }
+    html.bars .fxp-fav { grid-template-columns: none; grid-auto-flow: column; }
+    html.bars .fxp-fav button.empty.wide { font-size: 0; width: 32px; text-align: center; }
+    html.bars .fxp-fav button.empty.wide::after { content: "+"; font-size: 14px; }
+    html.bars .fxp button.original { padding: 6px 7px; }
+    html.bars #chain .model-select { font-size: 14.5px; padding-left: 10px; padding-right: 26px; background-position: right 9px center; }
+
+    /* ---- views (html.view-pedals, html.view-mini): the chain as a pedalboard, or a small window - both show the
+       block chosen in the chain (click) with its controls in a row; a double-click switches a block ---- */
+    html:is(.view-pedals, .view-mini) :is(.beta-footer) { display: none; }
+    html:is(.view-pedals, .view-mini) .top-row { display: block; }
+    html:is(.view-pedals, .view-mini) :is(.top-row, #chain) > :not(.view-focus) { display: none; }
+    html:is(.view-pedals, .view-mini) .top-row:not(:has(> .view-focus)) { display: none; }
+    html:is(.view-pedals, .view-mini) #chain:not(:has(> .view-focus)) { display: none; }
+    html:is(.view-pedals, .view-mini) #chain { display: block; }
+    html:is(.view-pedals, .view-mini) #chain > .block.view-focus { display: grid; grid-template-columns: 260px minmax(0, 1fr); column-gap: 18px; align-content: start; min-height: 0; }
+    html:is(.view-pedals, .view-mini) #chain > .block.view-focus > :not(.param-grid) { grid-column: 1; }
+    html:is(.view-pedals, .view-mini) #chain > .block.view-focus > .param-grid { grid-column: 2; grid-row: 1 / span 6; grid-template-columns: repeat(var(--view-cols, 4), minmax(0, 1fr)); }
+    html.view-mini { --view-cols: 3; }
+    html:is(.view-pedals, .view-mini) .top-row > .view-focus .amp-knobs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    html:is(.view-pedals, .view-mini) .sc-node.view-pick .sc-tile { outline: 2px solid #fff; outline-offset: 3px; }
+    html.view-mini header.topbar :is(.brand-sub, #renameBtn, #expBtn, #fsBtn, #midiBtn, #jamBtn, .tool-sep, #status) { display: none; }
+    html.view-mini .sc-node { flex: 1 1 0; min-width: 0; }
+    html.view-mini .sc-node.wide { flex: 1.6 1 0; min-width: 0; }
+    html.view-mini .sc-node.io { flex: 0 0 40px; }
+    html.view-mini .sc-node :is(.sc-sub, .sc-wide-sub) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    html.view-pedals #signalChain { display: none; }
+
+    /* the pedalboard: the chain from IN to OUT, a pedal per block (the own picture, or an enclosure in the block's
+       colour with its symbol for Neural's own tools), the amp and the cab drawn, a light for on, dimmed when off */
+    #pedalBoard { display: none; }
+    html.view-pedals #pedalBoard { position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 24px; padding: 34px 26px 22px; border-radius: 16px;
+      border: 1px solid #23262a; background: repeating-linear-gradient(180deg, transparent 0 86px, #1b1e21 86px 92px, #0d0f10 92px 96px), linear-gradient(180deg, #141618, #0b0c0d);
+      min-height: 300px; box-sizing: border-box; overflow-x: auto; }
+    #pedalBoard .io { align-self: center; flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #2c3035; display: grid; place-items: center;
+      font-size: 10px; font-weight: 750; letter-spacing: .08em; color: #8e9297; background: #0f1113; }
+    .pd { position: relative; flex: 0 1 auto; min-width: 0; display: grid; justify-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .pd .art { position: relative; display: grid; place-items: end center; min-height: 40px; }
+    .pd .art img.amp-photo { max-width: 240px; max-height: 150px; }
+    .capture-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; }
+    .capture-row > select { min-width: 0; }
+    .capture-row:has(> .amp-thumb[hidden]) { grid-template-columns: minmax(0, 1fr); }
+    .amp-thumb[hidden] { display: none; }
+    .amp-thumb img { display: block; height: 40px; width: auto; max-width: 72px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
+    .pd .art img { display: block; max-height: 170px; max-width: 220px; width: auto; height: auto; filter: drop-shadow(0 8px 10px rgba(0,0,0,.7)); }
+    .pd .led { position: absolute; top: -16px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: #2a2d31; border: 1px solid #000; }
+    .pd.on .led { background: var(--c); box-shadow: 0 0 10px 2px var(--c); }
+    .pd:not(.on) .art { filter: saturate(.25) brightness(.55); }
+    .pd .lbl { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; white-space: nowrap; }
+    .pd .nm { margin-top: -6px; max-width: 200px; font-size: 13.5px; font-weight: 650; color: #e6e8ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pd:not(.on) .nm { color: #8e9297; }
+    .pd.empty .art { opacity: .5; }
+    .pd.view-pick .art::after { content: ""; position: absolute; left: -8px; right: -8px; bottom: -10px; height: 3px; border-radius: 2px; background: var(--c); }
+    .pd .drawn { width: 96px; height: 150px; border-radius: 12px; display: grid; grid-template-rows: 1fr auto; justify-items: center; padding: 18px 0 16px; box-sizing: border-box;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--c) 92%, #fff), color-mix(in srgb, var(--c) 75%, #000)); box-shadow: 0 8px 14px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.3); color: var(--ink, #0b0b0b); }
+    .pd .drawn .ico { width: 30px; height: 30px; }
+    .pd .drawn .fs { width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f0f0f0, #9a9a9a 60%, #4a4a4a); box-shadow: 0 2px 3px rgba(0,0,0,.6); }
+    .pd .drawn.small { width: 70px; height: 112px; }
+    .pd .drawn.blank { background: none; border: 1.5px dashed #3a3f45; box-shadow: none; color: #4a4f55; }
+    .pd .drawn.blank .fs { display: none; }
+    .pd .amp { width: 200px; height: 112px; border-radius: 10px; background: linear-gradient(180deg, #1d1f22, #0f1012); border: 1px solid #2d3034;
+      box-shadow: 0 10px 16px rgba(0,0,0,.7); display: grid; grid-template-rows: 1fr 30px; overflow: hidden; }
+    .pd .amp .grille { background: repeating-linear-gradient(90deg, #17191b 0 3px, #222528 3px 5px); display: grid; place-items: center; padding: 0 10px; }
+    .pd .amp .plate { max-width: 170px; padding: 3px 10px; border-radius: 3px; background: #e9e1cc; color: #1b1b1b; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pd .amp .panel { display: flex; justify-content: space-evenly; align-items: center; background: #0b0c0d; border-top: 1px solid #2d3034; }
+    .pd .amp .panel i { width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f3efe4, #c9c2b2 55%, #8d8676); }
+    .pd .cab { width: 140px; height: 150px; border-radius: 10px; background: linear-gradient(180deg, #1d1f22, #0f1012); border: 1px solid #2d3034; box-shadow: 0 10px 16px rgba(0,0,0,.7);
+      display: grid; place-items: center; }
+    .pd .cab i { width: 104px; height: 104px; border-radius: 50%; background: radial-gradient(circle, #2a2d30 0 18%, #121314 19% 22%, #1a1c1e 23% 70%, #0a0b0c 71%); box-shadow: inset 0 0 0 3px #2c2f33; }
 
     /* shared presets: cards from GitHub, the capture and cab of each checked against the Nano */
     .shared-panel { grid-template-rows: auto auto auto minmax(0, 1fr); }
@@ -1115,6 +1211,8 @@
     .more-menu .menu-key:empty { display: none; }
     .more-menu button:disabled { opacity: .45; }
     .more-menu button[hidden] { display: none; }
+    .more-menu button.checked::after { content: "✓"; margin-left: auto; padding-left: 12px; color: #45F862; font-weight: 700; }
+    .more-menu button.checked .menu-key { margin-left: 8px; }
     :root { --ico-mute: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='8'/><path d='M6.5 6.5l11 11'/></g></svg>"); }
     .more-menu #muteInBtn.on, .more-menu #muteOutBtn.on { color: #ff8c8c; }
     :root { --ico-share: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3.5v11'/><path d='M7.5 8 12 3.5 16.5 8'/><path d='M5 12.5V19a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-6.5'/></g></svg>"); }
@@ -1254,7 +1352,8 @@
     .capture-card, .cab-card { display: flex; flex-flow: row wrap; align-items: center; gap: 10px 12px; }
     :is(.capture-card, .cab-card) > .block-head { display: contents; }
     :is(.capture-card, .cab-card) .block-title { order: 1; flex: 0 0 auto; }
-    :is(.capture-card, .cab-card) > select { order: 2; flex: 1 1 190px; width: auto; min-width: 0; height: 40px; }
+    :is(.capture-card, .cab-card) > :is(select, .capture-row) { order: 2; flex: 1 1 190px; width: auto; min-width: 0; height: 40px; }
+    .capture-row > select { width: 100%; height: 40px; }
     .capture-card .head-actions, .cab-card #cabIRToggle { order: 3; flex: 0 0 auto; }
     :is(.capture-card, .cab-card) > :is(.amp-face, .cabinet) { order: 4; flex: 1 1 100%; min-width: 0; }
     :is(.capture-card, .cab-card) > .mini-param-grid:empty { display: none; }
@@ -1785,6 +1884,11 @@
           <button id="muteOutBtn" title="The Nano's setting “Mute Guitar Output”: no guitar at the output jacks until it is switched back – the sound from USB stays" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteOutLabel">Mute guitar output</span></button>
           <button id="monitorBtn" title="Hear the Nano from USB through another audio device (Mac app)" hidden><span class="ico" style="--icon: var(--ico-monitor)"></span>Monitor…</button>
           <div class="menu-sep"></div>
+          <button class="view-item" data-view="full" title="Every block as a card"><span class="ico" style="--icon: var(--ico-list)"></span>Full view<span class="menu-key"></span></button>
+          <button class="view-item" data-view="pedals" title="The chain as a pedalboard: click a pedal for its controls, double-click switches it"><span class="ico" style="--icon: var(--ico-footswitch)"></span>Pedal view<span class="menu-key"></span></button>
+          <button class="view-item" data-view="mini" title="A small window: the chain and the controls of the block you click"><span class="ico" style="--icon: var(--ico-expand)"></span>Minimal view<span class="menu-key"></span></button>
+          <button id="knobsBtn" title="Round knobs instead of sliders"><span class="ico" style="--icon: var(--ico-level)"></span>Knobs instead of sliders</button>
+          <div class="menu-sep"></div>
           <button id="refreshBtn"><span class="ico" style="--icon: var(--ico-refresh)"></span>Refresh from the Nano</button>
           <button id="keysBtn"><span class="ico" style="--icon: var(--ico-keyboard)"></span>Keyboard shortcuts<span class="menu-key">?</span></button>
           <button id="copyLogBtn"><span class="ico" style="--icon: var(--ico-copy)"></span><span id="copyLogLabel">Copy log</span></button>
@@ -1807,6 +1911,7 @@
       </div>
     </div>
 
+    <section id="pedalBoard" aria-label="Pedalboard"></section>
     <section id="signalChain" class="signal-chain" aria-label="Signal chain" title="Click: highlight the block - double-click: switch it on / off"></section>
 
     <section class="top-row">
@@ -1821,7 +1926,7 @@
             </div>
           </div>
         </div>
-        <select id="captureSelect"></select>
+        <div class="capture-row"><div id="captureThumb" class="amp-thumb" hidden></div><select id="captureSelect"></select></div>
         <div id="currentCaptureText" class="current-item" hidden></div>
         <div id="ampFace" class="amp-face"><div id="ampKnobs" class="amp-knobs"></div></div>
         <div hidden>
@@ -2706,6 +2811,13 @@
       'Wham': 'img/DigiTech Whammy.png',
       'Chief OC2': 'img/Boss OC-2.png',
       'Legendary 87 (M)': 'img/UA Comp.png',
+      'Legendary 87 (ST)': 'img/UA Comp.png',
+      'Opto Comp (M)': 'img/Opto Comp.png',
+      'Opto Comp (ST)': 'img/Opto Comp.png',
+      'Solid State Comp (M)': 'img/SSL Comp.png',
+      'Solid State Comp (ST)': 'img/SSL Comp.png',
+      'VCA Comp (M)': 'img/VCA Comp.png',
+      'VCA Comp (ST)': 'img/VCA Comp.png',
       'Chief CE2W (ST)': 'img/Boos CE2w.png',
       'Chief DC2W (ST)': 'img/Boss DC-2w.png',
       'Chorus 229T': 'img/TC 2290.png',
@@ -2720,7 +2832,14 @@
     // The pictures are not part of the public editor: the picture column only shows where img/ exists.
     {
       const probe = new Image();
-      probe.onload = () => document.documentElement.classList.add('pedal-pictures');
+      probe.onload = () => {
+        document.documentElement.classList.add('pedal-pictures');
+        // the amp pictures of Amalgam's captures (private as well, next to the pedal pictures)
+        const amps = document.createElement('script');
+        amps.src = 'img/amalgam/index.js';
+        amps.onload = () => render();
+        document.head.appendChild(amps);
+      };
       probe.src = Object.values(MODEL_IMAGES)[0];
     }
 
@@ -5984,8 +6103,8 @@ function parseSelectedCaptureState(payload) {
     // iPhone app's Duo layouts draw instead (the slider's width = the whole range), where a tap without moving asks for
     // the value (the value text cannot be tapped there - the whole row is the slider).
     function knobDrag(down) {
-      const el = down.currentTarget, layout = document.documentElement.dataset.duo;
-      if (!layout || layout === 'outer') { const y0 = down.clientY; return { delta: m => y0 - m.clientY, end: () => {} }; }
+      const el = down.currentTarget;
+      if (!barLook()) { const y0 = down.clientY; return { delta: m => y0 - m.clientY, end: () => {} }; }
       const row = el.closest('.knob-param') || el, width = Math.max(60, row.getBoundingClientRect().width), x0 = down.clientX, y0 = down.clientY;
       let moved = 0, from = null;
       row.classList.add('dragging');
@@ -6008,10 +6127,9 @@ function parseSelectedCaptureState(payload) {
       knobEl.style.setProperty('--angle', (-135 + normalized * 270) + 'deg');
       setValueText(valueEl, text);
     }
-    // the fill bars of the Duo layouts show the unit small next to the number ("-18.2" "dB")
-    function duoBars() { const layout = document.documentElement.dataset.duo; return Boolean(layout) && layout !== 'outer'; }
+    // the fill bars (sliders) show the unit small next to the number ("-18.2" "dB")
     function setValueText(el, text) {
-      const split = duoBars() ? /^(.*\d)\s*([^\d\s][^\d]*)$/.exec(String(text)) : null;
+      const split = barLook() ? /^(.*\d)\s*([^\d\s][^\d]*)$/.exec(String(text)) : null;
       if (split) el.innerHTML = '<b>' + escapeHTML(split[1]) + '</b><small>' + escapeHTML(split[2]) + '</small>';
       else el.textContent = text;
     }
@@ -6580,7 +6698,7 @@ function parseSelectedCaptureState(payload) {
       p.appendChild(name);
 
       const options = param.meta.options;
-      if (duoBars() && options.length <= 3) {
+      if (barLook() && options.length <= 3) {
         const choose = index => {
           if (disabled || index === Number(param.value)) return;
           param.value = index;
@@ -6763,9 +6881,41 @@ function parseSelectedCaptureState(payload) {
       return item ? captureTypeInfo(item.type) : null;
     }
 
+    // The amp picture of an Amalgam capture (img/amalgam, private): their captures start with the amp's code ("TK IMP RH
+    // Clean …" -> TK-IMP); the longest code the name starts with wins. "AA" / "AAW" / "BASS" / "DI" in front are left out.
+    // Amalgam's own page shows the Two-Rock Silver Sterling (TRCK-SSS) for their "AATR SX3" captures.
+    const AMALGAM_ALIAS = { BC30: ['BCAT', 'ER30'], ERA30: ['BCAT', 'ER30'], ERA: ['BCAT', 'ER30'], BC: ['BCAT'] };
+    function amalgamFor(name) {
+      const all = window.AMALGAM_AMPS;
+      if (!all || !name) return null;
+      let words = String(name).toUpperCase().split(/[\s_\-]+/).filter(Boolean);
+      while (words.length > 2 && /^(AA|AAW|AMALGAM|BASS|DI)$/.test(words[0])) words.shift();
+      if (words[0] === 'AATR' && words[1] === 'SX3') words = ['TRCK', 'SSS', ...words.slice(2)];
+      else if (words[0] === 'BC' && words[1] === 'ERA') words = ['BCAT', 'ER30', ...words.slice(words[2] === '30' ? 3 : 2)];
+      else if (words[0] === 'ERA' && words[1] === '30') words = ['BCAT', 'ER30', ...words.slice(2)];
+      else if (AMALGAM_ALIAS[words[0]]) words = [...AMALGAM_ALIAS[words[0]], ...words.slice(1)];
+      let best = null, bestK = 1, bestLen = Infinity;
+      for (const [code, pic] of Object.entries(all)) {
+        const parts = code.toUpperCase().split('-').filter(part => !/^\d+$/.test(part) && part !== 'AMALGAM');
+        let k = 0;
+        while (k < parts.length && k < words.length && parts[k] === words[k]) k++;
+        if (k > bestK || (k === bestK && k >= 2 && parts.length < bestLen)) { best = pic; bestK = k; bestLen = parts.length; }
+      }
+      return bestK >= 2 ? best : null;
+    }
+    function captureAmpPicture() {
+      if (!state.capture.on) return null;
+      const type = currentCaptureType();
+      if (type && /^(pedal|overdrive|fuzz|compressor)$/.test(type.key)) return null;   // a pedal capture
+      return amalgamFor(state.currentCapture.name);
+    }
+
     function updateAmpFace() {
       const face = $('ampFace');
       if (!face) return;
+      const amp = captureAmpPicture(), thumb = $('captureThumb');
+      thumb.hidden = !amp;
+      thumb.innerHTML = amp ? '<img src="' + escapeHTML(amp.file) + '" alt="">' : '';
       // The capture's type shows in its symbol and next to the title (the private build shows the original symbols).
       const type = state.capture.on ? currentCaptureType() : null;
       $('captureIcon').style.setProperty('--icon', 'var(--ico-' + (type ? type.icon : 'capture') + ')');
@@ -9402,6 +9552,7 @@ function parseSelectedCaptureState(payload) {
           const layout = duoLayout();
           if (layout === 'outer') { if (n.state !== 'empty') n.toggle(); return; }
           if (layout === 'half' || layout === 'book') { duoSetFocus(n.key); return; }
+          if (viewMode() !== 'full') { setViewFocus(n.key); return; }
           const target = $(n.target);
           if (!target) return;
           target.style.setProperty('--flash', n.color);
@@ -9418,6 +9569,105 @@ function parseSelectedCaptureState(payload) {
       });
     }
 
+    // ---- Views: full (every block a card), pedals (the chain as a pedalboard) and minimal (a small window) - both
+    // show the block chosen in the chain with its controls in a row. Sliders (the default) or knobs. Remembered per
+    // browser / Mac app; the iPhone Duo's layouts keep their own. ----
+    const VIEW_STORE = 'nanoView';
+    const viewPrefs = (() => {
+      const base = { look: 'bars', view: 'full', focus: 'post2' };
+      try { return Object.assign(base, JSON.parse(localStorage.getItem(VIEW_STORE) || '{}')); } catch (e) { return base; }
+    })();
+    function saveViewPrefs() { try { localStorage.setItem(VIEW_STORE, JSON.stringify(viewPrefs)); } catch (e) {} }
+    function viewMode() { return document.documentElement.dataset.duo ? 'full' : viewPrefs.view; }
+    // sliders: the Duo's layouts (open) and, elsewhere, unless knobs are chosen
+    function barLook() { const duo = document.documentElement.dataset.duo; return duo ? duo !== 'outer' : viewPrefs.look === 'bars'; }
+    function applyView() {
+      const root = document.documentElement, duo = Boolean(root.dataset.duo);
+      root.classList.toggle('bars', !duo && viewPrefs.look === 'bars');
+      root.classList.toggle('view-pedals', !duo && viewPrefs.view === 'pedals');
+      root.classList.toggle('view-mini', !duo && viewPrefs.view === 'mini');
+      document.querySelectorAll('.view-item').forEach(btn => btn.classList.toggle('checked', btn.dataset.view === viewPrefs.view));
+      $('knobsBtn').classList.toggle('checked', viewPrefs.look === 'knobs');
+    }
+    function setView(view) {
+      const was = viewPrefs.view;
+      viewPrefs.view = view;
+      saveViewPrefs();
+      applyView();
+      // the Mac app makes its window small for the minimal view and gives it its size back afterwards
+      if (window.nanoWindow && (view === 'mini') !== (was === 'mini')) window.nanoWindow.mini(view === 'mini');
+      render();
+    }
+    function setViewFocus(key) {
+      viewPrefs.focus = key;
+      saveViewPrefs();
+      renderViewFocus();
+      renderPedalBoard();
+    }
+    const VIEW_CARDS = { gate: 'gateCard', capture: 'captureCard', cab: 'cabCard' };
+    function renderViewFocus() {
+      const id = VIEW_CARDS[viewPrefs.focus] || 'block-' + viewPrefs.focus;
+      document.querySelectorAll('.view-focus').forEach(el => { if (el.id !== id) el.classList.remove('view-focus'); });
+      const el = $(id);
+      if (el) el.classList.add('view-focus');
+      document.querySelectorAll('#signalChain .sc-node').forEach(node => node.classList.toggle('view-pick', node.dataset.key === viewPrefs.focus));
+    }
+    function chainToggle(key) {
+      if (key === 'gate') $('gateToggle').click();
+      else if (key === 'capture') $('captureToggle').click();
+      else if (key === 'cab') $('cabIRToggle').click();
+      else {
+        const toggle = document.querySelector('#block-' + key + ' > .block-head .toggle-switch');
+        if (toggle) toggle.click();
+      }
+    }
+    function renderPedalBoard() {
+      const box = $('pedalBoard');
+      if (!box) return;
+      if (viewMode() !== 'pedals') { if (box.firstChild) box.innerHTML = ''; return; }
+      const pictures = document.documentElement.classList.contains('pedal-pictures');
+      const drawn = (icon, cls) => '<div class="drawn ' + (cls || '') + '"><span class="ico" style="--icon: var(--ico-' + icon + ')"></span><i class="fs"></i></div>';
+      const pedal = (key, on, color, art, label, name, empty) =>
+        '<div class="pd' + (on ? ' on' : '') + (empty ? ' empty' : '') + (key === viewPrefs.focus ? ' view-pick' : '') + '" data-key="' + key +
+        '" style="--c:' + color + ';--ink:' + iconInk(color) + '" title="' + escapeHTML(label + ': ' + name) + (empty ? '' : ' - double-click: on / off') + '">' +
+        '<div class="art"><i class="led"></i>' + art + '</div><div class="lbl">' + escapeHTML(label) + '</div><div class="nm">' + escapeHTML(name) + '</div></div>';
+      const fx = key => {
+        const block = state.blocks[key];
+        const model = block.models.find(m => m.name === block.model);
+        const style = fxStyle(model);
+        if (block.model === 'None') return pedal(key, false, '#5e6369', drawn(style.icon || 'unknown', 'blank'), block.title, 'Empty', true);
+        const src = pictures && MODEL_IMAGES[block.model];
+        return pedal(key, block.on, style.color, src ? '<img src="' + escapeHTML(src) + '" alt="">' : drawn(style.icon), block.title, block.model);
+      };
+      const gateValue = state.gate.params[0] ? Math.round(state.gate.params[0].value) + ' %' : '';
+      const captureName = state.capture.on ? state.currentCapture.name || 'Capture' : 'Bypassed';
+      const ampPhoto = state.capture.on ? captureAmpPicture() : amalgamFor(state.currentCapture.name);
+      const cabName = state.cabIR.on ? state.currentIR.shortName || 'Cab / IR' : 'Bypassed';
+      box.innerHTML = '<div class="io">IN</div>' +
+        pedal('gate', state.gate.on, '#F2F2F2', drawn('gate', 'small'), 'Gate', gateValue) + fx('pre1') + fx('pre2') +
+        pedal('capture', state.capture.on, '#F2F2F2', ampPhoto ? '<img class="amp-photo" src="' + escapeHTML(ampPhoto.file) + '" alt="">'
+          : '<div class="amp"><div class="grille"><span class="plate">' + escapeHTML(captureName) +
+          '</span></div><div class="panel"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>', 'Capture', captureName) +
+        pedal('cab', state.cabIR.on, '#F2F2F2', '<div class="cab"><i></i></div>', 'Cab', cabName) +
+        fx('post1') + fx('post2') + fx('post3') + '<div class="io">OUT</div>';
+    }
+    $('pedalBoard').addEventListener('click', e => { const pd = e.target.closest('.pd'); if (pd) setViewFocus(pd.dataset.key); });
+    $('pedalBoard').addEventListener('dblclick', e => {
+      const pd = e.target.closest('.pd');
+      if (!pd || pd.classList.contains('empty')) return;
+      e.preventDefault();
+      chainToggle(pd.dataset.key);
+    });
+    document.querySelectorAll('.view-item').forEach(btn => btn.addEventListener('click', () => { toggleMoreMenu(false); setView(btn.dataset.view); }));
+    $('knobsBtn').addEventListener('click', () => {
+      toggleMoreMenu(false);
+      viewPrefs.look = viewPrefs.look === 'knobs' ? 'bars' : 'knobs';
+      saveViewPrefs();
+      applyView();
+      render();
+    });
+    applyView();
+
     function render() {
       renderPresetSelect();
       renderCaptureIR();
@@ -9427,6 +9677,8 @@ function parseSelectedCaptureState(payload) {
       chain.innerHTML = '';
       Object.entries(state.blocks).forEach(([key, block]) => chain.appendChild(renderBlock(key, block)));
       renderSignalChain();
+      renderViewFocus();
+      renderPedalBoard();
       if (eqView) eqView.afterRender();
       duoApply();
     }
@@ -10807,6 +11059,7 @@ function parseSelectedCaptureState(payload) {
       [['←', '→'], 'Previous / next preset'],
       [[CMD_KEY + 'E'], 'Export the preset as a file'],
       [[CMD_KEY + 'I'], 'Import a preset file'],
+      [[CMD_KEY + '1', CMD_KEY + '2', CMD_KEY + '3'], 'Full view / pedal view / minimal view'],
       [['T'], 'Tuner on / off'],
       [['A'], 'A/B compare: remember the settings as A, then switch between A and your changes'],
       [['Space'], 'Jam tracks: play / pause (while the player is shown)'],
@@ -10839,6 +11092,11 @@ function parseSelectedCaptureState(payload) {
         if (!dialogOpen) $({ s: 'saveBtn', e: 'exportBtn', i: 'importBtn' }[key]).click();
         return;
       }
+      if (mod && !e.altKey && !e.shiftKey && ['1', '2', '3'].includes(key) && !document.documentElement.dataset.duo) {
+        e.preventDefault();
+        setView(['full', 'pedals', 'mini'][Number(key) - 1]);
+        return;
+      }
       if (mod || e.altKey || e.ctrlKey || typing) return;
       if (key === 't' && (!dialogOpen || state.tuner.open)) {
         e.preventDefault();
@@ -10856,6 +11114,7 @@ function parseSelectedCaptureState(payload) {
     // The shortcuts in the tooltips
     [['presetPrev', ' (←)'], ['presetNext', ' (→)'], ['tunerBtn', ' (T)']].forEach(([id, hint]) => { $(id).title += hint; });
     [['exportBtn', 'E'], ['importBtn', 'I']].forEach(([id, key]) => { $(id).querySelector('.menu-key').textContent = CMD_KEY + key; });
+    document.querySelectorAll('.view-item').forEach((btn, i) => { btn.querySelector('.menu-key').textContent = CMD_KEY + (i + 1); });
     $('saveBtn').title = 'Save the preset on the Nano (' + CMD_KEY + 'S)';
 
     if (!navigator.bluetooth) {
@@ -11818,6 +12077,7 @@ function parseSelectedCaptureState(payload) {
       const layout = posture === 'outer' ? 'outer' : posture === 'half' ? (root.dataset.foldAxis === 'vertical' ? 'book' : 'half') : posture === 'flat' ? 'flat' : '';
       if (layout !== duoLayout()) {
         if (layout) root.dataset.duo = layout; else delete root.dataset.duo;
+        applyView();
         // the EQ dialog is the live view of an EQ while the halves are apart
         const overlay = $('eqOverlay'), docked = layout === 'half' || layout === 'book';
         if (docked && overlay.parentElement !== duoStage) { if (!overlay.hidden) eqView.closeDialog(); duoStage.appendChild(overlay); }

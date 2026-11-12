@@ -164,6 +164,23 @@ app.whenReady().then(() => {
   buildMenu();
   allowAudioInput();
   registerJam({ ipcMain });
+  // The editor's minimal view: a small window, and the size it had before when the view is left.
+  const fullBounds = new WeakMap();
+  ipcMain.handle('window:mini', (event, on) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win) return;
+    if (on) {
+      if (!fullBounds.has(win)) fullBounds.set(win, win.getBounds());
+      win.setMinimumSize(760, 360);
+      const b = win.getBounds();
+      win.setBounds({ x: b.x, y: b.y, width: 1000, height: 430 }, true);
+    } else {
+      const b = fullBounds.get(win);
+      fullBounds.delete(win);
+      win.setMinimumSize(900, 640);
+      if (b) win.setBounds(b, true);
+    }
+  });
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
