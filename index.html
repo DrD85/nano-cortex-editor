@@ -3439,10 +3439,11 @@
         state.presetLoadTimer = null;
         log('Lade neue Preset-Daten (Refresh)...');
         requestCurrentPresetState();
-      }, 450);
+      }, 250);   // (was 450: the editor showed the preset before for that long; fast switching still loads only the last)
     }
 
     async function requestCurrentPresetState() {
+      state.stateAskedAt = Date.now();   // (a model chosen after this is not in its answer)
       if (state.stateTimer) clearTimeout(state.stateTimer);
       state.stateTimer = null;
       state.stateMode = 'current';
@@ -3811,6 +3812,21 @@
         // wipe the real current values (which haven't been read back yet)
         // with defaults, causing a visible flash every time the state is
         // re-read for unrelated reasons (cab mic change, capture toggle, etc.)
+        // A model chosen here a moment ago that the Nano does not report: it did not take it (some combinations it
+        // refuses, e.g. a second pitch effect next to Transpose) - say so instead of silently going back.
+        const asked = modelAsked[blockKey];
+        if (asked && (Date.now() - asked.at > 8000 || asked.preset !== state.selectedPreset)) delete modelAsked[blockKey];
+        else if (asked && !(state.stateAskedAt > asked.at)) {
+          // a report asked for before the model was chosen: it cannot know it yet - not judged, and the choice stays
+          log(block.title + ': state from before choosing ' + asked.name + ' - not taken as the answer');
+          return;
+        } else if (asked) {
+          delete modelAsked[blockKey];
+          if (asked.name !== model.name) {
+            log(block.title + ': the Nano did not take ' + asked.name + ' - it kept ' + model.name);
+            toast('The Nano did not take ' + asked.name + ' in ' + block.title + ' - it kept ' + model.name + '.', 'info', 5000);
+          }
+        }
         if (block.model !== model.name) {
           block.model = model.name;
           block.params = structuredClone(model.params || []);
@@ -7068,6 +7084,9 @@ function parseSelectedCaptureState(payload) {
     }
 
     // readBack: read the new model's values afterwards - only if the effect is on (reading one that is off crashed the Nano).
+    // Models chosen here, until the Nano's next state report says whether it took them: { name, at, preset }
+    const modelAsked = {};
+
     async function setFXModel(blockKey, modelName, readBack = true) {
       const cfg = blockSlotConfig[blockKey];
       const block = state.blocks[blockKey];
@@ -7093,6 +7112,9 @@ function parseSelectedCaptureState(payload) {
       );
 
       await writeC304(cfg.label + ' model select ' + model.name, payload);
+      // Did the Nano take it? Its state shortly after tells (unless a preset load reads it anyway).
+      modelAsked[blockKey] = { name: model.name, at: Date.now(), preset: state.selectedPreset };
+      setTimeout(() => { if (modelAsked[blockKey] && !state.presetLoadTimer) requestCurrentPresetState(); }, 700);
 
       if (!readBack || !block.on) return;
       setTimeout(() => {
