@@ -592,6 +592,59 @@
     }
     .lib-item:hover { background: #171717; border-color: #2e2e2e; }
     .lib-item.current { border-color: #45F862; }
+    /* organizing captures / cabs: the slots on top, the library with filters below */
+    #orgOverlay { z-index: 55; }   /* under the questions (60) and the slot choice */
+    #askMessage .dlg-sub { white-space: pre-line; }
+    .og-panel { width: min(1240px, calc(100vw - 32px)); height: min(840px, calc(100vh - 32px)); border-radius: 18px; border: 1px solid #2a2e33; background: #111315;
+      display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
+    .og-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #1f2226; }
+    .og-head h2 { margin: 0 auto 0 0; font-size: 18px; font-weight: 650; color: #f2f2f2; }
+    .og-body { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+    .og-strip { padding: 14px 20px; border-bottom: 1px solid #1f2226; display: grid; gap: 8px; }
+    .og-q { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; }
+    .og-banks { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+    .og-banks.cabs { grid-template-columns: minmax(0, 1fr); }
+    .og-banks.cabs .og-bankcol { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .og-banks.cabs .og-bankcol .bn { grid-column: 1 / -1; }
+    .og-bankcol { display: grid; gap: 5px; align-content: start; }
+    .og-bankcol .bn { font-size: 11px; letter-spacing: .12em; color: #8e9297; }
+    .og-slot { border-radius: 9px; border: 1px solid #262a2f; background: #15181b; min-height: 34px; padding: 6px 9px; box-sizing: border-box;
+      display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 6px; cursor: grab; }
+    .og-slot .n { font-size: 11px; color: #6c7177; }
+    .og-slot .t { font-size: 13px; font-weight: 600; color: #e6e8ea; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .og-slot.empty { cursor: default; } .og-slot.empty .t { color: #5e6369; font-weight: 500; }
+    .og-slot.cur { border-color: #45F862; }
+    .og-slot.drop { border: 2px dashed #45F862; background: #13261a; }
+    .og-slot.drag { opacity: .45; }
+    .og-use { font-size: 11px; color: #8e9297; } .og-use.busy { color: #f2d14b; font-weight: 700; }
+    .og-libarea { padding: 14px 20px; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 18px; min-height: 0; }
+    .og-filters { display: grid; gap: 8px; align-content: start; }
+    .og-filters .lib-search { font-size: 14px; padding: 9px 12px; }
+    .og-chips { display: grid; gap: 6px; }
+    .og-chip { display: flex; justify-content: space-between; padding: 7px 10px; border-radius: 8px; border: 1px solid #343434; background: #151515; color: #d6d6d6; font: inherit;
+      font-size: 12.5px; font-weight: 500; text-align: left; cursor: pointer; text-transform: none; letter-spacing: 0; }
+    .og-chip .n { color: #808080; } .og-chip.on { background: #f2f2f2; color: #000; border-color: #f2f2f2; } .og-chip.on .n { color: #444; }
+    .og-chip:disabled { opacity: .4; cursor: default; }
+    .og-list { overflow: auto; min-height: 0; }
+    .og-lib-row { display: grid; grid-template-columns: 22px 30px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 9px;
+      border: 1px solid transparent; cursor: pointer; }
+    .og-lib-row:hover { background: #171a1d; }
+    .og-lib-row.sel { background: #1c1f23; border-color: #3a3f45; }
+    .og-lib-row.aud { border-color: #45F862; background: color-mix(in srgb, #45F862 10%, #0d0d0d); }
+    .og-lib-row .fx-icon { width: 30px; height: 30px; border-radius: 7px; }
+    .og-lib-row .fx-icon::after { inset: 4px; }
+    .og-chk { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid #4a4e53; display: grid; place-items: center; font-size: 12px; color: #0b0b0b; }
+    .og-chk.on { background: #f2f2f2; border-color: #f2f2f2; }
+    .og-name { font-size: 14px; font-weight: 600; color: #f2f2f2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .og-meta { font-size: 11.5px; color: #8e9297; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .og-badges { display: flex; gap: 6px; }
+    .og-badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid #2c3035; color: #bdbdbd; white-space: nowrap; }
+    .og-badge.slot { border-color: #45F86266; color: #7ff593; } .og-badge.warn { border-color: #f2d14b66; color: #f2d14b; }
+    .og-foot { display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-top: 1px solid #1f2226; background: #0e1012; }
+    .og-foot .t { font-size: 13px; color: #c8ccd1; margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .aud-btn.danger { border-color: #ff5a4d; color: #ff8a80; }
+    .aud-btn:disabled { opacity: .45; cursor: default; }
+    .og-head .mt-seg button { padding: 6px 14px; }
     /* listening to a capture without loading it (auditioning): a play button in each row, a bar at the bottom */
     #libraryOverlay .lib-panel { grid-template-rows: auto auto auto auto minmax(0, 1fr) auto; }
     #libraryOverlay .lib-item { grid-template-columns: 34px minmax(0, 1fr) auto; }
@@ -2025,6 +2078,7 @@
         <div id="moreMenu" class="more-menu" hidden>
           <button id="exportBtn" title="Save the current preset as a file (to keep or to share)"><span class="ico" style="--icon: var(--ico-export)"></span>Export preset file…<span class="menu-key"></span></button>
           <button id="importBtn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="ico" style="--icon: var(--ico-import)"></span>Import preset file…<span class="menu-key"></span></button>
+          <button id="orgBtn" title="All capture and cab slots and the library on the Nano: swap slots, load, delete what you do not need"><span class="ico" style="--icon: var(--ico-library)"></span>Organize captures…</button>
           <button id="sharedBtn" title="Presets others have shared on GitHub – each with the capture it needs, checked against your Nano"><span class="ico" style="--icon: var(--ico-list)"></span>Shared presets…</button>
           <button id="shareBtn" title="Share the current preset on GitHub, with a short description and the exact name of its capture"><span class="ico" style="--icon: var(--ico-share)"></span>Share this preset…</button>
           <div class="menu-sep"></div>
@@ -2448,7 +2502,8 @@
     <div class="lib-panel" role="dialog" aria-label="Capture library">
       <div class="tuner-head">
         <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-capture)"></span><h2 class="dlg-title">Capture Library</h2></div>
-        <button id="libraryClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+        <div style="display:flex;gap:8px;align-items:center"><button id="libraryOrg" class="aud-btn" title="Swap slots, load, delete what you do not need">Organize…</button>
+        <button id="libraryClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button></div>
       </div>
       <input id="librarySearch" class="lib-search" type="search" placeholder="Search name, tag, author …" autocomplete="off">
       <div class="lib-filters">
@@ -3408,6 +3463,7 @@
     // connect card comes up behind them). The meter, MIDI and the jam tracks do not need the connection.
     function closeDeviceDialogs() {
       closeTuner(false);
+      if ($('orgOverlay')) { org.busy = false; $('orgOverlay').hidden = true; }
       closeMetro(false);
       auditionEnded('');
       closeExpPanel();
@@ -4640,6 +4696,8 @@ function parseSelectedCaptureState(payload) {
       AuditioningEnableDisableResponse: 149,
       AuditioningListenCaptureRequest: 150,
       AuditioningListenCaptureResponse: 151,
+      DeleteLibraryItemsRequest: 82,
+      DeleteLibraryItemsResponse: 83,
       AuditioningListenIrRequest: 158,
       AuditioningListenIrResponse: 159,
       RetrieveSettingsRequest: 65,
@@ -4828,6 +4886,15 @@ function parseSelectedCaptureState(payload) {
 
       if (type === MSG.TempoScreen) {
         handleTempoScreen(data);
+        return true;
+      }
+
+      if (type === MSG.DeleteLibraryItemsResponse) {   // { 3: status (1 = success), 4: message }
+        const fields = framePayloadFields(data);
+        const ok = fields[3] && fields[3][0] && fields[3][0].value === 1;
+        const message = fields[4] && fields[4][0] && fields[4][0].wire === 2 ? utf8(fields[4][0].raw) : '';
+        log('RX delete reply: ' + (ok ? 'deleted' : 'NOT deleted') + (message ? ' "' + message + '"' : '') + ' ' + hex(data));
+        if (org.waiting) { const done = org.waiting; org.waiting = null; done({ ok, message }); }
         return true;
       }
 
@@ -5069,6 +5136,7 @@ function parseSelectedCaptureState(payload) {
       renderShared();   // what each shared preset needs: on the Nano or not
       renderCaptureIR();
       if (!$('libraryOverlay').hidden) renderLibraryBrowser();
+      renderOrganizer();
       if (state.viaController) setTimeout(fsLinkStart, 500);   // the controller's footswitches and FX presets
     }
 
@@ -5724,6 +5792,7 @@ function parseSelectedCaptureState(payload) {
         renderLibraryBrowser();
         list.scrollTop = top;
       }
+      renderOrganizer();
     }
 
     // SetCabinetSlotContentRequestMessage { 3: cabinetSlot (0-4),
@@ -5750,6 +5819,335 @@ function parseSelectedCaptureState(payload) {
       return await waitUntil(() => sameName(state.irNames.get(slot), item.name), 6000) ? slot : null;
     }
 
+    // ---- Organize captures / cabs: all slots on top, the library below (draft 8b) ----
+    // Slots are quick access: a preset keeps its capture / IR when its slot gets another one (it then comes from the
+    // library), so swapping slots changes no sound. Deleting a library item (DeleteLibraryItemsRequest 82, only user
+    // items, one per message as the app does it, reply 83) takes it from every preset that uses it - the list shows
+    // that once the presets were checked (scanSlotUsage). There is no message that empties a slot.
+    const org = { mode: 'capture', q: '', show: 'all', tidy: '', sel: new Set(), busy: false, status: '', waiting: null, drag: null };
+    const orgKey = item => item.kind + ':' + item.index;
+    const orgIsIr = () => org.mode === 'ir';
+
+    function orgLibrary() {
+      const L = state.library;
+      const list = orgIsIr()
+        ? L.irFactory.map(i => ({ ...i, kind: 'irFactory' })).concat(L.irUser.map(i => ({ ...i, kind: 'irUser' })))
+        : L.factory.map(i => ({ ...i, kind: 'factory' })).concat(L.user.map(i => ({ ...i, kind: 'user' })));
+      return list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+    }
+    const orgUser = item => item.kind === 'user' || item.kind === 'irUser';
+    const orgSlotCount = () => (orgIsIr() ? 5 : 25);
+    const orgSlotName = slot => (orgIsIr() ? state.irNames : state.captureNames).get(slot) || '';
+    const orgSlotsOf = item => { const out = []; for (let s = 1; s <= orgSlotCount(); s++) if (sameName(orgSlotName(s), item.name)) out.push(s); return out; };
+    const orgSlotLabel = s => (orgIsIr() ? 'Cab ' + s : Math.ceil(s / 5) + '-' + ((s - 1) % 5 + 1));
+    // presets that use an item (null: not checked yet)
+    function orgPresetsOf(item) {
+      const u = state.slotUsage;
+      if (!u || !u.captureNames) return null;
+      const list = orgIsIr() ? u.cabNames : u.captureNames;
+      return list.filter(x => sameName(x.name, item.name) || sameName(x.full, item.name)).map(x => x.preset);
+    }
+    const orgSlotUsers = slot => (state.slotUsage ? (state.slotUsage[orgIsIr() ? 'cab' : 'capture'][slot] || []) : null);
+    const orgCurrentSlot = () => (orgIsIr() ? (state.cabIR.on ? state.cabIR.stateSlot : null) : (state.capture.on ? state.capture.activeSlot : null));
+
+    function orgDialog() {
+      let overlay = $('orgOverlay');
+      if (overlay) return overlay;
+      overlay = document.createElement('div');
+      overlay.id = 'orgOverlay';
+      overlay.className = 'ask-overlay';
+      overlay.hidden = true;
+      overlay.innerHTML = '<div class="og-panel" role="dialog" aria-label="Organize captures">' +
+        '<div class="og-head"><h2 id="ogTitle">Organize captures</h2><span class="mt-seg" id="ogMode"><button data-v="capture">Captures</button><button data-v="ir">Cabs / IRs</button></span>' +
+        '<button class="aud-btn" id="ogScan" title="Loads every preset once (about a minute) to see which presets use which slot and which capture">Check which presets use what</button>' +
+        '<button class="dlg-close" id="ogClose" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button></div>' +
+        '<div class="og-body"><div class="og-strip"><div class="og-q" id="ogSlotsHint"></div><div class="og-banks" id="ogSlots"></div></div>' +
+        '<div class="og-libarea"><div class="og-filters"><input id="ogSearch" class="lib-search" type="search" placeholder="Search name …" autocomplete="off">' +
+        '<span class="og-q">Show</span><div id="ogShow" class="og-chips"></div><span class="og-q">Tidy up</span><div id="ogTidy" class="og-chips"></div></div>' +
+        '<div class="og-list" id="ogList"></div></div></div>' +
+        '<div class="og-foot"><span class="t" id="ogInfo"></span><button class="aud-btn" id="ogNone">Clear selection</button>' +
+        '<button class="aud-btn" id="ogLoad">Load into a slot…</button><button class="aud-btn danger" id="ogDelete">Delete…</button></div></div>';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeOrganizer(); });
+      overlay.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeOrganizer(); } });
+      $('ogClose').addEventListener('click', closeOrganizer);
+      $('ogMode').addEventListener('click', e => {
+        const b = e.target.closest('button');
+        if (!b || org.busy || b.dataset.v === org.mode) return;
+        if (audition.current) auditionStop();
+        Object.assign(org, { mode: b.dataset.v, sel: new Set(), tidy: '' });
+        renderOrganizer();
+      });
+      $('ogSearch').addEventListener('input', e => { org.q = e.target.value; renderOrganizer(); });
+      $('ogNone').addEventListener('click', () => { org.sel.clear(); renderOrganizer(); });
+      $('ogScan').addEventListener('click', async () => {
+        if (org.busy) return;
+        org.busy = true;
+        renderOrganizer();
+        const ok = await scanSlotUsage(text => { org.status = text; renderOrganizer(); });
+        org.busy = false;
+        org.status = ok ? 'Checked: which presets use which ' + (orgIsIr() ? 'cab' : 'capture') + '.' : org.status;
+        renderOrganizer();
+      });
+      $('ogLoad').addEventListener('click', async () => {
+        const item = orgLibrary().find(i => org.sel.has(orgKey(i)));
+        if (!item || org.busy) return;
+        const slot = await chooseSlot(orgIsIr() ? 'cab' : 'capture', item.name);
+        if (slot) await orgLoad(item, slot);
+      });
+      $('ogDelete').addEventListener('click', orgDelete);
+      return overlay;
+    }
+
+    function openOrganizer(mode = 'capture') {
+      if (!state.connected) { toast('Connect the Nano first.', 'error'); return; }
+      org.mode = mode;
+      org.sel.clear();
+      org.status = '';
+      orgDialog().hidden = false;
+      if (!state.library.loaded && state.stateMode !== 'library') requestLibraryContent();
+      renderOrganizer();
+      $('ogSearch').value = org.q;
+      $('ogSearch').focus();
+    }
+
+    function closeOrganizer() {
+      const overlay = $('orgOverlay');
+      if (!overlay || overlay.hidden || org.busy) return;
+      overlay.hidden = true;
+      if (audition.current) auditionStop();
+    }
+
+    function renderOrganizer() {
+      const overlay = $('orgOverlay');
+      if (!overlay || overlay.hidden) return;
+      const ir = orgIsIr();
+      $('ogTitle').textContent = ir ? 'Organize cabs / IRs' : 'Organize captures';
+      $('ogMode').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === org.mode));
+      $('ogScan').disabled = org.busy;
+      $('ogScan').textContent = org.busy ? 'Checking…' : state.slotUsage && state.slotUsage.captureNames ? 'Check again' : 'Check which presets use what';
+      $('ogSlotsHint').textContent = (ir ? 'Cab slots' : 'Slots') + ' – drag one onto another to swap · drop from the list below to load' +
+        (state.slotUsage ? ' · the number: presets using the slot' : '');
+
+      // the slots: five bank columns (captures) or one row of five (cabs)
+      const slots = $('ogSlots');
+      slots.className = 'og-banks' + (ir ? ' cabs' : '');
+      slots.innerHTML = '';
+      const current = orgCurrentSlot();
+      const columns = ir ? 1 : 5;
+      for (let col = 0; col < columns; col++) {
+        const column = document.createElement('div');
+        column.className = 'og-bankcol';
+        column.innerHTML = '<span class="bn">' + (ir ? 'CAB SLOTS' : 'BANK ' + (col + 1)) + '</span>';
+        const rows = ir ? 5 : 5;
+        for (let r = 0; r < rows; r++) {
+          const slot = ir ? r + 1 : col * 5 + r + 1;
+          const name = orgSlotName(slot);
+          const users = orgSlotUsers(slot);
+          const cell = document.createElement('div');
+          cell.className = 'og-slot' + (name ? '' : ' empty') + (slot === current ? ' cur' : '');
+          cell.draggable = Boolean(name) && !org.busy;
+          cell.dataset.slot = String(slot);
+          cell.title = (name || 'Empty') + (slot === current ? ' – this preset' : '') +
+            (users ? ' – ' + (users.length ? 'used by preset ' + users.join(', ') : 'no preset uses it') : '');
+          cell.innerHTML = '<span class="n">' + (ir ? slot : r + 1) + '</span><span class="t">' + escapeHTML(name || 'empty') + '</span>' +
+            (users && users.length ? '<span class="og-use busy">' + users.length + '</span>' : '');
+          cell.addEventListener('dragstart', e => { org.drag = { slot }; e.dataTransfer.setData('text/plain', 'slot:' + slot); e.dataTransfer.effectAllowed = 'move'; cell.classList.add('drag'); });
+          cell.addEventListener('dragend', () => { cell.classList.remove('drag'); org.drag = null; });
+          cell.addEventListener('dragover', e => { if (org.drag && !org.busy) { e.preventDefault(); cell.classList.add('drop'); } });
+          cell.addEventListener('dragleave', () => cell.classList.remove('drop'));
+          cell.addEventListener('drop', e => { e.preventDefault(); cell.classList.remove('drop'); const d = org.drag; org.drag = null; if (d) orgDrop(d, slot); });
+          column.appendChild(cell);
+        }
+        slots.appendChild(column);
+      }
+
+      // filters
+      const all = orgLibrary();
+      const q = org.q.trim().toLowerCase();
+      const byQuery = all.filter(i => !q || i.name.toLowerCase().includes(q));
+      const counts = {};
+      byQuery.forEach(i => { const k = i.name.trim().toLowerCase(); counts[k] = (counts[k] || 0) + 1; });
+      const tidyTest = {
+        noslot: i => !orgSlotsOf(i).length,
+        unused: i => { const p = orgPresetsOf(i); return p !== null && !p.length && !orgSlotsOf(i).length; },
+        twice: i => counts[i.name.trim().toLowerCase()] > 1
+      };
+      const shown = byQuery.filter(i => (org.show === 'all' || (org.show === 'user') === orgUser(i)) && (!org.tidy || tidyTest[org.tidy](i)));
+      const chip = (text, count, on, click, disabled, title) => {
+        const b = document.createElement('button');
+        b.className = 'og-chip' + (on ? ' on' : '');
+        b.disabled = Boolean(disabled);
+        if (title) b.title = title;
+        b.innerHTML = escapeHTML(text) + (count !== undefined ? ' <span class="n">' + count + '</span>' : '');
+        b.addEventListener('click', click);
+        return b;
+      };
+      const showBox = $('ogShow'), tidyBox = $('ogTidy');
+      showBox.innerHTML = tidyBox.innerHTML = '';
+      [['all', 'All', byQuery.length], ['user', ir ? 'User IRs' : 'User', byQuery.filter(orgUser).length],
+        ['factory', ir ? 'Factory cabs' : 'Factory', byQuery.filter(i => !orgUser(i)).length]]
+        .forEach(([key, text, count]) => showBox.appendChild(chip(text, count, org.show === key, () => { org.show = key; renderOrganizer(); })));
+      const unusedKnown = Boolean(state.slotUsage && state.slotUsage.captureNames);
+      [['noslot', 'Not in a slot', 'In none of the slots'], ['unused', 'Not used by a preset', unusedKnown ? 'In no slot and no preset uses it' : 'Check which presets use what first'],
+        ['twice', 'Same name twice', 'The same name more than once (factory and user, or twice in user)']]
+        .forEach(([key, text, title]) => tidyBox.appendChild(chip(text, byQuery.filter(tidyTest[key]).length, org.tidy === key,
+          () => { org.tidy = org.tidy === key ? '' : key; renderOrganizer(); }, key === 'unused' && !unusedKnown, title)));
+
+      // the library
+      const list = $('ogList'), top = list.scrollTop;
+      list.innerHTML = '';
+      if (!shown.length) list.innerHTML = '<div class="lib-empty">' + (all.length ? 'Nothing matches.' : state.library.loaded ? 'The library is empty.' : 'Reading the library from the Nano …') + '</div>';
+      shown.forEach(item => {
+        const key = orgKey(item), user = orgUser(item), inSlots = orgSlotsOf(item), presets = orgPresetsOf(item);
+        const row = document.createElement('div');
+        row.className = 'og-lib-row' + (org.sel.has(key) ? ' sel' : '') + (auditionIs(item) ? ' aud' : '');
+        row.draggable = !org.busy;
+        const type = ir ? null : captureTypeInfo(item.type);
+        row.innerHTML = '<span class="og-chk' + (org.sel.has(key) ? ' on' : '') + '" role="checkbox" aria-checked="' + org.sel.has(key) + '">' + (org.sel.has(key) ? '✓' : '') + '</span>' +
+          '<span class="fx-icon" style="--icon: var(--ico-' + (ir ? 'cab' : type.icon) + ');--block-color:#f2f2f2"></span>' +
+          '<span style="min-width:0"><div class="og-name">' + escapeHTML(item.name) + '</div><div class="og-meta">' +
+          (auditionIs(item) ? '<span class="aud-live">' + AUD_EQ + 'Listening</span> · ' : '') +
+          (user ? (ir ? 'User IR' : 'User') : (ir ? 'Factory cab' : 'Factory')) + (ir ? '' : ' · ' + type.label + (item.version ? ' · V' + item.version : '')) +
+          (presets && presets.length ? ' · presets ' + escapeHTML(presets.slice(0, 8).join(', ') + (presets.length > 8 ? ' …' : '')) : '') + '</div></span>' +
+          '<span class="og-badges">' + (inSlots.length ? '<span class="og-badge slot">' + (ir ? '' : 'Slot ') + inSlots.map(orgSlotLabel).join(', ') + '</span>' : '') +
+          (presets && presets.length ? '<span class="og-badge warn">' + presets.length + ' preset' + (presets.length > 1 ? 's' : '') + '</span>' : '') + '</span>' +
+          '<span class="aud-play' + (auditionIs(item) ? ' on' : '') + '" role="button" tabindex="0" title="' + (auditionIs(item) ? 'Stop listening' : 'Listen without loading it') + '">' +
+          (auditionIs(item) ? AUD_STOP : AUD_PLAY) + '</span>';
+        row.addEventListener('click', e => {
+          if (e.target.closest('.aud-play')) { e.stopPropagation(); if (auditionIs(item)) auditionStop(); else auditionStart(item); return; }
+          if (org.sel.has(key)) org.sel.delete(key); else org.sel.add(key);
+          renderOrganizer();
+        });
+        row.addEventListener('dragstart', e => { org.drag = { item }; e.dataTransfer.setData('text/plain', 'item:' + key); e.dataTransfer.effectAllowed = 'copy'; });
+        row.addEventListener('dragend', () => { org.drag = null; });
+        list.appendChild(row);
+      });
+      list.scrollTop = top;
+
+      // footer
+      const selected = all.filter(i => org.sel.has(orgKey(i)));
+      const deletable = selected.filter(orgUser);
+      const hit = deletable.flatMap(i => orgPresetsOf(i) || []);
+      $('ogInfo').textContent = org.status || (selected.length
+        ? selected.length + ' selected' + (deletable.length < selected.length ? ' · factory ' + (ir ? 'cabs' : 'captures') + ' cannot be deleted' : '') +
+          (hit.length ? ' · used by preset' + (hit.length > 1 ? 's ' : ' ') + Array.from(new Set(hit)).sort((a, b) => a - b).join(', ') + ' (they would lose it)'
+            : deletable.length && !unusedKnown ? ' · not checked which presets use them' : '')
+        : 'Click to select · drag onto a slot to load · ▶ listens without loading');
+      $('ogNone').hidden = !selected.length;
+      $('ogLoad').disabled = selected.length !== 1 || org.busy;
+      $('ogDelete').disabled = !deletable.length || org.busy;
+      $('ogDelete').textContent = deletable.length ? 'Delete ' + deletable.length + ' from the Nano…' : 'Delete…';
+    }
+
+    // Loads a library item into a slot without changing the current preset (slots are quick access).
+    async function orgLoad(item, slot) {
+      const ir = isIrKind(item.kind);
+      const nameBytes = Array.from(new TextEncoder().encode(item.name));
+      const identifier = [0x08, ...encodeVarint(item.index), 0x12, ...encodeVarint(nameBytes.length), ...nameBytes];
+      const user = item.kind === 'user' || item.kind === 'irUser';
+      const frame = ir
+        ? buildFrame([0x18, ...encodeVarint(slot - 1), user ? 0x2A : 0x22, ...encodeVarint(identifier.length), ...identifier], MSG.SetCabinetSlotContentRequest)
+        : buildFrame([0x18, ...encodeVarint(slot - 1), user ? 0x2A : 0x22, ...encodeVarint(identifier.length), ...identifier], MSG.SetCaptureSlotContentRequest);
+      if (frame.length - 2 > 255) { toast('The name is too long.', 'error'); return false; }
+      if (ir) state.pendingCabAssignment = { slot, name: item.name, quiet: true };
+      else state.pendingSlotAssignment = { slot, name: item.name };
+      await writeC304('Load library ' + (ir ? 'cab' : 'capture') + ' "' + item.name + '" into ' + (ir ? 'cab ' : '') + 'slot ' + slot, frame);
+      const names = ir ? state.irNames : state.captureNames;
+      const ok = await waitUntil(() => sameName(names.get(slot), item.name), 6000);
+      renderOrganizer();
+      return ok;
+    }
+
+    // A library item for what a slot holds (to load it elsewhere): user first, then factory
+    function orgItemNamed(name) {
+      const all = orgLibrary();
+      return all.find(i => orgUser(i) && sameName(i.name, name)) || all.find(i => sameName(i.name, name)) || null;
+    }
+
+    async function orgDrop(drag, slot) {
+      if (org.busy) return;
+      org.busy = true;
+      renderOrganizer();
+      try {
+        if (drag.item) {   // from the library: load it into the slot
+          org.status = 'Loading "' + drag.item.name + '" into ' + (orgIsIr() ? 'cab slot ' : 'slot ') + orgSlotLabel(slot) + ' …';
+          renderOrganizer();
+          const ok = await orgLoad(drag.item, slot);
+          org.status = ok ? '"' + drag.item.name + '" is in ' + (orgIsIr() ? 'cab slot ' : 'slot ') + orgSlotLabel(slot) + '.' : 'The Nano did not confirm the load.';
+          return;
+        }
+        if (drag.slot === slot) return;
+        // slot onto slot: swap (each one loaded from the library into the other slot)
+        const a = orgSlotName(drag.slot), b = orgSlotName(slot);
+        const itemA = orgItemNamed(a), itemB = b ? orgItemNamed(b) : null;
+        if (!itemA || (b && !itemB)) {
+          org.status = '"' + (!itemA ? a : b) + '" is not in the library – it cannot be moved (only loaded slots can be swapped).';
+          return;
+        }
+        org.status = 'Swapping ' + orgSlotLabel(drag.slot) + ' and ' + orgSlotLabel(slot) + ' …';
+        renderOrganizer();
+        const first = await orgLoad(itemA, slot);
+        const second = first && itemB ? await orgLoad(itemB, drag.slot) : first;
+        org.status = first && second ? (b ? 'Swapped: ' + orgSlotLabel(drag.slot) + ' ⇄ ' + orgSlotLabel(slot) + '. Presets keep their ' + (orgIsIr() ? 'cabs.' : 'captures.')
+          : '"' + a + '" is now also in ' + orgSlotLabel(slot) + ' (a slot cannot be emptied).') : 'The Nano did not confirm the swap – check the slots.';
+      } finally {
+        org.busy = false;
+        renderOrganizer();
+      }
+    }
+
+    // DeleteLibraryItemsRequest (82) { 3: user captures [ { 1: index, 2: name } ] | 4: user IRs [ ... ] } - one item
+    // per message, the highest index first (the ones after a deleted item move up)
+    async function orgDelete() {
+      const items = orgLibrary().filter(i => org.sel.has(orgKey(i)) && orgUser(i)).sort((a, b) => b.index - a.index);
+      if (!items.length || org.busy) return;
+      const ir = orgIsIr();
+      const hit = Array.from(new Set(items.flatMap(i => orgPresetsOf(i) || []))).sort((a, b) => a - b);
+      const inSlots = items.filter(i => orgSlotsOf(i).length);
+      const known = Boolean(state.slotUsage && state.slotUsage.captureNames);
+      const text = items.map(i => '• ' + i.name).join('\n') + '\n\n' +
+        (hit.length ? 'Preset' + (hit.length > 1 ? 's ' : ' ') + hit.join(', ') + ' use' + (hit.length > 1 ? '' : 's') + ' ' + (items.length > 1 ? 'them' : 'it') + ' and would lose ' + (items.length > 1 ? 'them' : 'it') + '. '
+          : known ? 'No preset uses ' + (items.length > 1 ? 'them' : 'it') + '. ' : 'Not checked which presets use ' + (items.length > 1 ? 'them' : 'it') + '. ') +
+        (inSlots.length ? inSlots.length + ' of them ' + (inSlots.length > 1 ? 'are' : 'is') + ' in a slot. ' : '') +
+        'This cannot be undone – only from a backup or a new download.';
+      if (!(await askConfirm('Delete ' + items.length + ' ' + (ir ? 'IR' : 'capture') + (items.length > 1 ? 's' : '') + ' from the Nano?', text,
+        { ok: 'Delete ' + items.length, danger: true }))) return;
+      org.busy = true;
+      let done = 0;
+      try {
+        for (const item of items) {
+          org.status = 'Deleting ' + (done + 1) + ' of ' + items.length + ': ' + item.name + ' …';
+          renderOrganizer();
+          const nameBytes = Array.from(new TextEncoder().encode(item.name));
+          const identifier = [0x08, ...encodeVarint(item.index), 0x12, ...encodeVarint(nameBytes.length), ...nameBytes];
+          const frame = buildFrame([ir ? 0x22 : 0x1A, ...encodeVarint(identifier.length), ...identifier], MSG.DeleteLibraryItemsRequest);
+          if (frame.length - 2 > 255) { toast('"' + item.name + '": the name is too long.', 'error'); break; }
+          const reply = new Promise(resolve => {
+            org.waiting = resolve;
+            setTimeout(() => { if (org.waiting === resolve) { org.waiting = null; resolve({ ok: false, message: 'no answer' }); } }, 8000);
+          });
+          await writeC304('Delete library ' + (ir ? 'IR' : 'capture') + ' ' + item.index + ' "' + item.name + '"', frame);
+          const result = await reply;
+          if (!result.ok) { toast('"' + item.name + '" was not deleted' + (result.message ? ': ' + result.message : '.'), 'error', 6000); break; }
+          org.sel.delete(orgKey(item));
+          done++;
+        }
+      } finally {
+        org.busy = false;
+        org.status = done ? done + ' deleted. Reading the library again …' : '';
+        renderOrganizer();
+        if (done) {
+          state.library.requested = false;
+          requestLibraryContent();
+          setTimeout(requestCurrentPresetState, 600);
+          await waitUntil(() => state.library.loaded, 8000);
+          org.status = done + ' deleted.';
+          renderOrganizer();
+        }
+      }
+    }
+
     // ---- Slot choice for library captures and IRs ----
     // Loading into one of the 25 capture / 5 cab slots replaces only the slot: presets that used it keep their capture
     // or IR, which then comes from the library (the Nano shows it as such; tested on hardware). The dialog lists the
@@ -5763,7 +6161,7 @@ function parseSelectedCaptureState(payload) {
       if (presetUnsaved() && !(await askConfirm('Discard the unsaved changes?', 'Preset ' + state.selectedPreset + ' has unsaved changes. ' +
           'The check loads every preset on the Nano once, which discards them.', { ok: 'Check anyway' }))) return false;
       const original = state.selectedPreset;
-      const usage = { capture: {}, cab: {} };
+      const usage = { capture: {}, cab: {}, captureNames: [], cabNames: [] };   // names: [{ preset, name }]
       const total = Math.max(state.presetNames.size, PRESET_COUNT);
       try {
         for (let preset = 1; preset <= total; preset++) {
@@ -5778,6 +6176,10 @@ function parseSelectedCaptureState(payload) {
           const cab = state.cabIR.on ? state.cabIR.stateSlot : null;
           if (capture) (usage.capture[capture] = usage.capture[capture] || []).push(preset);
           if (cab) (usage.cab[cab] = usage.cab[cab] || []).push(preset);
+          if (state.capture.on && state.currentCapture.name) usage.captureNames.push({ preset, name: state.currentCapture.name });
+          if (state.cabIR.on && (state.currentIR.shortName || state.currentIR.fullName)) {
+            usage.cabNames.push({ preset, name: state.currentIR.shortName || state.currentIR.fullName, full: state.currentIR.fullName || '' });
+          }
         }
         state.slotUsage = usage;
         log('Slot usage: captures ' + JSON.stringify(usage.capture) + ', cabs ' + JSON.stringify(usage.cab));
@@ -5881,6 +6283,10 @@ function parseSelectedCaptureState(payload) {
       log('Library cab loaded' + (pending ? ': "' + pending.name + '" in cab slot ' + pending.slot : ''));
       if (!pending) return;
       state.irNames.set(pending.slot, pending.name);
+      if (pending.quiet) {   // organizing the slots: the preset keeps its cab slot
+        setTimeout(requestCurrentPresetState, 300);
+        return;
+      }
       state.currentIR = { shortName: pending.name, fullName: pending.name, inBank: true, slot: pending.slot };
       selectCabIRSlot(pending.slot); // activate the slot, then re-read state and cab parameters
     }
@@ -9196,6 +9602,7 @@ function parseSelectedCaptureState(payload) {
     $('sharedShare').addEventListener('click', () => { closeShared(); openShare(); });
     $('sharedOverlay').addEventListener('click', e => { if (e.target === $('sharedOverlay')) closeShared(); });
     $('sharedBtn').addEventListener('click', openShared);
+    $('orgBtn').addEventListener('click', () => openOrganizer(state.libBrowser.mode === 'ir' && !$('libraryOverlay').hidden ? 'ir' : 'capture'));
 
     // ---- Share this preset ----
     // The preset is read as for a file and put on the clipboard, and GitHub's form opens in the browser with the name,
@@ -10738,6 +11145,7 @@ function parseSelectedCaptureState(payload) {
     $('expOverlay').addEventListener('click', e => { if (e.target === $('expOverlay')) closeExpPanel(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('expOverlay').hidden) closeExpPanel(); });
     $('libraryClose').addEventListener('click', closeLibraryBrowser);
+    $('libraryOrg').addEventListener('click', () => { const mode = state.libBrowser.mode; closeLibraryBrowser(); openOrganizer(mode); });
     $('audStop').addEventListener('click', auditionStop);
     $('audBarStop').addEventListener('click', auditionStop);
     $('audBarStop').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); auditionStop(); } });
