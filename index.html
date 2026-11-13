@@ -9098,10 +9098,16 @@ function parseSelectedCaptureState(payload) {
       }
       return list;
     }
+    // The name as the board keeps it: at most 15 bytes, cut before a letter rather than through it (ä is two bytes)
+    function fxpNameBytes(name) {
+      let bytes = new TextEncoder().encode(name);
+      for (let n = Math.min(15, bytes.length); bytes.length > 15; n--) bytes = new TextEncoder().encode(name.slice(0, n));
+      return bytes;
+    }
     function fxpEncode(favs) {
       const out = new Uint8Array(FXP_BOARD_SIZE * FXP_FAVOURITES);
       favs.slice(0, FXP_FAVOURITES).forEach((p, i) => {
-        const at = i * FXP_BOARD_SIZE, name = new TextEncoder().encode(p.name).slice(0, 15);
+        const at = i * FXP_BOARD_SIZE, name = fxpNameBytes(p.name);
         out.set(name, at);
         const values = (p.values || []).slice(0, FXP_BOARD_PARAMS);
         out[at + 16] = values.length;
