@@ -892,6 +892,35 @@
     html[data-duo="flat"] body.jam-open main { padding-bottom: calc(var(--jam-h, 72px) + 14px); }
     html[data-duo="flat"] main > :is(#signalChain, .connect-hero) { grid-column: 1 / -1; }
     html[data-duo="flat"] main > #signalChain { margin-right: var(--app-corner, 0px); margin-left: var(--app-corner-left, 0px); }
+    /* the controller's footswitches: the whole width at the end of the open layout; the half-open and closed layouts
+       are made of fixed areas with no room for them (the board has them at hand) */
+    html[data-duo="flat"] main > #fsStrip { grid-column: 1 / -1; }
+    html:is([data-duo="half"], [data-duo="book"], [data-duo="outer"]) #fsStrip { display: none; }
+    /* the views and knobs do not apply in the Duo's layouts (they have their own, with sliders): not in its menu */
+    html[data-duo] .more-menu :is(.view-item, #knobsBtn, #knobsBtn + .menu-sep) { display: none; }
+    /* a plain iPhone: the pedal and minimal views are made for a window on a computer and do not fit its width */
+    @media (max-width: 600px) { html[data-app="ios"]:not([data-duo]) .more-menu .view-item:not([data-view="full"]) { display: none; } }
+    html[data-duo] .ft .num { display: none; }   /* (the tiles are narrow here: the place in the row tells the number) */
+    html[data-duo] .ft .cap { padding-right: 24px; overflow: hidden; }
+    /* Organize captures on the iPhone's narrow screens: one column (it grew past the screen), the head wraps instead of
+       squeezing its words; below 600 px (the Duo closed, a plain iPhone) the filters go above the list */
+    html[data-app="ios"] .og-panel { grid-template-columns: minmax(0, 1fr); }
+    @media (max-width: 700px) {
+      html[data-app="ios"] .og-head { flex-wrap: wrap; row-gap: 10px; }
+      html[data-app="ios"] .og-head :is(h2, .mt-seg button) { white-space: nowrap; }
+    }
+    @media (max-width: 600px) {
+      html[data-app="ios"] .og-panel { width: calc(100vw - 16px); height: calc(100vh - 16px); }
+      html[data-app="ios"] :is(.og-head, .og-strip, .og-libarea, .og-foot) { padding-left: 12px; padding-right: 12px; }
+      html[data-app="ios"] .og-banks { gap: 6px; }
+      html[data-app="ios"] .og-slot { padding: 5px 6px; }
+      html[data-app="ios"] .og-body { overflow: auto; overscroll-behavior: contain; }   /* (slots, filters and list scroll as one) */
+      html[data-app="ios"] .og-libarea { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; gap: 10px; }
+      html[data-app="ios"] .og-list { overflow: visible; }
+      html[data-app="ios"] .og-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      html[data-app="ios"] .og-foot { flex-wrap: wrap; }
+      html[data-app="ios"] .og-foot .t { flex-basis: 100%; }
+    }
     html[data-duo="flat"] :is(.top-row, #chain) { display: contents; }
     html[data-duo="flat"] :is(.top-card, .block) { min-height: 0; height: auto; padding: 10px 12px; margin: 0; border-radius: 14px; grid-column: auto; gap: 8px; }
     html[data-duo="flat"] .block { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 8px; row-gap: 8px; align-content: start; }
