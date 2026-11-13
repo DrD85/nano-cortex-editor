@@ -663,6 +663,23 @@
     .aud-bar { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid #45F862; background: color-mix(in srgb, #45F862 12%, #0d0d0d); }
     .aud-bar[hidden] { display: none; }
     #libraryOverlay .lib-chip-row[hidden] { display: none; }
+    /* the wheel while a footswitch of the Nano is turned */
+    .wheel-overlay { position: fixed; inset: 0; z-index: 75; display: grid; place-items: center; background: rgba(0, 0, 0, .45); }
+    .wheel-overlay[hidden] { display: none; }
+    .wheel-panel { width: min(580px, calc(100vw - 32px)); padding: 20px 22px 18px; border-radius: 20px; border: 1px solid #2a2e33; background: #121417;
+      box-shadow: 0 30px 60px rgba(0,0,0,.6); display: grid; gap: 10px; text-align: center; }
+    .wheel-head { display: flex; align-items: center; gap: 12px; text-align: left; margin-bottom: 8px; }
+    .wheel-head .fx-icon { --block-color: #f2f2f2; width: 44px; height: 44px; border-radius: 9px; flex: none; }
+    .wheel-cap { font-size: 12px; letter-spacing: .16em; color: #a9adb3; }
+    .wheel-where { font-size: 18px; color: #f2f2f2; margin-top: 2px; }
+    .wheel-dots { margin-left: auto; display: flex; gap: 6px; }
+    .wheel-dots i { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #4a4e53; }
+    .wheel-dots i.on { background: #45F862; border-color: #45F862; }
+    .wheel-prev, .wheel-next { font-size: 18px; color: #5e6369; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wheel-now { padding: 16px 12px; border-radius: 14px; border: 2px solid #45F862; background: color-mix(in srgb, #45F862 12%, #0b0c0d);
+      font-size: 30px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wheel-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12px; color: #7c8187; }
+    .wheel-foot .aud-btn[hidden] { display: none; }
     .aud-bar .nm { font-size: 14px; font-weight: 650; color: #f2f2f2; margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .aud-bar .nm small { display: block; font-size: 11px; color: #8e9297; font-weight: 500; margin-top: 2px; }
     .aud-btn { padding: 7px 12px; border-radius: 9px; border: 1px solid #3a3f45; background: #16191c; color: #f2f2f2; font: inherit; font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; text-transform: none; letter-spacing: 0; }
@@ -3917,6 +3934,7 @@
     async function selectCaptureSlot(slotNumber) {
       const slot = Number(slotNumber);
       if (!Number.isFinite(slot) || slot < 0 || slot > 25) return;
+      rot.quietUntil = Date.now() + 700;
 
       state.capture.selectedSlot = slot;
       state.capture.on = slot !== 0;
@@ -3938,6 +3956,7 @@
     async function selectCabIRSlot(slotNumber) {
       const slot = Number(slotNumber);
       if (!Number.isFinite(slot) || slot < 0 || slot > 5) return;
+      rot.quietUntil = Date.now() + 700;
 
       state.cabIR.selectedSlot = slot;
       state.cabIR.on = slot !== 0;
@@ -4692,6 +4711,7 @@ function parseSelectedCaptureState(payload) {
       SaveExpAssignmentsRequest: 62,
       TunerMetering: 128,
       TempoScreen: 145,
+      Selector: 28,
       AuditioningEnableDisableRequest: 148,
       AuditioningEnableDisableResponse: 149,
       AuditioningListenCaptureRequest: 150,
@@ -4804,7 +4824,13 @@ function parseSelectedCaptureState(payload) {
     function handleTypedMessage(data) {
       const type = frameType(data);
 
+      if (type === MSG.Selector) {
+        handleSelector(data);
+        return true;
+      }
+
       if (type === MSG.SetPresetSlotsRequest) {
+        rot.quietUntil = Date.now() + 1500;   // (the capture that comes with a preset change is no turning)
         // Preset changed on the device (footswitch, knob) - mirror the app: update,
         // acknowledge, then re-read the state.
         const fields = framePayloadFields(data);
@@ -6321,6 +6347,94 @@ function parseSelectedCaptureState(payload) {
       if (send && state.connected) writeC304('Tuner off', tunerModeFrame(false));
     }
 
+    // ---- The Nano's rotary footswitches: the wheel (as on the controller) ----
+    // Turning footswitch I steps through the capture slots of the bank (bypass, 1-5, bypass ...), II through the cab
+    // slots. The Nano reports each step as SelectorValue (28) { 3: selector, 4: value }: 1 = capture position in the
+    // bank (0 = bypass, left out), 0 (left out) = the capture bank 1-5, 3 = cab slot. The editor shows the one before,
+    // now and after, and "Back to" the slot the turning started from; it closes 2 s after the last step. Not for the
+    // echo of the editor's own selections, nor for the capture that comes with a preset change on the Nano.
+    const rot = { quietUntil: 0, on: false, cab: false, from: 0, bank: 1, last: 0, timer: null, readTimer: null };
+
+    function handleSelector(data) {
+      const fields = framePayloadFields(data);
+      const num = n => (fields[n] && fields[n][0] && fields[n][0].wire === 0 ? fields[n][0].value : 0);
+      const which = num(3), value = num(4);
+      log('RX selector ' + which + ' = ' + value);
+      clearTimeout(rot.readTimer);   // the editor's cards follow with the next state (one read for several steps)
+      rot.readTimer = setTimeout(() => { if (state.connected) requestCurrentPresetState(); }, 450);
+      if (Date.now() < rot.quietUntil) return;
+      const active = state.capture.activeSlot || 0;
+      const bank = active ? Math.floor((active - 1) / 5) + 1 : rot.bank;
+      const position = active ? (active - 1) % 5 + 1 : 0;
+      let cab = false, slot;
+      if (which === 1) { slot = value ? (bank - 1) * 5 + value : 0; rot.bank = bank; }
+      else if (which === 0) { if (value < 1 || value > 5) return; rot.bank = value; slot = position ? (value - 1) * 5 + position : 0; }
+      else if (which === 3) { cab = true; slot = value; }
+      else return;
+      const before = cab ? (state.cabIR.on ? state.cabIR.stateSlot || state.cabIR.selectedSlot || 0 : 0) : active;
+      if (!rot.on || rot.cab !== cab || Date.now() - rot.last > 2500) rot.from = before;
+      rot.on = true;
+      rot.cab = cab;
+      rot.last = Date.now();
+      if (cab) state.cabIR.selectedSlot = slot;
+      else { state.capture.activeSlot = slot || null; if (slot) rot.bank = Math.floor((slot - 1) / 5) + 1; }
+      showWheel(cab, slot);
+    }
+
+    function wheelName(cab, slot) {
+      if (!slot) return 'Bypass';
+      const name = cab ? state.irNames.get(slot) : state.captureNames.get(slot);
+      return String(name || (cab ? 'Cab slot ' + slot : 'Capture slot ' + slot));
+    }
+
+    function showWheel(cab, slot) {
+      let overlay = $('wheelOverlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'wheelOverlay';
+        overlay.className = 'wheel-overlay';
+        overlay.innerHTML = '<div class="wheel-panel" role="dialog" aria-label="Turned on the Nano"><div class="wheel-head"><span class="fx-icon" id="wheelIcon"></span>' +
+          '<div><div class="wheel-cap" id="wheelCap"></div><div class="wheel-where" id="wheelWhere"></div></div><span class="wheel-dots" id="wheelDots"></span></div>' +
+          '<div class="wheel-prev" id="wheelPrev"></div><div class="wheel-now" id="wheelNow"></div><div class="wheel-next" id="wheelNext"></div>' +
+          '<div class="wheel-foot"><span>closes by itself after 2 s</span><button class="aud-btn" id="wheelBack"></button></div></div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', e => { if (e.target === overlay) closeWheel(); });
+        $('wheelBack').addEventListener('click', () => {
+          const from = rot.from, wasCab = rot.cab;
+          closeWheel();
+          if (wasCab) selectCabIRSlot(from);
+          else if (!from) selectCaptureSlot(0);
+          else {   // slot 1-25 over all banks: "bank and capture" (selector 4), as the library load does it
+            rot.quietUntil = Date.now() + 700;
+            writeC304('Capture slot ' + from + ' (back)', buildFrame([0x18, 0x04, 0x20, from - 1], MSG.Selector));
+            setTimeout(requestCurrentPresetState, 300);
+          }
+        });
+      }
+      const base = cab ? 0 : (rot.bank - 1) * 5;
+      const position = cab ? slot : (slot ? (slot - 1) % 5 + 1 : 0);
+      const prev = position === 0 ? 5 : position - 1, next = position === 5 ? 0 : position + 1;
+      $('wheelIcon').style.setProperty('--icon', 'var(--ico-' + (cab ? 'cab' : 'capture') + ')');
+      $('wheelCap').textContent = cab ? 'CAB / IR · FOOTSWITCH II' : 'CAPTURE · FOOTSWITCH I';
+      $('wheelWhere').textContent = cab ? (slot ? 'Slot ' + slot + ' of 5' : 'Bypass') : 'Bank ' + rot.bank + ' · ' + (slot ? 'slot ' + position : 'bypass');
+      $('wheelDots').innerHTML = [1, 2, 3, 4, 5].map(i => '<i class="' + (i === position ? 'on' : '') + '"></i>').join('');
+      $('wheelPrev').textContent = wheelName(cab, prev ? base + prev : 0);
+      $('wheelNow').textContent = wheelName(cab, slot);
+      $('wheelNext').textContent = wheelName(cab, next ? base + next : 0);
+      $('wheelBack').hidden = rot.from === slot;
+      $('wheelBack').textContent = 'Back to ' + wheelName(cab, rot.from);
+      overlay.hidden = false;
+      clearTimeout(rot.timer);
+      rot.timer = setTimeout(closeWheel, 2000);
+    }
+
+    function closeWheel() {
+      clearTimeout(rot.timer);
+      const overlay = $('wheelOverlay');
+      if (overlay) overlay.hidden = true;
+      rot.on = false;
+    }
+
     // ---- Tempo and metronome (NanOS 2.3.0; TempoScreenMessage 145, as Cortex Cloud 2.8.3 uses it) ----
     // The tempo comes with every state: 55 tempoIsGlobal, 56 tempo (float32), 61 externalMidiClockRunning.
     // TempoScreenMessage { 3 tempoScreenActive, 4 tempoIsGlobal, 5 tempo (float32), 6 externalMidiClockRunning,
@@ -6627,6 +6741,7 @@ function parseSelectedCaptureState(payload) {
       state.capture.on = true;
       state.capture.lastActiveSlot = slot;
 
+      rot.quietUntil = Date.now() + 700;
       await writeC304('08C0 capture change ' + slot, new Uint8Array([0x08, 0xC0, 0x18, 0x04, 0x20, index, 0x1C, 0x00, 0x00, 0x00]));
 
       renderCaptureIR();
