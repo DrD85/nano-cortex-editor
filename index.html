@@ -592,6 +592,27 @@
     }
     .lib-item:hover { background: #171717; border-color: #2e2e2e; }
     .lib-item.current { border-color: #45F862; }
+    /* listening to a capture without loading it (auditioning): a play button in each row, a bar at the bottom */
+    #libraryOverlay .lib-panel { grid-template-rows: auto auto auto auto minmax(0, 1fr) auto; }
+    #libraryOverlay .lib-item { grid-template-columns: 34px minmax(0, 1fr) auto; }
+    .aud-play { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #3a3f45; background: transparent; color: #e6e8ea; display: grid; place-items: center; cursor: pointer; flex: none; }
+    .aud-play:hover { border-color: #8a8f95; color: #fff; }
+    .aud-play svg { width: 14px; height: 14px; fill: currentColor; }
+    .aud-play.on { background: #45F862; border-color: #45F862; color: #0b0b0b; }
+    .aud-play.wait { opacity: .55; }
+    .lib-item.aud { border-color: #45F862; background: color-mix(in srgb, #45F862 10%, #0d0d0d); }
+    .aud-live { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #7ff593; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; }
+    .aud-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+    .aud-eq i { width: 3px; background: #45F862; border-radius: 1px; animation: aud-eq 0.9s ease-in-out infinite alternate; }
+    .aud-eq i:nth-child(2) { animation-delay: -.3s; } .aud-eq i:nth-child(3) { animation-delay: -.6s; }
+    @keyframes aud-eq { from { height: 25%; } to { height: 100%; } }
+    @media (prefers-reduced-motion: reduce) { .aud-eq i { animation: none; height: 70%; } }
+    .aud-bar { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid #45F862; background: color-mix(in srgb, #45F862 12%, #0d0d0d); }
+    .aud-bar[hidden] { display: none; }
+    .aud-bar .nm { font-size: 14px; font-weight: 650; color: #f2f2f2; margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .aud-bar .nm small { display: block; font-size: 11px; color: #8e9297; font-weight: 500; margin-top: 2px; }
+    .aud-btn { padding: 7px 12px; border-radius: 9px; border: 1px solid #3a3f45; background: #16191c; color: #f2f2f2; font: inherit; font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; text-transform: none; letter-spacing: 0; }
+    .aud-btn.primary { background: #f2f2f2; color: #0b0b0b; border-color: #f2f2f2; }
     .lib-item .fx-icon { --block-color: #f2f2f2; width: 34px; height: 34px; border-radius: 8px; }
     .lib-item .fx-icon::after { inset: 5px; }
     .lib-name { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2435,6 +2456,12 @@
       </div>
       <div id="libCount" class="lib-count"></div>
       <div id="libList" class="lib-list"></div>
+      <div id="audBar" class="aud-bar" hidden>
+        <span id="audBarStop" class="aud-play on" role="button" tabindex="0" title="Stop listening" aria-label="Stop listening"></span>
+        <span class="nm"><span id="audBarName"></span><small id="audBarNote">Listening – your slot and preset stay as they are</small></span>
+        <button id="audStop" class="aud-btn">Stop</button>
+        <button id="audLoad" class="aud-btn primary">Load into a slot…</button>
+      </div>
     </div>
   </div>
 
@@ -3378,6 +3405,7 @@
     function closeDeviceDialogs() {
       closeTuner(false);
       closeMetro(false);
+      auditionEnded('');
       closeExpPanel();
       closeFootswitches();
       closeLibraryBrowser();
@@ -3512,6 +3540,8 @@
       if (!metro.editing) metro.global = Boolean(varintField(55, 0));
       metro.extClock = Boolean(varintField(61, 0));
       metroRefresh();
+      // 64 captureAuditioningActive: the Nano ended the listening by itself (a preset change, its own controls)
+      if (audition.current && !varintField(64, 0) && Date.now() - audition.startedAt > 2000) auditionEnded('The Nano ended the listening.');
       log('Current preset: ' + state.selectedPreset + (state.presetDirty ? ' (edited)' : ''));
       if ((!$('expOverlay').hidden || state.mc6.mixSlot >= 0) && (state.exp.preset !== state.selectedPreset || !state.exp.loaded)) requestExpAssignments();
 
@@ -4601,6 +4631,10 @@ function parseSelectedCaptureState(payload) {
       SaveExpAssignmentsRequest: 62,
       TunerMetering: 128,
       TempoScreen: 145,
+      AuditioningEnableDisableRequest: 148,
+      AuditioningEnableDisableResponse: 149,
+      AuditioningListenCaptureRequest: 150,
+      AuditioningListenCaptureResponse: 151,
       RetrieveSettingsRequest: 65,
       RetrieveSettingsResponse: 66,
       UpdateSettingsRequest: 67,
@@ -4787,6 +4821,11 @@ function parseSelectedCaptureState(payload) {
 
       if (type === MSG.TempoScreen) {
         handleTempoScreen(data);
+        return true;
+      }
+
+      if (type === MSG.AuditioningListenCaptureResponse || type === MSG.AuditioningEnableDisableResponse) {
+        handleAuditionResponse(type, data);
         return true;
       }
 
@@ -5508,8 +5547,18 @@ function parseSelectedCaptureState(payload) {
         const row = document.createElement('button');
         row.className = 'lib-item' + (item.name.trim().toLowerCase() === currentName ? ' current' : '');
         row.title = item.description || item.name;
+        const playing = auditionIs(item);
+        if (playing) row.classList.add('aud');
         row.innerHTML = '<span class="fx-icon" style="--icon: var(--ico-' + type.icon + ')"></span>' +
-          '<span style="min-width:0"><div class="lib-name">' + escapeHTML(item.name) + '</div><div class="lib-meta">' + meta + tagsHTML + '</div></span>';
+          '<span style="min-width:0"><div class="lib-name">' + escapeHTML(item.name) + '</div><div class="lib-meta">' +
+          (playing ? '<span class="aud-live">' + AUD_EQ + 'Listening</span><span>·</span>' : '') + meta + tagsHTML + '</div></span>' +
+          '<span class="aud-play' + (playing ? ' on' : '') + (audition.pending ? ' wait' : '') + '" role="button" tabindex="0" title="' +
+          (playing ? 'Stop listening' : 'Listen without loading it into a slot') + '" aria-label="' + (playing ? 'Stop listening' : 'Listen') + '">' +
+          (playing ? AUD_STOP : AUD_PLAY) + '</span>';
+        const play = row.querySelector('.aud-play');
+        const toggle = e => { e.stopPropagation(); e.preventDefault(); if (auditionIs(item)) auditionStop(); else auditionStart(item); };
+        play.addEventListener('click', toggle);
+        play.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
         row.addEventListener('click', () => {
           closeLibraryBrowser();
           loadLibraryCapture(item.kind, item.index);
@@ -5528,6 +5577,77 @@ function parseSelectedCaptureState(payload) {
 
     function closeLibraryBrowser() {
       $('libraryOverlay').hidden = true;
+      if (audition.current) auditionStop();   // as the app: leaving the page ends the listening
+    }
+
+    // ---- Listening to a library capture without loading it (auditioning; as Cortex Cloud 2.8.3) ----
+    // AuditioningListenCaptureRequestMessage (150) { 3: factory id { 1: index, 2: name } | 4: user id { ... } } plays
+    // the capture in place of the preset's one; no slot and no preset changes. The reply (151) carries 3: status.
+    // Another capture: the next 150 (the app does not switch off in between). Stop: AuditioningEnableDisableRequest
+    // (148) { 2: requestId (the app: the time in ms), 3: enableCaptureAuditioning false }. The state tells in field 64
+    // whether the Nano is listening.
+    const AUD_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg>';
+    const AUD_STOP = '<svg viewBox="0 0 24 24" style="width:12px;height:12px"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+    const AUD_EQ = '<span class="aud-eq"><i></i><i></i><i></i></span>';
+    const audition = { current: null, pending: false, startedAt: 0 };
+    const auditionIs = item => Boolean(audition.current && audition.current.kind === item.kind && audition.current.index === item.index);
+    // a varint for numbers beyond 32 bits (the request id is a time in ms)
+    const varintBig = value => { const out = []; let v = Math.floor(value); while (v > 0x7F) { out.push((v % 128) | 0x80); v = Math.floor(v / 128); } out.push(v); return out; };
+
+    function auditionStart(item) {
+      if (!state.connected) { toast('Connect the Nano first.', 'error'); return; }
+      const nameBytes = Array.from(new TextEncoder().encode(item.name));
+      const identifier = [0x08, ...encodeVarint(item.index), 0x12, ...encodeVarint(nameBytes.length), ...nameBytes];
+      const frame = buildFrame([item.kind === 'factory' ? 0x1A : 0x22, ...encodeVarint(identifier.length), ...identifier], MSG.AuditioningListenCaptureRequest);
+      if (frame.length - 2 > 255) { toast('Capture name is too long.', 'error'); return; }
+      audition.current = { kind: item.kind, index: item.index, name: item.name };
+      audition.pending = true;
+      audition.startedAt = Date.now();
+      writeC304('Listen to ' + (item.kind === 'factory' ? 'factory' : 'user') + ' capture ' + item.index + ' "' + item.name + '"', frame);
+      renderAudition();
+    }
+
+    function auditionStop() {
+      if (!audition.current) return;
+      audition.current = null;
+      audition.pending = false;
+      if (state.connected) writeC304('Listening off', buildFrame([0x10, ...varintBig(Date.now()), 0x18, 0x00], MSG.AuditioningEnableDisableRequest));
+      renderAudition();
+    }
+
+    // the Nano stopped it, refused it, or the connection is gone
+    function auditionEnded(text) {
+      if (!audition.current) return;
+      audition.current = null;
+      audition.pending = false;
+      if (text) toast(text, 'info', 3500);
+      renderAudition();
+    }
+
+    function handleAuditionResponse(type, data) {
+      const fields = framePayloadFields(data);
+      const status = fields[3] && fields[3][0] ? fields[3][0].value : 0;
+      const message = fields[5] && fields[5][0] && fields[5][0].wire === 2 ? utf8(fields[5][0].raw) : '';
+      log('RX ' + (type === MSG.AuditioningListenCaptureResponse ? 'listen' : 'listening on/off') + ' reply: status ' + status + (message ? ' "' + message + '"' : '') + ' ' + hex(data));
+      if (type !== MSG.AuditioningListenCaptureResponse || !audition.current) return;
+      audition.pending = false;
+      if (status !== 1) auditionEnded('The Nano did not play the capture' + (message ? ': ' + message : '.'));   // OperationStatus 1 = success
+      else renderAudition();
+    }
+
+    function renderAudition() {
+      const a = audition.current;
+      $('audBar').hidden = !a;
+      if (a) {
+        $('audBarName').textContent = a.name;
+        $('audBarStop').innerHTML = AUD_STOP;
+        $('audBarNote').textContent = audition.pending ? 'Starting…' : 'Listening – your slot and preset stay as they are';
+      }
+      if (!$('libraryOverlay').hidden) {   // keep the list where it is
+        const list = $('libList'), top = list.scrollTop;
+        renderLibraryBrowser();
+        list.scrollTop = top;
+      }
     }
 
     // SetCabinetSlotContentRequestMessage { 3: cabinetSlot (0-4),
@@ -10541,6 +10661,15 @@ function parseSelectedCaptureState(payload) {
     $('expOverlay').addEventListener('click', e => { if (e.target === $('expOverlay')) closeExpPanel(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('expOverlay').hidden) closeExpPanel(); });
     $('libraryClose').addEventListener('click', closeLibraryBrowser);
+    $('audStop').addEventListener('click', auditionStop);
+    $('audBarStop').addEventListener('click', auditionStop);
+    $('audBarStop').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); auditionStop(); } });
+    $('audLoad').addEventListener('click', () => {   // the capture heard: into a slot as usual (the listening ends first)
+      const a = audition.current;
+      if (!a) return;
+      closeLibraryBrowser();
+      loadLibraryCapture(a.kind, a.index);
+    });
     $('libraryOverlay').addEventListener('click', e => { if (e.target === $('libraryOverlay')) closeLibraryBrowser(); });
     $('librarySearch').addEventListener('input', e => { state.libBrowser.q = e.target.value; renderLibraryBrowser(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('libraryOverlay').hidden) closeLibraryBrowser(); });
