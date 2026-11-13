@@ -609,6 +609,7 @@
     @media (prefers-reduced-motion: reduce) { .aud-eq i { animation: none; height: 70%; } }
     .aud-bar { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid #45F862; background: color-mix(in srgb, #45F862 12%, #0d0d0d); }
     .aud-bar[hidden] { display: none; }
+    #libraryOverlay .lib-chip-row[hidden] { display: none; }
     .aud-bar .nm { font-size: 14px; font-weight: 650; color: #f2f2f2; margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .aud-bar .nm small { display: block; font-size: 11px; color: #8e9297; font-weight: 500; margin-top: 2px; }
     .aud-btn { padding: 7px 12px; border-radius: 9px; border: 1px solid #3a3f45; background: #16191c; color: #f2f2f2; font: inherit; font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; text-transform: none; letter-spacing: 0; }
@@ -1457,7 +1458,7 @@
     :is(.capture-card, .cab-card) .block-title { order: 1; flex: 0 0 auto; }
     :is(.capture-card, .cab-card) > :is(select, .capture-row) { order: 2; flex: 1 1 190px; width: auto; min-width: 0; height: 40px; }
     .capture-row > select { width: 100%; height: 40px; }
-    .capture-card .head-actions, .cab-card #cabIRToggle { order: 3; flex: 0 0 auto; }
+    :is(.capture-card, .cab-card) .head-actions, .cab-card #cabIRToggle { order: 3; flex: 0 0 auto; }
     :is(.capture-card, .cab-card) > :is(.amp-face, .cabinet) { order: 4; flex: 1 1 100%; min-width: 0; }
     :is(.capture-card, .cab-card) > .mini-param-grid:empty { display: none; }
     .amp-face, .cabinet { padding: 10px 12px 8px; border: 1px solid #23272b; background: #0e1012; }
@@ -2089,8 +2090,11 @@
       <div class="top-card cab-card" id="cabCard" style="--block-color: var(--white);">
         <div class="block-head">
           <div class="block-title"><span class="fx-icon" style="--icon: var(--ico-cab)"></span><h2>Cab / IR</h2></div>
-          <div id="cabIRToggle" class="toggle-switch on" data-midi-id="toggle::cab" data-midi-target='{"kind":"toggle","target":"cab"}'>
-            <div class="toggle-dot"></div>
+          <div class="head-actions">
+            <button id="irLibraryBtn" class="icon-btn small" title="Browse the cab / IR library – listen to them without loading" aria-label="Cab / IR library"><span class="ico" style="--icon: var(--ico-library)"></span></button>
+            <div id="cabIRToggle" class="toggle-switch on" data-midi-id="toggle::cab" data-midi-target='{"kind":"toggle","target":"cab"}'>
+              <div class="toggle-dot"></div>
+            </div>
           </div>
         </div>
         <select id="irSelect"></select>
@@ -3009,7 +3013,7 @@
       presetSlots: { a1: -1, b1: -1, a2: -1, b2: -1 },
       library: { factory: [], user: [], irFactory: [], irUser: [], loaded: false, requested: false },
       exp: { preset: null, loaded: false, ranges: {}, bypass: {}, saveTimer: null, status: '', pending: null, queue: [] },
-      libBrowser: { q: '', source: 'all', version: 'all', type: 'all', instrument: 'all', tags: new Set() },
+      libBrowser: { mode: 'capture', q: '', irQ: '', source: 'all', irSource: 'all', version: 'all', type: 'all', instrument: 'all', tags: new Set() },
       tuner: { open: false, live: true, baseFrequency: 440, muted: false, logged: 0 },
       libraryBytes: [],
       libraryTimer: null,
@@ -3541,7 +3545,8 @@
       metro.extClock = Boolean(varintField(61, 0));
       metroRefresh();
       // 64 captureAuditioningActive: the Nano ended the listening by itself (a preset change, its own controls)
-      if (audition.current && !varintField(64, 0) && Date.now() - audition.startedAt > 2000) auditionEnded('The Nano ended the listening.');
+      // (65 irAuditioningActive for an IR)
+      if (audition.current && !varintField(isIrKind(audition.current.kind) ? 65 : 64, 0) && Date.now() - audition.startedAt > 2000) auditionEnded('The Nano ended the listening.');
       log('Current preset: ' + state.selectedPreset + (state.presetDirty ? ' (edited)' : ''));
       if ((!$('expOverlay').hidden || state.mc6.mixSlot >= 0) && (state.exp.preset !== state.selectedPreset || !state.exp.loaded)) requestExpAssignments();
 
@@ -4635,6 +4640,8 @@ function parseSelectedCaptureState(payload) {
       AuditioningEnableDisableResponse: 149,
       AuditioningListenCaptureRequest: 150,
       AuditioningListenCaptureResponse: 151,
+      AuditioningListenIrRequest: 158,
+      AuditioningListenIrResponse: 159,
       RetrieveSettingsRequest: 65,
       RetrieveSettingsResponse: 66,
       UpdateSettingsRequest: 67,
@@ -4824,7 +4831,7 @@ function parseSelectedCaptureState(payload) {
         return true;
       }
 
-      if (type === MSG.AuditioningListenCaptureResponse || type === MSG.AuditioningEnableDisableResponse) {
+      if (type === MSG.AuditioningListenCaptureResponse || type === MSG.AuditioningListenIrResponse || type === MSG.AuditioningEnableDisableResponse) {
         handleAuditionResponse(type, data);
         return true;
       }
@@ -5475,6 +5482,14 @@ function parseSelectedCaptureState(payload) {
 
     function renderLibraryBrowser() {
       const f = state.libBrowser;
+      const ir = f.mode === 'ir';
+      const panel = $('libraryOverlay');
+      panel.querySelector('.dlg-title').textContent = ir ? 'Cab / IR Library' : 'Capture Library';
+      panel.querySelector('.tuner-head .fx-icon').style.setProperty('--icon', 'var(--ico-' + (ir ? 'cab' : 'capture') + ')');
+      panel.querySelector('.lib-panel').setAttribute('aria-label', ir ? 'Cab / IR library' : 'Capture library');
+      $('librarySearch').placeholder = ir ? 'Search name …' : 'Search name, tag, author …';
+      ['libVersion', 'libTypes', 'libInstruments', 'libTags'].forEach(id => { $(id).hidden = ir; });
+      if (ir) { renderIrBrowser(); return; }
       const entries = libraryEntries();
       const set = change => { Object.assign(f, change); renderLibraryBrowser(); };
 
@@ -5547,18 +5562,7 @@ function parseSelectedCaptureState(payload) {
         const row = document.createElement('button');
         row.className = 'lib-item' + (item.name.trim().toLowerCase() === currentName ? ' current' : '');
         row.title = item.description || item.name;
-        const playing = auditionIs(item);
-        if (playing) row.classList.add('aud');
-        row.innerHTML = '<span class="fx-icon" style="--icon: var(--ico-' + type.icon + ')"></span>' +
-          '<span style="min-width:0"><div class="lib-name">' + escapeHTML(item.name) + '</div><div class="lib-meta">' +
-          (playing ? '<span class="aud-live">' + AUD_EQ + 'Listening</span><span>·</span>' : '') + meta + tagsHTML + '</div></span>' +
-          '<span class="aud-play' + (playing ? ' on' : '') + (audition.pending ? ' wait' : '') + '" role="button" tabindex="0" title="' +
-          (playing ? 'Stop listening' : 'Listen without loading it into a slot') + '" aria-label="' + (playing ? 'Stop listening' : 'Listen') + '">' +
-          (playing ? AUD_STOP : AUD_PLAY) + '</span>';
-        const play = row.querySelector('.aud-play');
-        const toggle = e => { e.stopPropagation(); e.preventDefault(); if (auditionIs(item)) auditionStop(); else auditionStart(item); };
-        play.addEventListener('click', toggle);
-        play.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+        libraryRowBody(row, item, type.icon, meta, tagsHTML);
         row.addEventListener('click', () => {
           closeLibraryBrowser();
           loadLibraryCapture(item.kind, item.index);
@@ -5567,10 +5571,58 @@ function parseSelectedCaptureState(payload) {
       });
     }
 
-    function openLibraryBrowser() {
+    // The cab / IR library in the same dialog: factory cabs and user IRs by name, each with a play button.
+    function renderIrBrowser() {
+      const f = state.libBrowser;
+      const entries = state.library.irFactory.map(item => ({ ...item, kind: 'irFactory' }))
+        .concat(state.library.irUser.map(item => ({ ...item, kind: 'irUser' })))
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+      const q = f.irQ.trim().toLowerCase();
+      const byQuery = entries.filter(item => !q || item.name.toLowerCase().includes(q));
+      const set = change => { Object.assign(f, change); renderLibraryBrowser(); };
+      renderChipRow('libSource', 'Source', [
+        { text: 'All', count: byQuery.length, active: f.irSource === 'all', onClick: () => set({ irSource: 'all' }) },
+        { text: 'Factory cabs', count: byQuery.filter(i => i.kind === 'irFactory').length, active: f.irSource === 'irFactory', onClick: () => set({ irSource: 'irFactory' }) },
+        { text: 'User IRs', count: byQuery.filter(i => i.kind === 'irUser').length, active: f.irSource === 'irUser', onClick: () => set({ irSource: 'irUser' }) }
+      ]);
+      const results = byQuery.filter(item => f.irSource === 'all' || item.kind === f.irSource);
+      $('libCount').textContent = results.length + ' of ' + entries.length + ' cabs / IRs' + (state.library.loaded ? '' : ' (loading…)');
+      const list = $('libList');
+      list.innerHTML = '';
+      if (!results.length) {
+        list.innerHTML = '<div class="lib-empty">' + (entries.length ? 'No cabs / IRs match.' : 'The library has not been loaded from the Nano yet.') + '</div>';
+        return;
+      }
+      const current = String(state.currentIR.shortName || '').trim().toLowerCase();
+      let letter = null;
+      results.forEach(item => {
+        const first = item.name.charAt(0).toUpperCase();
+        const heading = /[A-Z]/.test(first) ? first : '#';
+        if (heading !== letter) {
+          letter = heading;
+          const h = document.createElement('div');
+          h.className = 'lib-letter';
+          h.textContent = heading;
+          list.appendChild(h);
+        }
+        const row = document.createElement('button');
+        row.className = 'lib-item' + (item.name.trim().toLowerCase() === current ? ' current' : '');
+        row.title = item.name;
+        libraryRowBody(row, item, 'cab', '<span>' + (item.kind === 'irFactory' ? 'Factory cab' : 'User IR') + '</span>', '');
+        row.addEventListener('click', () => {
+          closeLibraryBrowser();
+          loadLibraryCab(item.kind, item.index);
+        });
+        list.appendChild(row);
+      });
+    }
+
+    function openLibraryBrowser(mode = 'capture') {
+      if (state.libBrowser.mode !== mode && audition.current) auditionStop();   // the other library: what was playing ends
+      state.libBrowser.mode = mode;
       $('libraryOverlay').hidden = false;
       if (state.connected && !state.library.loaded && state.stateMode !== 'library') requestLibraryContent();   // the first request got no reply
-      $('librarySearch').value = state.libBrowser.q;
+      $('librarySearch').value = mode === 'ir' ? state.libBrowser.irQ : state.libBrowser.q;
       renderLibraryBrowser();
       $('librarySearch').focus();
     }
@@ -5590,6 +5642,23 @@ function parseSelectedCaptureState(payload) {
     const AUD_STOP = '<svg viewBox="0 0 24 24" style="width:12px;height:12px"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
     const AUD_EQ = '<span class="aud-eq"><i></i><i></i><i></i></span>';
     const audition = { current: null, pending: false, startedAt: 0 };
+    const isIrKind = kind => kind === 'irFactory' || kind === 'irUser';
+
+    // a library row: icon, name, meta, and the play button (captures and IRs alike)
+    function libraryRowBody(row, item, icon, meta, tagsHTML) {
+      const playing = auditionIs(item);
+      if (playing) row.classList.add('aud');
+      row.innerHTML = '<span class="fx-icon" style="--icon: var(--ico-' + icon + ')"></span>' +
+        '<span style="min-width:0"><div class="lib-name">' + escapeHTML(item.name) + '</div><div class="lib-meta">' +
+        (playing ? '<span class="aud-live">' + AUD_EQ + 'Listening</span><span>·</span>' : '') + meta + tagsHTML + '</div></span>' +
+        '<span class="aud-play' + (playing ? ' on' : '') + (audition.pending ? ' wait' : '') + '" role="button" tabindex="0" title="' +
+        (playing ? 'Stop listening' : 'Listen without loading it into a slot') + '" aria-label="' + (playing ? 'Stop listening' : 'Listen') + '">' +
+        (playing ? AUD_STOP : AUD_PLAY) + '</span>';
+      const play = row.querySelector('.aud-play');
+      const toggle = e => { e.stopPropagation(); e.preventDefault(); if (auditionIs(item)) auditionStop(); else auditionStart(item); };
+      play.addEventListener('click', toggle);
+      play.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+    }
     const auditionIs = item => Boolean(audition.current && audition.current.kind === item.kind && audition.current.index === item.index);
     // a varint for numbers beyond 32 bits (the request id is a time in ms)
     const varintBig = value => { const out = []; let v = Math.floor(value); while (v > 0x7F) { out.push((v % 128) | 0x80); v = Math.floor(v / 128); } out.push(v); return out; };
@@ -5598,20 +5667,26 @@ function parseSelectedCaptureState(payload) {
       if (!state.connected) { toast('Connect the Nano first.', 'error'); return; }
       const nameBytes = Array.from(new TextEncoder().encode(item.name));
       const identifier = [0x08, ...encodeVarint(item.index), 0x12, ...encodeVarint(nameBytes.length), ...nameBytes];
-      const frame = buildFrame([item.kind === 'factory' ? 0x1A : 0x22, ...encodeVarint(identifier.length), ...identifier], MSG.AuditioningListenCaptureRequest);
-      if (frame.length - 2 > 255) { toast('Capture name is too long.', 'error'); return; }
+      const ir = isIrKind(item.kind);
+      // the IR request has the same shape: { 3: factory IR { 1: index, 2: name } | 4: user IR { ... } }
+      const frame = buildFrame([item.kind === 'factory' || item.kind === 'irFactory' ? 0x1A : 0x22, ...encodeVarint(identifier.length), ...identifier],
+        ir ? MSG.AuditioningListenIrRequest : MSG.AuditioningListenCaptureRequest);
+      if (frame.length - 2 > 255) { toast('The name is too long.', 'error'); return; }
+      if (audition.current && isIrKind(audition.current.kind) !== ir) auditionStop();   // one at a time
       audition.current = { kind: item.kind, index: item.index, name: item.name };
       audition.pending = true;
       audition.startedAt = Date.now();
-      writeC304('Listen to ' + (item.kind === 'factory' ? 'factory' : 'user') + ' capture ' + item.index + ' "' + item.name + '"', frame);
+      writeC304('Listen to ' + (item.kind === 'factory' || item.kind === 'irFactory' ? 'factory' : 'user') + (ir ? ' IR ' : ' capture ') + item.index + ' "' + item.name + '"', frame);
       renderAudition();
     }
 
     function auditionStop() {
       if (!audition.current) return;
+      const ir = isIrKind(audition.current.kind);
       audition.current = null;
       audition.pending = false;
-      if (state.connected) writeC304('Listening off', buildFrame([0x10, ...varintBig(Date.now()), 0x18, 0x00], MSG.AuditioningEnableDisableRequest));
+      // { 2: requestId, 3: enableCaptureAuditioning false } or { 2: requestId, 4: enableIrAuditioning false }
+      if (state.connected) writeC304('Listening off' + (ir ? ' (IR)' : ''), buildFrame([0x10, ...varintBig(Date.now()), ir ? 0x20 : 0x18, 0x00], MSG.AuditioningEnableDisableRequest));
       renderAudition();
     }
 
@@ -5628,10 +5703,11 @@ function parseSelectedCaptureState(payload) {
       const fields = framePayloadFields(data);
       const status = fields[3] && fields[3][0] ? fields[3][0].value : 0;
       const message = fields[5] && fields[5][0] && fields[5][0].wire === 2 ? utf8(fields[5][0].raw) : '';
-      log('RX ' + (type === MSG.AuditioningListenCaptureResponse ? 'listen' : 'listening on/off') + ' reply: status ' + status + (message ? ' "' + message + '"' : '') + ' ' + hex(data));
-      if (type !== MSG.AuditioningListenCaptureResponse || !audition.current) return;
+      const listen = type === MSG.AuditioningListenCaptureResponse || type === MSG.AuditioningListenIrResponse;
+      log('RX ' + (listen ? 'listen' : 'listening on/off') + ' reply: status ' + status + (message ? ' "' + message + '"' : '') + ' ' + hex(data));
+      if (!listen || !audition.current || (type === MSG.AuditioningListenIrResponse) !== isIrKind(audition.current.kind)) return;
       audition.pending = false;
-      if (status !== 1) auditionEnded('The Nano did not play the capture' + (message ? ': ' + message : '.'));   // OperationStatus 1 = success
+      if (status !== 1) auditionEnded('The Nano did not play ' + (isIrKind(audition.current.kind) ? 'the IR' : 'the capture') + (message ? ': ' + message : '.'));   // OperationStatus 1 = success
       else renderAudition();
     }
 
@@ -10655,7 +10731,8 @@ function parseSelectedCaptureState(payload) {
     });
     $('renameBtn').addEventListener('click', renamePreset);
     $('tunerBtn').addEventListener('click', () => openTuner(false));
-    $('libraryBtn').addEventListener('click', openLibraryBrowser);
+    $('libraryBtn').addEventListener('click', () => openLibraryBrowser('capture'));
+    $('irLibraryBtn').addEventListener('click', () => openLibraryBrowser('ir'));
     $('expBtn').addEventListener('click', openExpPanel);
     $('expClose').addEventListener('click', closeExpPanel);
     $('expOverlay').addEventListener('click', e => { if (e.target === $('expOverlay')) closeExpPanel(); });
@@ -10668,10 +10745,11 @@ function parseSelectedCaptureState(payload) {
       const a = audition.current;
       if (!a) return;
       closeLibraryBrowser();
-      loadLibraryCapture(a.kind, a.index);
+      if (isIrKind(a.kind)) loadLibraryCab(a.kind, a.index);
+      else loadLibraryCapture(a.kind, a.index);
     });
     $('libraryOverlay').addEventListener('click', e => { if (e.target === $('libraryOverlay')) closeLibraryBrowser(); });
-    $('librarySearch').addEventListener('input', e => { state.libBrowser.q = e.target.value; renderLibraryBrowser(); });
+    $('librarySearch').addEventListener('input', e => { state.libBrowser[state.libBrowser.mode === 'ir' ? 'irQ' : 'q'] = e.target.value; renderLibraryBrowser(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('libraryOverlay').hidden) closeLibraryBrowser(); });
     $('tunerClose').addEventListener('click', () => closeTuner());
     $('tunerOverlay').addEventListener('click', e => { if (e.target === $('tunerOverlay')) closeTuner(); });
