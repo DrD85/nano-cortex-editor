@@ -78,6 +78,10 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true,
       sandbox: true,
+      // Timers run on time behind other windows too: Chromium slows a hidden page's timers to once a second, and
+      // the editor following the Nano or the controller (a preset change, the effect reads one after the other,
+      // connecting again) took several seconds while the window was in the background.
+      backgroundThrottling: false,
       preload: path.join(__dirname, 'preload.js')   // the bridges to the helpers: meter, monitor, spectrum, jam tracks
     }
   });

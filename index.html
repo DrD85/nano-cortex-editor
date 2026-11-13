@@ -3268,7 +3268,10 @@
     // Mac app: connect without a click - at start and after a lost link (the board restarting, flashing). The app
     // runs the connect as a gesture for the page (Bluetooth may only be asked for after a click); a Disconnect of the
     // user's own stops it until Connect is clicked again. Not in a browser: there the click stays.
-    const autoLink = { wanted: true, auto: false, timer: null, tries: 0 };
+    // boardAlone: the controller was there but did not let the editor in - it does so only while it holds the Nano
+    // (after a lost link, until it finds the Nano again). Then tried less often: every try takes the controller's
+    // radio from its search for the Nano, which can be found for only a few seconds.
+    const autoLink = { wanted: true, auto: false, timer: null, tries: 0, boardAlone: false };
     const autoLinkAvailable = () => Boolean(window.nanoWindow && typeof window.nanoWindow.autoConnect === 'function');
     function scheduleAutoConnect(ms) {
       if (!autoLinkAvailable() || !autoLink.wanted || state.connected) return;
@@ -3303,7 +3306,7 @@
         connectBusy = false;
         $('connectBtn').disabled = false;
         if (state.connected) autoLink.tries = 0;
-        else scheduleAutoConnect(autoLink.tries < 3 ? 2000 : autoLink.tries < 14 ? 5000 : 20000);   // (soon, then every 5 s for a minute, then every 20 s)
+        else scheduleAutoConnect(autoLink.boardAlone ? 10000 : autoLink.tries < 3 ? 2000 : autoLink.tries < 14 ? 5000 : 20000);   // (soon, then every 5 s for a minute, then every 20 s)
         autoLink.auto = false;
       }
     }
@@ -3385,7 +3388,16 @@
         }
 
         if (!state.c304 || !state.c305) throw new Error('C304/C305 not found under A002/A003');
-        await state.c305.startNotifications();
+        try {
+          await state.c305.startNotifications();
+        } catch (err) {
+          if (/controller/i.test(device.name || '')) {
+            if (!autoLink.boardAlone) log('The controller does not hold the Nano yet - trying again every 10 s.');
+            autoLink.boardAlone = true;
+          }
+          throw err;
+        }
+        autoLink.boardAlone = false;
         state.c305.addEventListener('characteristicvaluechanged', onC305);
 
         state.connected = true;
@@ -3397,7 +3409,7 @@
         log('C305 notifications enabled. Loading metadata and current preset state...');
       } catch (err) {
         log('Connect failed: ' + err.message);
-        setStatus('Disconnected');
+        setStatus(autoLink.boardAlone ? 'Controller is looking for the Nano' : 'Disconnected');
         // The list was closed without a device - often because the Nano was not in it: it only shows while nothing
         // else holds its one Bluetooth connection.
         if (err && err.name === 'NotFoundError' && !autoLink.auto) {   // (an automatic try says nothing: it tries again)
@@ -3478,7 +3490,7 @@
 
     function onDisconnected() {
       state.connected = false;
-      scheduleAutoConnect(3000);   // Mac app: a lost link is taken up again (not after the user's Disconnect)
+      scheduleAutoConnect(1500);   // Mac app: a lost link is taken up again (not after the user's Disconnect)
       state.viaController = false;
       state.library.requested = false;   // read again on the next connection: Cortex Cloud may have changed it
       state.libraryRx = null;
@@ -3499,7 +3511,7 @@
       state.settingsAsked = false;
       clearLocalEdit();
       renderMutes();
-      setStatus('Disconnected');
+      setStatus(autoLink.boardAlone ? 'Controller is looking for the Nano' : 'Disconnected');
       log('Disconnected.');
     }
 
@@ -3766,9 +3778,12 @@
       requestCabIRParamRefresh();
       queueFXParamRefreshes();
 
+      // Through the controller its footswitches and FX presets first: the controller answers those itself within a
+      // second, the library takes the Nano several seconds (it waits until they are through, see there).
+      if (state.viaController && !fsLink.asked) setTimeout(fsLinkStart, 300);
       if (!state.library.requested) {
         state.library.requested = true;
-        setTimeout(requestLibraryContent, 2500);
+        setTimeout(requestLibraryContent, 1200);
       }
     }
 
@@ -5045,8 +5060,9 @@ function parseSelectedCaptureState(payload) {
 
     function requestLibraryContent(retry) {
       if (!state.connected) return;
-      if (state.stateMode !== 'idle' || state.pendingParamBlock || state.libraryRx) {
-        setTimeout(() => requestLibraryContent(retry), 1000);
+      // (not while the controller answers in several packets either: those are not told apart from the library's)
+      if (state.stateMode !== 'idle' || state.pendingParamBlock || state.libraryRx || ctl.waiter || fsLink.syncing) {
+        setTimeout(() => requestLibraryContent(retry), 250);
         return;
       }
 
@@ -5205,7 +5221,7 @@ function parseSelectedCaptureState(payload) {
       renderCaptureIR();
       if (!$('libraryOverlay').hidden) renderLibraryBrowser();
       renderOrganizer();
-      if (state.viaController) setTimeout(fsLinkStart, 500);   // the controller's footswitches and FX presets
+      if (state.viaController) setTimeout(fsLinkStart, 100);   // the controller's footswitches and FX presets
     }
 
     // Loads a library capture into a slot the user chooses (with the presets that use each slot) and uses that slot in
@@ -8874,7 +8890,7 @@ function parseSelectedCaptureState(payload) {
     // The board sends its eight fields as its screen shows them (60011 each, 60013 its settings) whenever they change;
     // the strip gives the screen's own commands back (60014, only those the board accepts from the editor). The four
     // favourite FX presets of each effect are the board's four FX presets of that model (60016-60023).
-    const fsLink = { tiles: {}, settings: null, asked: false, open: 0, folded: false, synced: false };
+    const fsLink = { tiles: {}, settings: null, asked: false, open: 0, folded: false, synced: false, syncing: false };
     try { fsLink.folded = localStorage.getItem('nanoFsStripFolded') === '1'; } catch (e) {}
     const SWITCH1_NAMES = ['FX / presets', 'FX / scenes', 'Presets / scenes', 'Presets, scenes, FX'];
     // The own banks' colours and symbols as on the board (its ui.c BANK_COLORS and tools/preset_icons.py - own drawings,
@@ -8948,8 +8964,10 @@ function parseSelectedCaptureState(payload) {
 
     async function fsLinkStart() {
       if (!state.connected || !state.viaController || fsLink.asked) return;
+      if (state.libraryRx) { setTimeout(fsLinkStart, 250); return; }   // the library coming: after it
       fsLink.asked = true;
-      await ctlRequest('Controller: footswitches', 60010, [], 1500);   // (the fields come as pushes, no answer)
+      // (no answer: the fields come as pushes - sent past the request queue, which would wait for one in vain)
+      writeC304('Controller: footswitches', ctlFrame(60010, []));
       fxpSyncAll();
     }
     function fsLinkEnd() {
@@ -9213,6 +9231,10 @@ function parseSelectedCaptureState(payload) {
     // favourites the board does not have (while there is room) - stored on both.
     async function fxpSyncAll() {
       if (!state.viaController) return;
+      fsLink.syncing = true;
+      try { await fxpSyncRun(); } finally { fsLink.syncing = false; }
+    }
+    async function fxpSyncRun() {
       const m = await ctlRequest('Controller: models with FX presets', 60018);
       if (!m || m.type !== 60019) { log('FX presets: the controller does not share them (older version?)'); return; }
       const types = new Set();
@@ -11288,6 +11310,7 @@ function parseSelectedCaptureState(payload) {
 
     function disconnect() {
       chooseNext = true;   // the next Connect opens the list (another device may be wanted)
+      autoLink.boardAlone = false;
       autoLink.wanted = false;   // (the user's own Disconnect: no automatic connecting until Connect is clicked)
       clearTimeout(autoLink.timer);
       if (state.device && state.device.gatt.connected) {
