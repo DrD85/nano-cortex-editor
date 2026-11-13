@@ -42,5 +42,7 @@ contextBridge.exposeInMainWorld('nanoJam', {
 
 // The minimal view makes the window small (and gives it its size back afterwards).
 contextBridge.exposeInMainWorld('nanoWindow', {
-  mini: on => ipcRenderer.invoke('window:mini', Boolean(on))
+  mini: on => ipcRenderer.invoke('window:mini', Boolean(on)),
+  // Connect without a click: the app calls the page's nanoConnectNow() as a gesture (Bluetooth needs one)
+  autoConnect: () => ipcRenderer.invoke('window:connect')
 });

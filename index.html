@@ -3265,6 +3265,28 @@
     // (the 18 KB preset list) were mixed into the current preset state and left the editor at "loading".
     let connectBusy = false;
 
+    // Mac app: connect without a click - at start and after a lost link (the board restarting, flashing). The app
+    // runs the connect as a gesture for the page (Bluetooth may only be asked for after a click); a Disconnect of the
+    // user's own stops it until Connect is clicked again. Not in a browser: there the click stays.
+    const autoLink = { wanted: true, auto: false, timer: null, tries: 0 };
+    const autoLinkAvailable = () => Boolean(window.nanoWindow && typeof window.nanoWindow.autoConnect === 'function');
+    function scheduleAutoConnect(ms) {
+      if (!autoLinkAvailable() || !autoLink.wanted || state.connected) return;
+      clearTimeout(autoLink.timer);
+      autoLink.timer = setTimeout(() => {
+        autoLink.timer = null;
+        if (!autoLink.wanted || state.connected || connectBusy) return;
+        autoLink.tries++;
+        window.nanoWindow.autoConnect();   // the app calls nanoConnectNow() as a gesture
+      }, ms);
+    }
+    window.nanoConnectNow = () => {
+      if (state.connected || connectBusy || !autoLink.wanted) return;
+      autoLink.auto = true;
+      log('Connecting automatically (try ' + autoLink.tries + ')...');
+      connectAll();
+    };
+
     async function connectAll() {
       if (connectBusy || state.connected) {
         log('Connect ignored: ' + (state.connected ? 'already connected.' : 'a connection is being set up.'));
@@ -3280,6 +3302,9 @@
       } finally {
         connectBusy = false;
         $('connectBtn').disabled = false;
+        if (state.connected) autoLink.tries = 0;
+        else scheduleAutoConnect(autoLink.tries < 3 ? 2000 : autoLink.tries < 14 ? 5000 : 20000);   // (soon, then every 5 s for a minute, then every 20 s)
+        autoLink.auto = false;
       }
     }
 
@@ -3375,7 +3400,7 @@
         setStatus('Disconnected');
         // The list was closed without a device - often because the Nano was not in it: it only shows while nothing
         // else holds its one Bluetooth connection.
-        if (err && err.name === 'NotFoundError') {
+        if (err && err.name === 'NotFoundError' && !autoLink.auto) {   // (an automatic try says nothing: it tries again)
           showNotice('Nano not in the list?', 'The Nano shows up only while nothing else is connected to it.' + NL + NL +
             '• Close the Cortex Cloud app on your phone (or switch the phone’s Bluetooth off).' + NL +
             '• Close other tabs or windows with the editor, and the Nano Cortex Controller if it is on.' + NL +
@@ -3383,7 +3408,7 @@
             'If it still does not appear, switch the Nano off and on.');
         }
         // the direct try took the few seconds in which a click may open the list
-        if (err && err.name === 'SecurityError') {
+        if (err && err.name === 'SecurityError' && !autoLink.auto) {
           chooseNext = true;
           showNotice('Choose the Nano', 'The Nano did not answer directly. Click Connect again to choose it from the list.');
         }
@@ -3453,6 +3478,7 @@
 
     function onDisconnected() {
       state.connected = false;
+      scheduleAutoConnect(3000);   // Mac app: a lost link is taken up again (not after the user's Disconnect)
       state.viaController = false;
       state.library.requested = false;   // read again on the next connection: Cortex Cloud may have changed it
       state.libraryRx = null;
@@ -11262,6 +11288,8 @@ function parseSelectedCaptureState(payload) {
 
     function disconnect() {
       chooseNext = true;   // the next Connect opens the list (another device may be wanted)
+      autoLink.wanted = false;   // (the user's own Disconnect: no automatic connecting until Connect is clicked)
+      clearTimeout(autoLink.timer);
       if (state.device && state.device.gatt.connected) {
         state.device.gatt.disconnect();
       } else {
@@ -11269,7 +11297,8 @@ function parseSelectedCaptureState(payload) {
       }
     }
 
-    $('connectBtn').addEventListener('click', () => { if (state.connected) toggleMoreMenu(); else connectAll(); });
+    $('connectBtn').addEventListener('click', () => { if (state.connected) toggleMoreMenu(); else { autoLink.wanted = true; autoLink.tries = 0; connectAll(); } });
+    scheduleAutoConnect(800);   // Mac app: connect at start
     function toggleMoreMenu(open) {
       const menu = $('moreMenu');
       menu.hidden = open === undefined ? !menu.hidden : !open;

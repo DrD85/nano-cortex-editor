@@ -181,6 +181,11 @@ app.whenReady().then(() => {
       if (b) win.setBounds(b, true);
     }
   });
+  // The editor connects by itself (at start, after a lost link): its Connect runs as a user gesture, which Bluetooth
+  // needs; the device is then picked by the select-bluetooth-device handler as after a click.
+  ipcMain.handle('window:connect', event => {
+    event.sender.executeJavaScript('window.nanoConnectNow && window.nanoConnectNow()', true).catch(() => {});
+  });
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
