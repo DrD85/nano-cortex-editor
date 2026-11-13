@@ -8946,6 +8946,22 @@ function parseSelectedCaptureState(payload) {
       if (fsLink.open) renderFsPop();
     }
 
+    // The two reverb settings: per setting a choice - the reverb as it is now, or one of its FX presets (the board's
+    // four of that model; their values and name are copied into the setting). Only once the FX presets are shared.
+    function rpChoices(st) {
+      const block = state.blocks[FX_SLOT_KEYS[st.mixSlot]];
+      const presets = fsLink.synced && block && block.model ? fxpFavourites(fxPresetsOf(block.model)).map(p => p.name) : [];
+      return [0, 1].map(n => {
+        const set = (st.rpSet >> n) & 1, name = st.rpNames[n] || 'Setting ' + (n + 1);
+        const from = set ? presets.indexOf(name) : -1;
+        return '<div class="q">Setting ' + (n + 1) + (set ? ' · ' + escapeHTML(name) : ' · not set') + '</div><select data-act="rp" data-n="' + n + '">' +
+          (set && from < 0 ? '<option value="keep" selected>' + escapeHTML(name) + ' (as it is)</option>' : '') +
+          (!set ? '<option value="keep" selected>Choose …</option>' : '') +
+          '<option value="now">The reverb as it is now</option>' +
+          presets.map((p, i) => '<option value="' + i + '"' + (i === from ? ' selected' : '') + '>FX preset: ' + escapeHTML(p) + '</option>').join('') + '</select>';
+      }).join('');
+    }
+
     // The own bank's fields: preset mode (not scenes, not the set list, not the looper)
     function bankMode() { const st = fsLink.settings; return Boolean(st && st.bank && !st.fxMode && !st.bank.scenes && !st.bank.setlist && !st.bank.looper); }
     // 'B': symbol << 18 | bank << 14 | slot << 11 | colour << 7 | preset (0 = the default preset of the field)
@@ -8999,7 +9015,7 @@ function parseSelectedCaptureState(payload) {
           const reverbs = state.blocks[FX_SLOT_KEYS[st.mixSlot]].models.filter(m => m.id && /reverb/i.test(m.category));
           html += '<div class="q">Reverb B</div><select data-act="revb"><option value="0">None</option>' +
             reverbs.map(m => '<option value="' + modelType(m) + '"' + (modelType(m) === kept ? ' selected' : '') + '>' + escapeHTML(m.name) + '</option>').join('') + '</select>' +
-            '<div class="q">Two settings: take the reverb as it is now</div><div class="seg"><button data-act="rp1">As setting 1</button><button data-act="rp2">As setting 2</button></div>';
+            rpChoices(st);
         }
       } else {
         html += '<p class="hint">' + escapeHTML(t.note || 'Nothing to set for this footswitch.') + '</p>';
@@ -9029,7 +9045,6 @@ function parseSelectedCaptureState(payload) {
         if (a === 'hold') { fsCommand('footswitch ' + sw + ' held', 'w', 0x100 | sw); return; }
         if (a.startsWith('s1:')) { fsCommand('footswitch 1', ']', layoutPacked(st.count, st.order, Number(a.slice(3)))); return; }
         if (a.startsWith('ab:')) { fsCommand('second effect switch', '>', ((sw - 3) << 8) | Number(a.slice(3))); return; }
-        if (a === 'rp1' || a === 'rp2') { fsCommand('reverb setting', '-', a === 'rp1' ? 1 : 2); return; }
         if (a === 'bank-1' || a === 'bank+1') { fsCommand('bank', 'k', a === 'bank-1' ? -1 : 1); return; }
         if (a.startsWith('bc:') || a.startsWith('bi:')) {
           const i = sw - 3, b = st.bank;
@@ -9069,7 +9084,11 @@ function parseSelectedCaptureState(payload) {
       const v = Number(sel.value);
       if (sel.dataset.act === 'bp') { const i = sw - 3; bankSet(i, v, st.bank.colors[i], st.bank.icons[i]); }
       else if (sel.dataset.act === 'b') fsCommand('second effect', 'A', (((8 + sw - 3) << 24) | v) >>> 0);
-      else if (sel.dataset.act === 'revb') {
+      else if (sel.dataset.act === 'rp') {   // a reverb setting: the reverb now (1 / 2) or an FX preset (0x100 | n << 4 | index)
+        const n = Number(sel.dataset.n);
+        if (sel.value === 'now') fsCommand('reverb setting ' + (n + 1) + ' from the reverb', '-', n + 1);
+        else if (sel.value !== 'keep') fsCommand('reverb setting ' + (n + 1) + ' from an FX preset', '-', 0x100 | n << 4 | Number(sel.value));
+      } else if (sel.dataset.act === 'revb') {
         // a B chosen while the switch is the mix switch is kept for later (w 2); while it swaps A / B it changes B
         const parked = !st.revB;
         fsCommand('reverb B', 'A', v ? ((((parked ? 2 : 0) << 24) | v) >>> 0) : 0);
