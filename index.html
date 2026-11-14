@@ -1853,6 +1853,31 @@
     .fxi-tips { margin: 10px 0 0; padding-left: 16px; font-size: 12.5px; line-height: 1.5; color: #b8bcc1; }
     .fxi-tips li + li { margin-top: 4px; }
     .fxi-foot { margin-top: 12px; padding-top: 10px; border-top: 1px solid #2c3035; font-size: 10.5px; line-height: 1.45; color: #6f747a; }
+    /* the large view of an effect (personal build, notes from img/fx-info/index.js): the original, starting points, tips */
+    .fxi-panel { width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: auto; border-top: 2px solid var(--block-color); }
+    .fxi-panel .fxi-sub { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; margin-left: 4px; }
+    .fxi-cols { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; margin-top: 16px; }
+    .fxi-photo { height: 210px; display: grid; place-items: center; border-radius: 12px; background: radial-gradient(circle at 50% 40%, #24282d, #15171a 70%); }
+    .fxi-photo img { max-width: 86%; max-height: 180px; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .6)); }
+    .fxi-cols .fxi-based { margin-top: 12px; }
+    .fxi-cols .fxi-based:first-child { margin-top: 0; }
+    .fxi-based span.made { display: block; margin: 3px 0 0; font-size: 11.5px; font-weight: 400; letter-spacing: 0; text-transform: none; color: #a9adb2; line-height: 1.4; }
+    .fxi-cap { margin: 14px 0 6px; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; font-weight: 500; }
+    .fxi-cols .fxi-cap:first-child { margin-top: 0; }
+    .fxi-heard { margin: 0; font-size: 12.5px; line-height: 1.5; color: #b8bcc1; }
+    .fxi-starts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .fxi-start { display: grid; grid-template-columns: 1fr auto; align-content: start; align-items: center; gap: 4px 10px; padding: 8px 10px;
+                 border-radius: 9px; border: 1px solid #2c3035; background: #15171a; }
+    .fxi-start b { font-size: 13px; font-weight: 600; color: #f2f2f2; }
+    .fxi-start .vals { grid-column: 1 / span 2; font-size: 11.5px; color: #9aa0a6; line-height: 1.45; font-variant-numeric: tabular-nums; }
+    .fxi-start .why { grid-column: 1 / span 2; font-size: 11.5px; color: #7d8288; line-height: 1.4; }
+    .fxi-start button { grid-column: 2; grid-row: 1; height: 28px; padding: 0 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+                        background: transparent; border: 1px solid color-mix(in srgb, var(--block-color) 70%, #33383e); color: #e6e7e8; }
+    .fxi-start button:hover { border-color: var(--block-color); }
+    .fxi-start.on { border-color: color-mix(in srgb, var(--block-color) 55%, #2c3035); }
+    .fxi-start.on button { background: var(--block-color); border-color: var(--block-color); color: var(--icon-ink); }
+    .fxi-panel .fxi-tips { margin-top: 0; }
+    @media (max-width: 760px) { .fxi-cols, .fxi-starts { grid-template-columns: 1fr; } }
 
     /* A/B compare: two segments next to Rename; the lit one is the side you hear */
     .ab-box { display: inline-flex; align-items: stretch; height: 40px; flex: none; border: 1px solid #3a3d40; border-radius: 10px; overflow: hidden;
@@ -2341,6 +2366,16 @@
           <button type="button" id="alStart" class="primary">Start</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="fxInfoOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel fxi-panel" role="dialog" aria-label="Effect info">
+      <div class="tuner-head">
+        <div class="block-title" id="fxiTitle"></div>
+        <button id="fxiClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+      </div>
+      <div id="fxiBody"></div>
     </div>
   </div>
 
@@ -3157,6 +3192,8 @@
     const postFx2Models = [].concat(deviceModels.postUtilityEQ.slice(1), deviceModels.delay);
     const postFx3Models = [].concat(deviceModels.postUtilityEQ.slice(1), deviceModels.reverb);
 
+    // Originals: Pedal Playground's photos (img/pp, the same as in the QC Editor); wahs, LA-2A, Whammy, Lexicon and the
+    // utility stand-ins: the pictures chosen before.
     const MODEL_IMAGES = {
       'Circular Delay': 'img/Circular delay.png',
       'Digital Delay (ST)': 'img/Digital Delay.png',
@@ -3183,42 +3220,42 @@
       'Bubba Wah': 'img/Budda Wah.png',
       'Crying Clyde Wah': 'img/Crying Clyde wah.png',
       'Crying Wah': 'img/cry Baby.png',
-      'Chief BD 2': 'img/BD 2.png',
-      'Chief BD2': 'img/BD 2.png',
-      'Chief OD1': 'img/OD-1.png',
-      'Exotic': 'img/Xotic-BB.png',
-      'Exotic Z Boost': 'img/Xotic RC Booster.png',
-      'Facial Fuzz': 'img/Dunlop Fuzzface.png',
-      'Green 808': 'img/808.png',
-      'Obsessive Drive': 'img/OCD.png',
-      'OD250': 'img/DOD Pre.png',
-      'Rodent Drive': 'img/ProRat.png',
-      'Exotic Bass Z Boost': 'img/Xotic Bass.png',
-      'Microtubes B3K': 'img/Darkglass.png',
+      'Chief BD 2': 'img/pp/boss-bd2.png',
+      'Chief BD2': 'img/pp/boss-bd2.png',
+      'Chief OD1': 'img/pp/boss-od1.png',
+      'Exotic': 'img/pp/xotic-bb.png',
+      'Exotic Z Boost': 'img/pp/xotic-rcbooster.png',
+      'Facial Fuzz': 'img/pp/dunlop-jdf2.png',
+      'Green 808': 'img/pp/ibanez-ts808.png',
+      'Obsessive Drive': 'img/pp/fulltone-ocd.png',
+      'OD250': 'img/pp/dod-250.png',
+      'Rodent Drive': 'img/pp/proco-rat.png',
+      'Exotic Bass Z Boost': 'img/pp/xotic-bass-rcboosterv2.png',
+      'Microtubes B3K': 'img/pp/darkglass-b3k.png',
       'Mind Hall': 'img/Lexicon224.png',
       'Shimmer': 'img/Shimmer Reverb.png',
-      'Blossom (ST)': 'img/Strymon BigSky.png',
-      'Poly Octaver': 'img/EHX Micro POG.png',
+      'Blossom (ST)': 'img/pp/strymon-bigsky.png',
+      'Poly Octaver': 'img/pp/ehx-micro-pog.png',
       'Wham': 'img/DigiTech Whammy.png',
-      'Chief OC2': 'img/Boss OC-2.png',
-      'Legendary 87 (M)': 'img/UA Comp.png',
-      'Legendary 87 (ST)': 'img/UA Comp.png',
+      'Chief OC2': 'img/pp/boss-oc2.png',
+      'Legendary 87 (M)': 'img/pp/ua-1176.png',
+      'Legendary 87 (ST)': 'img/pp/ua-1176.png',
       'Opto Comp (M)': 'img/Opto Comp.png',
       'Opto Comp (ST)': 'img/Opto Comp.png',
       'Solid State Comp (M)': 'img/SSL Comp.png',
       'Solid State Comp (ST)': 'img/SSL Comp.png',
       'VCA Comp (M)': 'img/VCA Comp.png',
       'VCA Comp (ST)': 'img/VCA Comp.png',
-      'Chief CE2W (ST)': 'img/Boos CE2w.png',
-      'Chief DC2W (ST)': 'img/Boss DC-2w.png',
-      'Chorus 229T': 'img/TC 2290.png',
-      'Dream Chorus (ST)': 'img/TC Dream.png',
-      'Dream Chorus': 'img/TC Dream.png',
-      'MX Flanger': 'img/MXR M11r.png',
-      'MX Phase 95': 'img/mxr phase 95.png',
-      'MX Vibes': 'img/MXR Univibe.png',
-      'MX Vibe': 'img/MXR Univibe.png',
-      'Love Meat': 'img/Lovetone Meatball.png',
+      'Chief CE2W (ST)': 'img/pp/boss-ce2w.png',
+      'Chief DC2W (ST)': 'img/pp/boss-dc2w.png',
+      'Chorus 229T': 'img/pp/tc-2290p.png',
+      'Dream Chorus (ST)': 'img/pp/tc-thedreamscape.png',
+      'Dream Chorus': 'img/pp/tc-thedreamscape.png',
+      'MX Flanger': 'img/pp/mxr-m117r.png',
+      'MX Phase 95': 'img/pp/mxr-m290.png',
+      'MX Vibes': 'img/pp/mxr-m68.png',
+      'MX Vibe': 'img/pp/mxr-m68.png',
+      'Love Meat': 'img/pp/lovetone-meatball.png',
       // Neural DSP's utility effects (no original): the nearest real device or Neural's own plugin picture
       'Adaptive Gate': 'img/Fortin Zuul.png',
       'Utility Gate': 'img/ISP Decimator.png',
@@ -3240,6 +3277,11 @@
         amps.src = 'img/amalgam/index.js';
         amps.onload = () => render();
         document.head.appendChild(amps);
+        // the richer effect notes with the real devices and starting points (private as well)
+        const notes = document.createElement('script');
+        notes.src = 'img/fx-info/index.js';
+        notes.onload = () => render();
+        document.head.appendChild(notes);
       };
       probe.src = Object.values(MODEL_IMAGES)[0];
     }
@@ -11570,6 +11612,10 @@ function parseSelectedCaptureState(payload) {
     // the other models get no reference. Texts and tips are our own short notes.
     const FX_INFO_FOOT = '"Based on" as stated by Neural DSP. Product names are trademarks of their owners and only name ' +
       'the original whose sound was modelled – no affiliation with this editor.';
+    const FX_INFO_FOOT_OWN = '"Based on" as named by Neural DSP or the Unofficial Quad Cortex Device List. Product names are trademarks of ' +
+      'their owners – no affiliation with this editor. Starting points are places to begin, not recipes.';
+    const FX_LIKE_FOOT = '"In the style of" names classic devices of the same kind for orientation – Neural DSP does not name an original ' +
+      'for this model. Starting points are places to begin, not recipes.';
     const COMP_TIP = 'Mix blends the uncompressed signal back in (parallel compression). (M) runs in the Pre slots, (ST) in stereo in the Post slots.';
     const REVERB_TIP = 'Pre Delay keeps the note clear before the reverb starts; High Pass and Low Pass keep the tail out of the mud and the fizz.';
     const FX_INFO = {
@@ -11683,9 +11729,97 @@ function parseSelectedCaptureState(payload) {
       'Shimmer': { cat: 'Reverb', text: 'Reverb with a pitch-shifted tail – the octave shimmer of ambient guitar.',
         tips: ['Pitch sets the interval of the tail (+12 is the classic octave), Feedback how much of it builds up.', REVERB_TIP] }
     };
-    const fxInfoOf = model => FX_INFO[String(model || '').replace(/\s*\((M|ST)\)$/, '')] || null;
+    // The personal build adds richer notes from img/fx-info/index.js (private: real devices, players, starting points);
+    // they replace the neutral text and tips of the same model and open in the large view instead of the popover.
+    const fxInfoOf = model => {
+      const key = String(model || '').replace(/\s*\((M|ST)\)$/, '');
+      const pub = FX_INFO[key], own = window.FX_INFO_PRIVATE && window.FX_INFO_PRIVATE[key];
+      return own ? Object.assign({}, pub || {}, own, { rich: true }) : pub || null;
+    };
+    // A starting point's values ({ Distortion: 2, Sync: 'On' }) on the block's own controls (names without case).
+    const fxStartParams = (block, start) => Object.entries(start.values || {}).map(([name, value]) => {
+      const param = block.params.find(p => p.name.toLowerCase() === name.toLowerCase());
+      if (!param) return null;
+      const raw = param.meta && param.meta.kind === 'enum' && typeof value === 'string'
+        ? param.meta.options.findIndex(o => String(o).toLowerCase() === value.toLowerCase()) : value;
+      const v = raw === -1 ? null : coerceParamValue(param, raw);
+      return v === null ? null : { param, value: v };
+    }).filter(Boolean);
+    const fxStartIsOn = (block, start) => {
+      const list = fxStartParams(block, start);
+      return list.length > 0 && list.every(({ param, value }) => Math.abs(param.value - value) <= (param.meta && param.meta.step || 0.1) / 2 + 1e-9);
+    };
+    const fxStartText = (block, start) => fxStartParams(block, start).map(({ param, value }) =>
+      param.name + ' ' + paramDisplayValue(Object.assign({}, param, { value }))).join(' · ');
+    function applyFxStart(blockKey, index) {
+      const block = state.blocks[blockKey], info = block && fxInfoOf(block.model), start = info && info.starts && info.starts[index];
+      if (!start) return;
+      const list = fxStartParams(block, start);
+      list.forEach(({ param, value }) => { param.value = value; });
+      block.fxPresetActive = -1;
+      render();
+      list.forEach(({ param }) => setFXParam(blockKey, param));
+      log(block.title + ': starting point "' + start.name + '"');
+      fillFxInfoDialog();
+    }
 
-    const fxInfo = { blockKey: null };
+    // The large view (pattern of the microphone dialog): picture and story on the left, starting points and tips on the right.
+    function openFxInfoDialog(blockKey) {
+      const block = state.blocks[blockKey], info = block && fxInfoOf(block.model);
+      if (!info) return;
+      closeFxInfo();
+      closeFxpList();
+      fxInfo.dialogKey = blockKey;
+      const style = fxStyle(block.models.find(m => m.name === block.model));
+      const panel = document.querySelector('#fxInfoOverlay .fxi-panel');
+      panel.style.setProperty('--block-color', style.color);
+      panel.style.setProperty('--icon-ink', iconInk(style.color));
+      $('fxiTitle').style.setProperty('--block-color', style.color);
+      $('fxiTitle').innerHTML = fxIconHTML(style.icon) + '<h2 class="dlg-title">' + escapeHTML(block.model) + '</h2><span class="fxi-sub">' +
+        escapeHTML(block.title + (info.cat ? ' · ' + info.cat : '')) + '</span>';
+      fillFxInfoDialog();
+      $('fxInfoOverlay').hidden = false;
+      $('fxiClose').focus();
+    }
+    function closeFxInfoDialog() {
+      $('fxInfoOverlay').hidden = true;
+      fxInfo.dialogKey = null;
+    }
+    function fillFxInfoDialog() {
+      const blockKey = fxInfo.dialogKey, block = blockKey && state.blocks[blockKey], info = block && fxInfoOf(block.model);
+      if (!info) return;
+      const picture = document.documentElement.classList.contains('pedal-pictures') && MODEL_IMAGES[block.model];
+      const original = info.basedOn || info.like;
+      $('fxiBody').innerHTML = '<div class="fxi-cols"><div>' +
+          (picture && (info.basedOn || info.photo) ? '<div class="fxi-photo"><img src="' + escapeHTML(picture) + '" alt=""></div>' : '') +
+          (original ? '<div class="fxi-based"><span>' + (info.basedOn ? 'Based on' : 'In the style of') + '</span>' + escapeHTML(original) +
+            (info.made ? '<span class="made">' + escapeHTML(info.made) + '</span>' : '') + '</div>' : '') +
+          '<p class="fxi-text">' + escapeHTML(info.text || '') + '</p>' +
+          (info.heard ? '<div class="fxi-cap">Heard on</div><p class="fxi-heard">' + escapeHTML(info.heard) + '</p>' : '') +
+        '</div><div>' +
+          (info.starts && info.starts.length ? '<div class="fxi-cap">Starting points</div><div class="fxi-starts">' +
+            info.starts.map((st, i) => {
+              const on = fxStartIsOn(block, st);
+              return '<div class="fxi-start' + (on ? ' on' : '') + '"><b>' + escapeHTML(st.name) + '</b>' +
+                '<button data-i="' + i + '" title="' + (on ? 'These are the current settings' : 'Set these values on the Nano (Orig on the card goes back)') + '">' +
+                (on ? 'Applied' : 'Apply') + '</button>' +
+                '<span class="vals">' + escapeHTML(fxStartText(block, st)) + '</span>' +
+                (st.why ? '<span class="why">' + escapeHTML(st.why) + '</span>' : '') + '</div>';
+            }).join('') + '</div>' : '') +
+          (info.tips && info.tips.length ? '<div class="fxi-cap">On the Nano</div><ul class="fxi-tips">' +
+            info.tips.map(t => '<li>' + escapeHTML(t) + '</li>').join('') + '</ul>' : '') +
+        '</div></div>' +
+        (original || info.starts ? '<div class="fxi-foot">' + escapeHTML(info.basedOn ? FX_INFO_FOOT_OWN : FX_LIKE_FOOT) + '</div>' : '');
+    }
+    $('fxiClose').addEventListener('click', closeFxInfoDialog);
+    $('fxInfoOverlay').addEventListener('click', e => { if (e.target === $('fxInfoOverlay')) closeFxInfoDialog(); });
+    $('fxiBody').addEventListener('click', e => {
+      const b = e.target.closest('.fxi-start button');
+      if (b && fxInfo.dialogKey) applyFxStart(fxInfo.dialogKey, Number(b.dataset.i));
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('fxInfoOverlay').hidden) closeFxInfoDialog(); });
+
+    const fxInfo = { blockKey: null, dialogKey: null };
 
     function closeFxInfo() {
       const pop = $('fxInfoPopover');
@@ -11694,6 +11828,7 @@ function parseSelectedCaptureState(payload) {
     }
 
     function toggleFxInfo(blockKey) {
+      { const b = state.blocks[blockKey], i = b && fxInfoOf(b.model); if (i && i.rich) { openFxInfoDialog(blockKey); return; } }
       if (fxInfo.blockKey === blockKey) { closeFxInfo(); return; }
       closeFxpList();
       const block = state.blocks[blockKey];
