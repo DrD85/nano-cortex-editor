@@ -452,6 +452,8 @@
 
     .tuner-panel {
       width: min(560px, calc(100vw - 32px));
+      max-height: calc(100vh - 16px);
+      overflow-y: auto;
       padding: 22px 24px 24px;
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -1911,7 +1913,7 @@
     .sc-tile.io.tempo .mt-beats { gap: 3px; }
     .sc-tile.io.tempo .mt-beats i { width: 5px; height: 5px; border-width: 1px; }
     .sc-tile.io.tempo .mt-beats i.acc { width: 6px; height: 6px; }
-    .mt-panel { width: min(760px, calc(100vw - 32px)); padding: 22px 24px 24px; border-radius: 20px; border: 1px solid #2a2e33; background: #121417; box-shadow: 0 30px 60px rgba(0,0,0,.6); }
+    .mt-panel { width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 16px); overflow-y: auto; padding: 22px 24px 24px; border-radius: 20px; border: 1px solid #2a2e33; background: #121417; box-shadow: 0 30px 60px rgba(0,0,0,.6); }
     .mt-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
     .mt-head h2 { margin: 0; font-size: 18px; font-weight: 650; color: #f2f2f2; display: flex; align-items: center; gap: 10px; }
     .mt-head .mt-tools { display: flex; align-items: center; gap: 10px; }
@@ -11720,7 +11722,7 @@ function parseSelectedCaptureState(payload) {
       'Modulated': { cat: 'Reverb', text: 'Reverb with a modulated, chorus-like tail – lush and wide.', tips: ['Mod Speed and Mod Depth set the movement of the tail.', REVERB_TIP] },
       'Ambience': { cat: 'Reverb', text: 'Early reflections that add space and size without an audible tail.', tips: ['Size sets how big the space feels.', REVERB_TIP] },
       'Cave': { cat: 'Reverb', text: 'Large, dark, cavernous space.', tips: ['Damping darkens the tail further.', REVERB_TIP] },
-      'Mind Hall': { cat: 'Reverb', basedOn: 'Lexicon 224', text: 'Lush hall from the classic digital studio reverb of the late 70s and 80s.', tips: ['Damping darkens the tail.', REVERB_TIP] },
+      'Mind Hall': { cat: 'Reverb', text: 'Lush hall from the classic digital studio reverb of the late 70s and 80s.', tips: ['Damping darkens the tail.', REVERB_TIP] },
       'Blossom': { cat: 'Reverb', basedOn: 'Strymon BigSky (Bloom mode)', text: 'A reverb that swells and blooms behind the note – large, slow and soft.',
         tips: ['Diffusion and E.R. Length set how slowly it blooms.', 'Ducking keeps it out of the way while you play.', REVERB_TIP] },
       'Shimmer': { cat: 'Reverb', text: 'Reverb with a pitch-shifted tail – the octave shimmer of ambient guitar.',
@@ -12087,8 +12089,8 @@ function parseSelectedCaptureState(payload) {
       },
       // ---------------------------------------------------------------- compressor
       'Legendary 87': {
-        basedOn: 'Universal Audio 1176LN',
-        made: '1967 · Universal Audio – designed by Bill Putnam; the first all-transistor (FET) limiter',
+        basedOn: 'Universal Audio 1176',
+        made: '1967 · Universal Audio – designed by Bill Putnam; the first all-transistor (FET) limiter (the low-noise 1176LN followed in 1970)',
         text: 'The famous FET studio compressor: very fast, punchy and present – it adds bite and sustain and pushes a guitar forward. Fixed threshold: Input sets how hard it compresses, Makeup the level after it.',
         starts: [
           { name: 'Clean sparkle', values: { Input: -24, Ratio: '4', Attack: 0.5, Release: 0.5, Makeup: 6, Mix: 100 }, why: 'Even, present clean and funk rhythm.' },
@@ -12102,7 +12104,8 @@ function parseSelectedCaptureState(payload) {
         ]
       },
       'Opto Comp': {
-        basedOn: 'Teletronix LA-2A',
+        like: 'Teletronix LA-2A',
+        photo: true,
         made: 'early 1960s · Teletronix – Jim Lawrence\'s tube compressor with an optical cell; later made by Universal Audio',
         text: 'The smoothest classic compressor: a light-dependent cell reacts gently and program-dependent, so the compression is hard to hear but the sound gets even and warm. Great for cleans that should just sit there.',
         starts: [
@@ -12430,7 +12433,8 @@ function parseSelectedCaptureState(payload) {
         tips: ['Pre Delay keeps the note clear before the reverb starts; High Pass and Low Pass keep the tail out of the mud and the fizz.']
       },
       'Mind Hall': {
-        basedOn: 'Lexicon 224',
+        like: 'Lexicon 224',
+        photo: true,
         made: '1978 · Lexicon – one of the first digital studio reverbs',
         text: 'The lush, grainy hall of late-70s and 80s records: dense, smooth and slightly dark, it sounds "expensive" behind cleans and leads.',
         starts: [
