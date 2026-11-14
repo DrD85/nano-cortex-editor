@@ -5123,7 +5123,7 @@ function parseSelectedCaptureState(payload) {
       document.querySelectorAll('#capSaveTypes button').forEach(b => b.classList.toggle('on', Number(b.dataset.save) === cap.saveType));
       $('capProgTitle').textContent = 'Capturing · ' + cap.progress + ' %';
       $('capProg').style.width = cap.progress + '%';
-      const left = (100 - cap.progress) * 3;
+      const left = (100 - cap.progress) * 2.3;   // (on the Nano: about 3.5 minutes from the start to done)
       $('capProgLeft').textContent = cap.progress <= 0 ? 'Starting …' : left >= 90 ? 'About ' + Math.round(left / 60) + ' minutes left.' : 'Almost done.';
       const nameOk = $('capName').value.trim().length >= 4 && !cap.saving;
       $('capSaveLib').disabled = !nameOk;
@@ -5353,12 +5353,14 @@ function parseSelectedCaptureState(payload) {
           }
           return true;
         }
-        case CAPM.TrainingProgress:
-          cap.progress = value(3);
+        case CAPM.TrainingProgress: {   // 0-255 (Cortex Cloud shows value / 255; seen on the Nano: done after ~220)
+          const percent = Math.min(100, Math.floor(value(3) * 100 / 255)), changed = percent !== cap.progress;
+          cap.progress = percent;
           capEntered('capturing');
-          if (cap.step !== 3 || cap.progress % 10 === 0) log('Capture: ' + cap.progress + ' %');
+          if (changed) log('Capture: ' + percent + ' % (' + value(3) + ')');
           if (cap.step !== 3) capShow(3); else capRender();
           return true;
+        }
         case CAPM.TrainingDone:
           log('Capture: done – compare and save');
           cap.progress = 100;
@@ -5369,7 +5371,7 @@ function parseSelectedCaptureState(payload) {
           return true;
         case CAPM.CaptureState: {
           const step = value(3);
-          cap.progress = value(4);
+          cap.progress = Math.min(100, Math.floor(value(4) * 100 / 255));
           cap.source = value(7) === 1;
           cap.cab = value(8);
           log('Capture state: step ' + step + ', ' + cap.progress + ' %, listening to the ' + (cap.source ? 'original' : 'capture') + ', cab ' + cap.cab);
