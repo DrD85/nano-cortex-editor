@@ -37,6 +37,7 @@ run metronome        mock.js test-metronome.js
 run listen-capture   mock.js library.js test-listen-capture.js
 run listen-ir        mock.js library.js test-listen-ir.js
 run board-strip      mock.js fake-board.js test-board-strip.js
+run auto-backup      mock.js fake-board.js test-auto-backup.js
 page dialogs mock.js library.js check-dialogs.js
 for size in 1440,900 1000,517 760,447; do
   result="$(title dialogs "$size")"

@@ -23,9 +23,24 @@
     } else if (type === 60014) { deliver(60015, [1]); if (body[0] === 66) { const a = (body[1] | body[2] << 8 | body[3] << 16 | body[4] << 24) >>> 0; const i = (a >> 11) & 7; board.presets[i] = a & 127; board.colors[i] = (a >> 7) & 15; board.icons[i] = (a >> 18) & 31; window.__lastB = a; deliver(60013, settings()); } if (body[0] === 93) { const a = body[1] | body[2] << 8 | body[3] << 16 | body[4] << 24; board.layout.count = (a >>> 24) & 15; board.layout.switch1 = (a >>> 28) & 3; board.layout.order = [...Array(8)].map((_, p) => ((a >>> (3 * p)) & 7) + 1); deliver(60013, settings()); } }
     else if (type === 60018) { const types = Object.keys(board.fxp).filter(k => board.fxp[k]).map(Number); deliver(60019, [types.length, 0, ...types.flatMap(t => [t & 255, (t >> 8) & 255, (t >> 16) & 255, t >>> 24])]); }
     else if (type === 60016) { const t = body[0] | body[1] << 8 | body[2] << 16 | body[3] << 24; deliver(60017, [...body.slice(0, 4), ...(board.fxp[t] || new Array(264).fill(0))]); }
+    else if (type === 60000) {   // backup: entry by index, then the closing info
+      const index = body[0] | body[1] << 8, n = board.store.length;
+      if (index < n) deliver(60001, [index & 255, index >> 8, n & 255, n >> 8, T(board.store[index].key).length, ...T(board.store[index].key), ...board.store[index].value]);
+      else deliver(60002, [0, 0, n & 255, n >> 8, 0x58, 0x02, ...T('1.21.0')]);
+    }
+    else if (type === 60003) { board.restoring = []; deliver(60004, [1]); }
+    else if (type === 60005) {
+      const kl = body[0], key = new TextDecoder().decode(Uint8Array.from(body.slice(1, 1 + kl))), total = body[1 + kl] | body[2 + kl] << 8, offset = body[3 + kl] | body[4 + kl] << 8;
+      let entry = board.restoring.find(e => e.key === key);
+      if (!entry) { entry = { key, value: new Array(total).fill(0) }; board.restoring.push(entry); }
+      body.slice(5 + kl).forEach((b, i) => { entry.value[offset + i] = b; });
+      deliver(60006, [1]);
+    }
+    else if (type === 60007) { board.store = board.restoring; deliver(60008, [1, board.store.length & 255, board.store.length >> 8]); }
     else if (type === 60020) { const t = body[0] | body[1] << 8 | body[2] << 16 | body[3] << 24; board.fxp[t] = body.slice(4); deliver(60021, [1]); }
     return true;
   };
+  board.store = [{ key: 'layout', value: [8, 3, 4, 7, 2, 5, 6, 8, 1] }, { key: 'banks', value: Array.from({ length: 400 }, (_, i) => i & 255) }, { key: 'metro', value: [1, 2, 0, 0, 0] }];
   window.__board = board;
   // the board has two Tape Delay presets (model 9012?) - set from the editor's own encoder
   const tape = state.blocks.post2.models.find(m => m.name === 'Tape Delay');

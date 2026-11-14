@@ -686,6 +686,12 @@
     .aud-bar .nm small { display: block; font-size: 11px; color: #8e9297; font-weight: 500; margin-top: 2px; }
     .aud-btn { padding: 7px 12px; border-radius: 9px; border: 1px solid #3a3f45; background: #16191c; color: #f2f2f2; font: inherit; font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; text-transform: none; letter-spacing: 0; }
     .aud-btn.primary { background: #f2f2f2; color: #0b0b0b; border-color: #f2f2f2; }
+    .aud-btn:disabled { opacity: .45; cursor: default; }
+    .ab-panel { width: min(620px, calc(100vw - 32px)); max-height: calc(100vh - 16px); overflow-y: auto; display: grid; gap: 14px; }
+    .ab-list { display: grid; gap: 6px; }
+    .ab-row { display: flex; align-items: center; gap: 8px; padding: 9px 10px 9px 14px; border-radius: 10px; border: 1px solid #23272b; background: #121416; }
+    .ab-row .ab-text { margin-right: auto; min-width: 0; display: grid; gap: 2px; font-size: 14px; color: #f2f2f2; }
+    .ab-row .ab-text small { font-size: 11.5px; color: #8e9297; }
     .lib-item .fx-icon { --block-color: #f2f2f2; width: 34px; height: 34px; border-radius: 8px; }
     .lib-item .fx-icon::after { inset: 5px; }
     .lib-name { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2210,6 +2216,7 @@
           <div class="menu-sep"></div>
           <button id="ctlBackupBtn" title="Save everything the controller stores (banks, scenes, second effects, set list …) as a file" hidden><span class="ico" style="--icon: var(--ico-export)"></span>Back up controller settings…</button>
           <button id="ctlRestoreBtn" title="Write a backup file back to the controller – it replaces what the controller stores now" hidden><span class="ico" style="--icon: var(--ico-import)"></span>Restore controller settings…</button>
+          <button id="ctlAutoBtn" title="The controller's settings as the editor read them by itself – the last ten different states" hidden><span class="ico" style="--icon: var(--ico-controller)"></span>Automatic controller backups…</button>
           <button id="mc6Btn" title="A bank for the Morningstar MC6 Pro from up to five presets"><span class="ico" style="--icon: var(--ico-controller)"></span>Morningstar MC6 Pro export…</button>
           <button id="muteInBtn" title="The Nano's setting “Mute Guitar Input”: no sound from the guitar input until it is switched back" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteInLabel">Mute guitar input</span></button>
           <button id="muteOutBtn" title="The Nano's setting “Mute Guitar Output”: no guitar at the output jacks until it is switched back – the sound from USB stays" hidden><span class="ico" style="--icon: var(--ico-mute)"></span><span id="muteOutLabel">Mute guitar output</span></button>
@@ -9493,6 +9500,7 @@ function parseSelectedCaptureState(payload) {
 
     function showControllerMenu() {
       $('ctlBackupBtn').hidden = $('ctlRestoreBtn').hidden = !(state.connected && state.viaController);
+      $('ctlAutoBtn').hidden = !(state.connected && state.viaController) && !autoBackupList().length;   // (kept backups can be saved as files without it)
     }
 
     function ctlFrame(type, payload = []) {
@@ -9931,6 +9939,7 @@ function parseSelectedCaptureState(payload) {
         if (merged.length !== board.length) { await fxpBoardWrite(type, merged); changed++; }
       }
       fsLink.synced = true;
+      autoBackupSchedule();
       log('FX presets shared with the controller: ' + types.size + ' models' + (changed ? ', ' + changed + ' written to it' : ''));
       render();
     }
@@ -9962,59 +9971,161 @@ function parseSelectedCaptureState(payload) {
     const b64 = bytes => btoa(String.fromCharCode(...bytes));
     const unb64 = text => Uint8Array.from(atob(text), c => c.charCodeAt(0));
 
+    // Reads everything the controller stores. quiet: no progress toasts (the automatic backup). Returns the backup
+    // object, or an error text.
+    async function readControllerStore(quiet) {
+      const entries = [];
+      let info = null;
+      for (let index = 0; index < 4000; index++) {
+        if (!state.connected || !state.viaController) return 'The connection through the controller ended.';
+        const m = await ctlRequest('Controller entry ' + index, 60000, [index & 0xFF, index >> 8]);
+        if (!m) return index ? 'The controller stopped answering - no backup written.' : 'The controller does not answer - its firmware has to be 1.13 or later for a backup.';
+        if (m.type === 60002) { info = m.body; break; }
+        if (m.type !== 60001 || m.body.length < 5) continue;
+        const keyLength = m.body[4];
+        if (!keyLength) continue;                           // an entry the controller could not read
+        const key = new TextDecoder().decode(m.body.slice(5, 5 + keyLength));
+        entries.push({ key, value: b64(m.body.slice(5 + keyLength)) });
+        if (!quiet && index % 25 === 24) toast('Reading the controller: ' + (index + 1) + ' of ' + (m.body[2] | (m.body[3] << 8)) + ' entries …', 'info', 1500);
+      }
+      if (!info || !entries.length) return 'Nothing read from the controller.';
+      return {
+        format: 'nano-cortex-controller-settings', version: 1,
+        firmware: new TextDecoder().decode(info.slice(6)), created: new Date().toISOString(),
+        used: info[2] | (info[3] << 8), capacity: info[4] | (info[5] << 8), entries
+      };
+    }
+
+    function saveBackupFile(data) {
+      const fileName = 'nano-controller-settings-' + String(data.created).slice(0, 10) + '.json';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
+      a.download = fileName;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      return fileName;
+    }
+
     async function backupController() {
       if (!state.connected || !state.viaController) { toast('Connect through the controller first.', 'info'); return; }
       if (ctl.busy || state.fileBusy) return;
       ctl.busy = true;
       $('ctlBackupBtn').disabled = $('ctlRestoreBtn').disabled = true;
       try {
-        const entries = [];
-        let info = null;
-        for (let index = 0; index < 2000; index++) {
-          const m = await ctlRequest('Controller entry ' + index, 60000, [index & 0xFF, index >> 8]);
-          if (!m) {
-            toast(index ? 'The controller stopped answering - no backup written.'
-                        : 'The controller does not answer - its firmware has to be 1.13 or later for a backup.', 'error', 6000);
-            return;
-          }
-          if (m.type === 60002) { info = m.body; break; }
-          if (m.type !== 60001 || m.body.length < 5) continue;
-          const keyLength = m.body[4];
-          if (!keyLength) continue;                           // an entry the controller could not read
-          const key = new TextDecoder().decode(m.body.slice(5, 5 + keyLength));
-          entries.push({ key, value: b64(m.body.slice(5 + keyLength)) });
-          if (index % 25 === 24) toast('Reading the controller: ' + (index + 1) + ' of ' + (m.body[2] | (m.body[3] << 8)) + ' entries …', 'info', 1500);
-        }
-        if (!info || !entries.length) { toast('Nothing read from the controller.', 'error'); return; }
-        const used = info[2] | (info[3] << 8), capacity = info[4] | (info[5] << 8);
-        const data = {
-          format: 'nano-cortex-controller-settings', version: 1,
-          firmware: new TextDecoder().decode(info.slice(6)), created: new Date().toISOString(),
-          used, capacity, entries
-        };
-        const fileName = 'nano-controller-settings-' + data.created.slice(0, 10) + '.json';
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
-        a.download = fileName;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-        const percent = capacity ? Math.round(used * 100 / capacity) : 0;
-        log('Controller backup: ' + entries.length + ' entries, store ' + percent + ' % full, written as ' + fileName);
-        toast(entries.length + ' entries saved as ' + fileName + '. The controller\'s memory is ' + percent + ' % full.', 'ok', 6000);
+        const data = await readControllerStore(false);
+        if (typeof data === 'string') { toast(data, 'error', 6000); return; }
+        const fileName = saveBackupFile(data);
+        const percent = data.capacity ? Math.round(data.used * 100 / data.capacity) : 0;
+        log('Controller backup: ' + data.entries.length + ' entries, store ' + percent + ' % full, written as ' + fileName);
+        toast(data.entries.length + ' entries saved as ' + fileName + '. The controller\'s memory is ' + percent + ' % full.', 'ok', 6000);
+        autoBackupKeep(data);   // (the newest state is also the newest automatic backup)
       } finally {
         ctl.busy = false;
         $('ctlBackupBtn').disabled = $('ctlRestoreBtn').disabled = false;
       }
     }
 
+    // ---- Automatic backups of the controller ----
+    // Each time the editor is connected through the controller (at most once in AUTO_BACKUP_HOURS) it reads the
+    // controller's store quietly and keeps the last AUTO_BACKUP_KEEP different states in this browser / app. A
+    // controller that lost its settings, or a setting changed by mistake, can be brought back from them
+    // ("Automatic controller backups…" in the menu). Nothing is written to the controller by this.
+    const AUTO_BACKUP_STORE = 'nanoCtlAutoBackups';
+    const AUTO_BACKUP_KEEP = 10;
+    const AUTO_BACKUP_HOURS = 12;
+    const autoBackup = { timer: null, running: false };
+    function autoBackupList() {
+      try {
+        const list = JSON.parse(localStorage.getItem(AUTO_BACKUP_STORE) || '[]');
+        return Array.isArray(list) ? list.filter(b => b && b.format === 'nano-cortex-controller-settings' && Array.isArray(b.entries)) : [];
+      } catch (e) { return []; }
+    }
+    // the settings alone, in a fixed order: two backups with the same text hold the same settings
+    const backupContent = data => JSON.stringify(data.entries.map(e => [e.key, e.value]).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)));
+    function autoBackupKeep(data) {
+      const list = autoBackupList();
+      const content = backupContent(data);
+      if (list.length && backupContent(list[0]) === content) list[0] = { ...list[0], checked: data.created, firmware: data.firmware };   // unchanged: only the date it was seen
+      else list.unshift({ ...data, checked: data.created });
+      while (list.length > AUTO_BACKUP_KEEP) list.pop();
+      for (;;) {   // (when the storage is full: without the oldest)
+        try { localStorage.setItem(AUTO_BACKUP_STORE, JSON.stringify(list)); return list; } catch (e) { if (list.length <= 1) return list; list.pop(); }
+      }
+    }
+    function autoBackupSchedule() {
+      clearTimeout(autoBackup.timer);
+      autoBackup.timer = null;
+      if (!state.connected || !state.viaController) return;
+      const last = autoBackupList()[0];
+      const age = last ? Date.now() - Date.parse(last.checked || last.created) : Infinity;
+      if (age < AUTO_BACKUP_HOURS * 3600 * 1000) return;
+      autoBackup.timer = setTimeout(autoBackupRun, 8000);   // once the connection has settled
+    }
+    async function autoBackupRun() {
+      if (autoBackup.running || !state.connected || !state.viaController) return;
+      if (ctl.busy || state.fileBusy || !fsLink.synced) { autoBackup.timer = setTimeout(autoBackupRun, 5000); return; }
+      autoBackup.running = true;
+      ctl.busy = true;
+      try {
+        const data = await readControllerStore(true);
+        if (typeof data === 'string') { log('Automatic controller backup: ' + data); return; }
+        const list = autoBackupKeep(data);
+        log('Automatic controller backup: ' + data.entries.length + ' entries (firmware ' + data.firmware + '), ' + list.length + ' kept');
+      } finally {
+        autoBackup.running = false;
+        ctl.busy = false;
+      }
+    }
+
+    // The list of the automatic backups: restore one, or save it as a file.
+    function openAutoBackups() {
+      let overlay = $('autoBackupOverlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'autoBackupOverlay';
+        overlay.className = 'ask-overlay';
+        overlay.innerHTML = '<div class="ask-panel ab-panel" role="dialog" aria-label="Automatic controller backups"><div class="tuner-head">' +
+          '<div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-controller)"></span><h2 class="dlg-title">Automatic controller backups</h2></div>' +
+          '<button class="dlg-close" data-act="close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button></div>' +
+          '<div class="dlg-info">The editor reads the controller\'s settings by itself when it is connected through it (at most every ' + AUTO_BACKUP_HOURS +
+          ' hours) and keeps the last ' + AUTO_BACKUP_KEEP + ' different states here.</div><div class="ab-list" id="autoBackupRows"></div></div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', async e => {
+          if (e.target === overlay || e.target.closest('[data-act="close"]')) { overlay.hidden = true; return; }
+          const button = e.target.closest('button[data-i]');
+          if (!button) return;
+          const data = autoBackupList()[Number(button.dataset.i)];
+          if (!data) return;
+          if (button.dataset.act === 'file') { toast('Saved as ' + saveBackupFile(data) + '.', 'ok'); return; }
+          overlay.hidden = true;
+          restoreControllerData(data);
+        });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden && $('askOverlay').hidden) overlay.hidden = true; });
+      }
+      const list = autoBackupList();
+      const date = iso => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? '?' : d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); };
+      const can = state.connected && state.viaController;
+      $('autoBackupRows').innerHTML = list.length ? list.map((b, i) =>
+        '<div class="ab-row"><span class="ab-text"><b>' + escapeHTML(date(b.created)) + '</b><small>' + b.entries.length + ' entries · firmware ' + escapeHTML(String(b.firmware || '?')) +
+        (b.checked && b.checked !== b.created ? ' · unchanged until ' + escapeHTML(date(b.checked)) : '') + '</small></span>' +
+        '<button class="aud-btn" data-act="file" data-i="' + i + '">Save as file</button>' +
+        '<button class="aud-btn primary" data-act="restore" data-i="' + i + '"' + (can ? '' : ' disabled title="Connect through the controller first"') + '>Restore…</button></div>').join('')
+        : '<div class="lib-empty">No automatic backup yet - the first one is made a few seconds after connecting through the controller.</div>';
+      overlay.hidden = false;
+    }
+
     async function restoreController(file) {
-      if (!state.connected || !state.viaController) { toast('Connect through the controller first.', 'info'); return; }
-      if (ctl.busy || state.fileBusy) return;
       let data;
       try { data = JSON.parse(await file.text()); } catch (err) { data = null; }
+      return restoreControllerData(data);
+    }
+
+    async function restoreControllerData(data) {
+      if (!state.connected || !state.viaController) { toast('Connect through the controller first.', 'info'); return; }
+      if (ctl.busy || state.fileBusy) return;
       const entries = data && data.format === 'nano-cortex-controller-settings' && Array.isArray(data.entries)
         ? data.entries.filter(e => e && typeof e.key === 'string' && e.key.length > 0 && e.key.length < 16 && typeof e.value === 'string') : null;
-      if (!entries || !entries.length) { toast('This is not a backup file of the controller.', 'error'); return; }
+      if (!entries || !entries.length) { toast('This is not a backup of the controller.', 'error'); return; }
       const when = data.created ? ' from ' + String(data.created).slice(0, 10) : '';
       if (!(await askConfirm('Restore the controller\'s settings?', 'The backup' + when + ' (' + entries.length + ' entries) replaces everything the controller ' +
           'stores now: banks, scenes, second effects, set list, footswitch order. The controller restarts afterwards.', { ok: 'Restore' }))) return;
@@ -12879,6 +12990,7 @@ function parseSelectedCaptureState(payload) {
     $('saveBtn').addEventListener('click', savePreset);
     $('exportBtn').addEventListener('click', exportPresetFile);
     $('ctlBackupBtn').addEventListener('click', backupController);
+    $('ctlAutoBtn').addEventListener('click', openAutoBackups);
     $('ctlRestoreBtn').addEventListener('click', () => { $('ctlRestoreFile').value = ''; $('ctlRestoreFile').click(); });
     $('ctlRestoreFile').addEventListener('change', e => { if (e.target.files[0]) restoreController(e.target.files[0]); });
     $('importBtn').addEventListener('click', pickPresetFile);
