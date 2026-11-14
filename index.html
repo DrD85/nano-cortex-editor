@@ -2113,6 +2113,57 @@
       body.jam-open main { padding-bottom: 190px; }
       body.jam-open .toasts { bottom: 180px; }
     }
+    /* ---- Neural Capture V1 assistant (… > New Neural Capture) ---- */
+    .cw-panel { width: min(880px, calc(100vw - 32px)); height: auto; max-height: calc(100vh - 32px); overflow-y: auto; grid-template-rows: auto; gap: 16px; background: #121416; }
+    .cw-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .cw-steps span { padding: 9px 0; border-radius: 20px; border: 1px solid #2c3036; text-align: center; font-size: 13px; font-weight: 600; color: #9da2a9; }
+    .cw-steps span.done { color: #f2f2f2; }
+    .cw-steps span.done::before { content: "✓ "; color: #45F862; }
+    .cw-steps span.on { background: #ececec; border-color: #ececec; color: #0d0f11; }
+    .cw-page { display: grid; gap: 12px; }
+    .cw-page[hidden] { display: none; }
+    .cw-card { background: #1a1d20; border: 1px solid #2c3036; border-radius: 12px; padding: 14px 16px; }
+    .cw-seg { display: inline-flex; border: 1px solid #2c3036; border-radius: 18px; overflow: hidden; flex-wrap: wrap; }
+    .cw-seg button { border: 0; border-radius: 0; background: none; padding: 7px 14px; font-size: 13px; color: #9da2a9; }
+    .cw-seg button + button { border-left: 1px solid #2c3036; }
+    .cw-seg button.on { background: #ececec; color: #0d0f11; }
+    .cw-seg button:hover { color: #f2f2f2; }
+    .cw-seg button.on:hover { color: #0d0f11; }
+    .cw-list { margin: 0; padding-left: 22px; display: grid; gap: 8px; font-size: 14px; line-height: 1.45; color: #e6e8ea; }
+    .cw-list b { font-weight: 650; }
+    .cw-warn { border: 1px solid #6b4a12; background: #1d1609; border-radius: 10px; padding: 9px 12px; font-size: 12.5px; color: #ffd38a; line-height: 1.4; }
+    .cw-warn b { color: #FFB02E; }
+    .cw-lbl { font-size: 11px; letter-spacing: .09em; color: #9da2a9; font-weight: 700; }
+    .cw-meter { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 14px; margin: 6px 0 4px; }
+    .cw-val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .cw-bar { position: relative; height: 26px; border-radius: 6px; background: #0b0c0d; border: 1px solid #2c3036; overflow: hidden; }
+    .cw-zone { position: absolute; top: 0; bottom: 0; left: 55%; right: 12%; border-left: 1px dashed #5b6168; border-right: 1px dashed #5b6168; background: rgba(69, 248, 98, .07); }
+    .cw-fill { position: absolute; left: 0; top: 4px; bottom: 4px; width: 0; border-radius: 3px; background: linear-gradient(90deg, #2fbf4a, #45F862); transition: width .08s linear; }
+    .cw-fill.hot { background: #ff5a4e; }
+    .cw-peak { position: absolute; top: 2px; bottom: 2px; width: 3px; left: 0; background: #45F862; }
+    .cw-slider { width: calc(100% - 110px); margin: 2px 0 8px 110px; accent-color: #f2f2f2; }
+    .cw-tips { display: grid; gap: 6px; font-size: 13px; line-height: 1.4; color: #d6d9dd; }
+    .cw-tips div { display: flex; gap: 10px; align-items: flex-start; }
+    .cw-tips i { flex: none; width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; background: var(--c); }
+    .cw-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .cw-small { font-size: 13px; color: #9da2a9; line-height: 1.45; }
+    .cw-msg { font-size: 13px; color: #FFB02E; min-height: 18px; }
+    .cw-foot { display: flex; align-items: center; gap: 10px; }
+    .cw-foot .cw-small { flex: 1; }
+    .cw-go { background: #45F862; border-color: #45F862; color: #0d0f11; }
+    .cw-go:hover { background: #7bff92; border-color: #7bff92; }
+    .cw-go:disabled, .cw-panel button:disabled { opacity: .45; cursor: default; }
+    .cw-out { background: none; }
+    .cw-big { font-size: 28px; font-weight: 700; }
+    .cw-prog { height: 10px; border-radius: 5px; background: #0b0c0d; border: 1px solid #2c3036; overflow: hidden; }
+    .cw-prog div { height: 100%; width: 0; background: #45F862; transition: width .4s; }
+    .cw-name { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #45F862; background: #0d0f11; color: #fff; font-size: 15px; outline: none; }
+    .cw-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .cw-slots button { padding: 9px 8px; font-size: 12.5px; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .cw-slots button.on { background: #ececec; border-color: #ececec; color: #0d0f11; }
+    .cw-done { text-align: center; padding: 22px 0 8px; }
+    .cw-done .cw-check { width: 70px; height: 70px; border-radius: 50%; background: #45F862; color: #0d0f11; display: inline-grid; place-items: center; font-size: 38px; font-weight: 800; }
+    .cw-done h3 { margin: 14px 0 6px; font-size: 22px; }
   </style>
 </head>
 <body>
@@ -2151,6 +2202,7 @@
           <button id="exportBtn" title="Save the current preset as a file (to keep or to share)"><span class="ico" style="--icon: var(--ico-export)"></span>Export preset file…<span class="menu-key"></span></button>
           <button id="importBtn" title="Load a preset file into the current preset (or drop the file on the window)"><span class="ico" style="--icon: var(--ico-import)"></span>Import preset file…<span class="menu-key"></span></button>
           <button id="orgBtn" title="All capture and cab slots and the library on the Nano: swap slots, load, delete what you do not need"><span class="ico" style="--icon: var(--ico-library)"></span>Organize captures…</button>
+          <button id="captureBtn" title="Capture an amp, a cab or a pedal with the Nano (Neural Capture V1) – guided step by step"><span class="ico" style="--icon: var(--ico-capture)"></span>New Neural Capture…</button>
           <button id="sharedBtn" title="Presets others have shared on GitHub – each with the capture it needs, checked against your Nano"><span class="ico" style="--icon: var(--ico-list)"></span>Shared presets…</button>
           <button id="shareBtn" title="Share the current preset on GitHub, with a short description and the exact name of its capture"><span class="ico" style="--icon: var(--ico-share)"></span>Share this preset…</button>
           <div class="menu-sep"></div>
@@ -2478,6 +2530,82 @@
         <span id="copyStatus" class="slot-status"></span>
         <button type="button" id="copyCancel">Cancel</button>
         <button type="button" id="copyOk" class="primary">Copy</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="capOverlay" class="lib-overlay" hidden>
+    <div class="lib-panel cw-panel" role="dialog" aria-modal="true" aria-label="New Neural Capture">
+      <div class="tuner-head">
+        <div class="block-title" style="--block-color: #f2f2f2;"><span class="fx-icon" style="--icon: var(--ico-capture)"></span><h2 class="dlg-title">New Neural Capture (V1)</h2></div>
+        <button id="capClose" class="dlg-close" title="Close – the Nano leaves capture mode" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+      </div>
+      <div class="cw-steps" id="capSteps"><span>1 · Connect</span><span>2 · Levels</span><span>3 · Capture</span><span>4 · Compare &amp; save</span></div>
+
+      <div class="cw-page" data-step="1">
+        <div class="cw-seg" id="capTypes"><button data-type="0" class="on">Amp + cab (mic)</button><button data-type="1">Amp head</button><button data-type="2">Pedal</button></div>
+        <ol class="cw-list" id="capConnect"></ol>
+        <div class="cw-warn"><b>Tube amps:</b> never connect the speaker output to the Nano without a reactive load box – it can damage both.</div>
+        <div class="cw-msg" data-msg="1"></div>
+        <div class="cw-foot"><span class="cw-small">Takes about 5 minutes. The new capture goes to My Neural Captures.</span><button class="cw-out" data-cap="close">Cancel</button><button class="primary" data-cap="levels">Next</button></div>
+      </div>
+
+      <div class="cw-page" data-step="2" hidden>
+        <div class="cw-card">
+          <div class="cw-lbl">CAPTURE IN</div>
+          <div class="cw-meter"><div class="cw-val" id="capGainVal">–</div><div class="cw-bar"><div class="cw-zone"></div><div class="cw-fill" id="capFill0"></div><div class="cw-peak" id="capPeak0"></div></div></div>
+          <input type="range" class="cw-slider" id="capGain" min="0" max="255" step="1" value="0">
+          <div class="cw-lbl" style="margin-top:10px">OUTPUT LEVEL</div>
+          <div class="cw-meter"><div class="cw-val" id="capLevelVal">–</div><div class="cw-bar"><div class="cw-zone"></div><div class="cw-fill" id="capFill1"></div><div class="cw-peak" id="capPeak1"></div></div></div>
+          <input type="range" class="cw-slider" id="capLevel" min="0" max="255" step="1" value="0">
+          <div class="cw-small">Output level is only what you hear (headphones, OUTPUT 1L). The meters come live from the Nano.</div>
+        </div>
+        <div class="cw-card cw-tips">
+          <div><i style="--c:#45F862"></i><span>Strum hard. <b>Green</b> = good – both bars in the marked field, never all the way right.</span></div>
+          <div><i style="--c:#4AA3FF"></i><span><b>Too low:</b> raise Capture In. Still low at +24 dB? Set it to 0 and switch <b>BOOST</b> on at the Nano (+26 dB).</span></div>
+          <div><i style="--c:#FF5A4E"></i><span><b>Clipping:</b> BOOST off, or turn the amp's / pedal's output down.</span></div>
+        </div>
+        <div class="cw-row"><span class="cw-small">Listen through cab while you set it up</span><div class="cw-seg" data-cabs><button data-cab="0" class="on">No cab</button><button data-cab="1">Cab 1</button><button data-cab="2">Cab 2</button><button data-cab="3">Cab 3</button><button data-cab="4">Cab 4</button><button data-cab="5">Cab 5</button></div></div>
+        <div class="cw-msg" data-msg="2"></div>
+        <div class="cw-foot"><span class="cw-small">Nano in capture mode · footswitches on the controller are off</span><button class="cw-out" data-cap="close">Cancel</button><button data-cap="connect">Back</button><button class="cw-go" data-cap="start">Start capture</button></div>
+      </div>
+
+      <div class="cw-page" data-step="3" hidden>
+        <div class="cw-big" id="capProgTitle">Capturing</div>
+        <div class="cw-prog"><div id="capProg"></div></div>
+        <div class="cw-small" id="capProgLeft"></div>
+        <div class="cw-card cw-tips">
+          <div><i style="--c:#FFB02E"></i><span>The Nano plays test tones through your amp – keep the volume where it is.</span></div>
+          <div><i style="--c:#FFB02E"></i><span>Don't play, don't touch the amp, the mic or the cables until it is done.</span></div>
+          <div><i style="--c:#FFB02E"></i><span>Keep the room quiet – the mic hears everything.</span></div>
+        </div>
+        <div class="cw-msg" data-msg="3"></div>
+        <div class="cw-foot"><span class="cw-small"></span><button class="cw-out" data-cap="stop">Stop capture</button></div>
+      </div>
+
+      <div class="cw-page" data-step="4" hidden>
+        <div class="cw-row"><span class="cw-small" style="width:60px">Listen</span><div class="cw-seg" id="capListen"><button data-listen="0" class="on">Capture</button><button data-listen="1">Original</button></div>
+          <span class="cw-small" style="margin-left:12px">Auto</span><div class="cw-seg" id="capAuto"><button data-auto="0" class="on">Off</button><button data-auto="2">2 s</button><button data-auto="4">4 s</button><button data-auto="8">8 s</button></div></div>
+        <div class="cw-row"><span class="cw-small" style="width:60px">Cab</span><div class="cw-seg" data-cabs><button data-cab="0" class="on">No cab</button><button data-cab="1">Cab 1</button><button data-cab="2">Cab 2</button><button data-cab="3">Cab 3</button><button data-cab="4">Cab 4</button><button data-cab="5">Cab 5</button></div>
+          <span class="cw-small">Captured a cab too? Listen without a cab to compare fairly.</span></div>
+        <div class="cw-card" id="capSaveCard">
+          <div class="cw-lbl">NAME</div>
+          <input id="capName" class="cw-name" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="e.g. Plexi Crunch SM57 (at least 4 characters)" style="margin:6px 0 12px">
+          <div class="cw-lbl">TYPE</div>
+          <div class="cw-seg" id="capSaveTypes" style="margin-top:6px"><button data-save="0">Amp</button><button data-save="1" class="on">Amp + cab</button><button data-save="2">Cab</button><button data-save="3">Pedal</button><button data-save="4">Other</button></div>
+        </div>
+        <div class="cw-card" id="capSlotCard" hidden>
+          <div class="cw-row" style="margin-bottom:8px"><span class="cw-small" style="flex:1">Which capture slot (bank – slot)? The capture in it now stays in My Neural Captures.</span><button class="btn-small cw-out" data-cap="slotback">Back to the name</button></div>
+          <div class="cw-slots" id="capSlots"></div>
+        </div>
+        <div class="cw-msg" data-msg="4"></div>
+        <div class="cw-foot"><button class="cw-out" data-cap="discard" title="Throw this capture away and go back to the levels">Discard</button><span class="cw-small"></span><button id="capSaveLib" data-cap="savelib">Save to library</button><button id="capSaveSlot" class="cw-go" data-cap="saveslot">Save to slot …</button></div>
+      </div>
+
+      <div class="cw-page" data-step="5" hidden>
+        <div class="cw-done"><div class="cw-check">✓</div><h3 id="capDoneTitle"></h3><div class="cw-small" id="capDoneText"></div></div>
+        <div class="cw-foot"><span class="cw-small"></span><button data-cap="again">Another capture</button><button class="primary" data-cap="done">Done</button></div>
       </div>
     </div>
   </div>
@@ -3237,7 +3365,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.17.0';
+    const EDITOR_VERSION = '1.18.0';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -3299,6 +3427,10 @@
 
     // Resolves true once the BLE write went through, false if it failed or there was no connection.
     function writeC304(label, payload, coalesceKey = null) {
+      if (cap && cap.mode && !cap.bypass && !capAllowed(frameType(payload))) {   // the Nano is capturing: nothing may change it now
+        log('Capture mode – not sent: ' + label);
+        return Promise.resolve(false);
+      }
       return new Promise(resolve => {
         if (coalesceKey) {
           const pending = gattWriteQueue.find(job => job.key === coalesceKey);
@@ -3597,6 +3729,7 @@
     // The connection is gone: the dialogs that work on the Nano close (none of them could act any more, and the
     // connect card comes up behind them). The meter, MIDI and the jam tracks do not need the connection.
     function closeDeviceDialogs() {
+      capDisconnected();
       closeTuner(false);
       if ($('orgOverlay')) { org.busy = false; $('orgOverlay').hidden = true; }
       closeMetro(false);
@@ -3618,6 +3751,7 @@
     function onC305(event) {
       const data = new Uint8Array(event.target.value.buffer.slice(0));
       if (frameType(data) === MSG.TunerMetering) { handleTunerMetering(data); return; }
+      if (frameType(data) === 64 && capMeter(data)) return;   // capture meters (many per second, not logged)
       if (frameType(data) === MSG.ControllerSwitch) { controllerSwitch(data); return; }
       if (ctlPacket(data)) return;
       log('RX C305: ' + hex(data.slice(0, 24)) + (data.length > 24 ? ' ...' : ''));
@@ -3687,6 +3821,7 @@
       log('CURRENT STATE FULL HEX: ' + hex(bytes));
       log('CURRENT STATE FULL ASCII: ' + printableASCII(bytes));
       const fields = parseProtoFields(bytes);
+      if (capStateReply(fields)) { state.stateBytes = []; state.stateMode = 'idle'; return; }   // capture mode
 
       const captureSlot = fields[11] && fields[11][0] ? fields[11][0].value : 0;
 
@@ -4957,8 +5092,469 @@ function parseSelectedCaptureState(payload) {
     }
 
     // Single-packet messages identified by their type. Returns true when handled.
+    // ---- Neural Capture V1 (… > New Neural Capture) ----
+    // Guided as Cortex Cloud 2.8.3 does it (decoded 2026-11-14): 73 puts the Nano into capture mode, 26 with context 1
+    // sets CAPTURE IN / OUTPUT LEVEL, 43 a cab to listen through, 39 starts it, 40 / 41 / 93 report it, 42 compares,
+    // 13 saves it into My Neural Captures (80 then puts it into a slot with the id from 14), 27 Exit goes back one
+    // step. While the Nano is in capture mode the editor sends nothing else to it (writeC304 checks capAllowed).
+    const CAPM = { SaveCapture: 13, SaveCaptureResponse: 14, Value: 26, Button: 27, StartTraining: 39, TrainingProgress: 40,
+                   TrainingDone: 41, AbCompare: 42, CompareCab: 43, Metering: 64, StartCapture: 73, CaptureStateRequest: 87,
+                   CaptureState: 88, CaptureSanity: 93, StateResponse: 2 };
+    const CAP_CONNECT = [
+      ['Guitar into <b>INPUT 1</b>.', '<b>OUTPUT 2R (CAPTURE OUT)</b> to the amp’s input.',
+       'A mic in front of the speaker into <b>CAPTURE INPUT</b>: about 1 inch (2–3 cm) from the grill, at the centre of the cone, straight on. Dynamic mics plug in directly, condenser mics need a preamp. Towards the edge = fewer mids, closer = more bass, angled (45°) = warmer.',
+       'Headphones into <b>HP OUTPUT</b>, or a monitor on <b>OUTPUT 1L</b>.'],
+      ['Guitar into <b>INPUT 1</b>.', '<b>OUTPUT 2R (CAPTURE OUT)</b> to the amp’s input.',
+       '<b>Reactive load box:</b> the amp’s speaker output into the load box, its line output into <b>CAPTURE INPUT</b>. Or the amp’s <b>D.I. out</b> into CAPTURE INPUT – with a cabinet still connected to the amp.',
+       'Headphones into <b>HP OUTPUT</b>, or a monitor on <b>OUTPUT 1L</b>.'],
+      ['Guitar into <b>INPUT 1</b>.', '<b>OUTPUT 2R (CAPTURE OUT)</b> to the pedal’s input.', 'The pedal’s output into <b>CAPTURE INPUT</b>.',
+       'Headphones into <b>HP OUTPUT</b>, or a monitor on <b>OUTPUT 1L</b>.'],
+    ];
+    const CAP_SAVE_TYPES = ['amp_head', 'amp_and_cab', 'cab', 'pedal', 'default'];
+    var cap = {   // (var: writeC304 above looks at it)
+      mode: false, step: 0, type: 0, saveType: 1, gain: 0, level: 0, progress: 0, cab: 0, source: false, auto: 0,
+      autoTimer: null, saving: false, saveSlot: 0, slotPicking: false, chosenSlot: 0, name: '', leaving: false,
+      exitsNeeded: 1, exitsSent: 0, contextSeen: false, lastMeterAt: 0, peak: [0, 0], peakAt: [0, 0], meterMax: [0, 0],
+      checkTimer: null, bypass: false, stopArmed: 0
+    };
+
+    function capAllowed(type) {
+      return type === null || type === 1 || type === 30 || type === 65 || type === 76 || type === 91;
+    }
+
+    function pbVar(field, value) { return [field << 3, ...encodeVarint(value)]; }
+    function pbBytes(field, bytes) { return [field << 3 | 2, ...encodeVarint(bytes.length), ...bytes]; }
+    function pbStr(field, text) { return pbBytes(field, Array.from(new TextEncoder().encode(text))); }
+
+    function capSend(label, type, payload = []) {
+      cap.bypass = true;
+      const done = writeC304('Capture: ' + label, buildFrame(payload, type), type === CAPM.Value ? 'capValue' + payload[1] : null);
+      cap.bypass = false;
+      return done;
+    }
+
+    // The app's sliders: value = min + (max − min) · p^(1 / skew), p = raw / 255.
+    function capDb(which, raw) {
+      const p = Math.max(0, Math.min(255, raw)) / 255;
+      return which === 0 ? 24 * Math.pow(p, 1 / 0.9) : -60 + 72 * Math.pow(p, 1 / 3.8018);
+    }
+    function capDbText(which, raw) {
+      const db = capDb(which, raw);
+      return (db < 0 ? '−' : '') + Math.abs(db).toFixed(1) + ' dB';
+    }
+
+    function capRender() {
+      const steps = $('capSteps').children;
+      for (let i = 0; i < 4; i++) {
+        steps[i].className = i + 1 === cap.step ? 'on' : i + 1 < cap.step ? 'done' : '';
+        steps[i].textContent = i + 1 < cap.step ? ['Connect', 'Levels', 'Capture', 'Compare & save'][i] : (i + 1) + ' · ' + ['Connect', 'Levels', 'Capture', 'Compare & save'][i];
+      }
+      document.querySelectorAll('#capOverlay .cw-page').forEach(p => { p.hidden = Number(p.dataset.step) !== cap.step; });
+      document.querySelectorAll('#capTypes button').forEach(b => b.classList.toggle('on', Number(b.dataset.type) === cap.type));
+      $('capConnect').innerHTML = CAP_CONNECT[cap.type].map(s => '<li>' + s + '</li>').join('');
+      $('capGain').value = cap.gain;
+      $('capLevel').value = cap.level;
+      $('capGainVal').textContent = capDbText(0, cap.gain);
+      $('capLevelVal').textContent = capDbText(1, cap.level);
+      document.querySelectorAll('#capOverlay [data-cabs] button').forEach(b => b.classList.toggle('on', Number(b.dataset.cab) === cap.cab));
+      document.querySelectorAll('#capListen button').forEach(b => b.classList.toggle('on', (b.dataset.listen === '1') === cap.source));
+      document.querySelectorAll('#capAuto button').forEach(b => b.classList.toggle('on', Number(b.dataset.auto) === cap.auto));
+      document.querySelectorAll('#capSaveTypes button').forEach(b => b.classList.toggle('on', Number(b.dataset.save) === cap.saveType));
+      $('capProgTitle').textContent = 'Capturing · ' + cap.progress + ' %';
+      $('capProg').style.width = cap.progress + '%';
+      const left = (100 - cap.progress) * 2.3;   // (on the Nano: about 3.5 minutes from the start to done)
+      $('capProgLeft').textContent = cap.progress <= 0 ? 'Starting …' : left >= 90 ? 'About ' + Math.round(left / 60) + ' minutes left.' : 'Almost done.';
+      const nameOk = $('capName').value.trim().length >= 4 && !cap.saving;
+      $('capSaveLib').disabled = !nameOk;
+      $('capSaveSlot').disabled = !nameOk || (cap.slotPicking && !cap.chosenSlot);
+      $('capSaveSlot').textContent = cap.slotPicking ? (cap.chosenSlot ? 'Save into ' + (Math.floor((cap.chosenSlot - 1) / 5) + 1) + '–' + ((cap.chosenSlot - 1) % 5 + 1) : 'Choose a slot') : 'Save to slot …';
+      $('capSlotCard').hidden = !cap.slotPicking;
+      $('capSaveCard').hidden = cap.slotPicking;
+      if (cap.slotPicking) {
+        $('capSlots').innerHTML = '';
+        for (let s = 1; s <= 25; s++) {
+          const b = document.createElement('button');
+          b.textContent = (Math.floor((s - 1) / 5) + 1) + '–' + ((s - 1) % 5 + 1) + '  ' + (state.captureNames.get(s) || '–');
+          b.title = b.textContent;
+          b.classList.toggle('on', s === cap.chosenSlot);
+          b.onclick = () => { cap.chosenSlot = s; capRender(); };
+          $('capSlots').appendChild(b);
+        }
+      }
+      if (cap.saving) capMessage4('Saving …');
+    }
+
+    function capMessage4(text) { capMsg(4, text); }
+    function capMsg(step, text) {
+      document.querySelectorAll('#capOverlay [data-msg]').forEach(m => { if (Number(m.dataset.msg) === step) m.textContent = text || ''; });
+    }
+    function capClearMessages() { document.querySelectorAll('#capOverlay [data-msg]').forEach(m => { m.textContent = ''; }); }
+
+    function capShow(step, message) {
+      const opening = $('capOverlay').hidden;
+      if (opening) {
+        $('capName').value = '';
+        cap.slotPicking = false;
+        cap.chosenSlot = 0;
+        capClearMessages();
+      }
+      cap.step = step;
+      if (step !== 4) { capAutoStop(); cap.auto = 0; }
+      $('capOverlay').hidden = false;
+      capRender();
+      if (message) capMsg(step, message);
+    }
+
+    function capCloseDialog() {
+      $('capOverlay').hidden = true;
+      capAutoStop();
+      cap.step = 0;
+    }
+
+    function capCheckLater(ms) {
+      clearTimeout(cap.checkTimer);
+      cap.checkTimer = setTimeout(capCheck, ms);
+    }
+
+    function capMetersRunning() { return Date.now() - cap.lastMeterAt < 1200; }
+
+    // Where is the Nano? With field 23 in its state replies that tells; without it the Exits needed for the step it
+    // was on are counted and its capture meters must have stopped.
+    function capCheck() {
+      if (!cap.mode) return;
+      if (cap.contextSeen || !cap.leaving) { requestCurrentPresetState(); return; }
+      if (cap.exitsSent < cap.exitsNeeded || (capMetersRunning() && cap.exitsSent < 4)) {
+        cap.exitsSent++;
+        capExitStep();
+        capCheckLater(900);
+        return;
+      }
+      capLeft();
+    }
+
+    function capExitStep() { return capSend('Exit', CAPM.Button, [0x20, 0x01]); }
+
+    function capEntered(why) {
+      if (cap.mode) return;
+      log('Capture: the Nano is in capture mode (' + why + ') – the editor stays quiet');
+      cap.mode = true;
+      cap.leaving = false;
+      cap.progress = 0;
+      cap.source = false;
+      if ($('capOverlay').hidden) capShow(2);
+    }
+
+    function capLeft() {
+      if (!cap.mode && $('capOverlay').hidden) return;
+      log('Capture: the Nano is back in play mode (meters seen up to ' + cap.meterMax.join(' / ') + ')');
+      const wasLeaving = cap.leaving;
+      cap.mode = cap.leaving = cap.saving = false;
+      clearTimeout(cap.checkTimer);
+      if (!$('capOverlay').hidden) {
+        capCloseDialog();
+        if (!wasLeaving) toast('The Nano left capture mode.', 'info');
+      }
+      beginPresetLoad();
+    }
+
+    function capLeave() {
+      cap.exitsNeeded = cap.step >= 3 ? 2 : 1;
+      capCloseDialog();
+      if (!cap.mode) return;
+      cap.leaving = true;
+      cap.exitTries = 0;
+      cap.exitsSent = 1;
+      capExitStep();
+      capCheckLater(900);
+    }
+
+    async function capOpen() {
+      if (!state.connected) { toast('Connect the Nano first.', 'error'); return; }
+      const users = state.library && state.library.user ? state.library.user.length : 0;
+      if (users >= 256) {
+        await showNotice('My Neural Captures is full', 'The Nano keeps up to 256 own captures. Delete one under Organize captures first.');
+        return;
+      }
+      cap.type = 0;
+      cap.saveType = 1;
+      cap.cab = 0;
+      cap.auto = 0;
+      capStart(1);
+    }
+
+    function capStart(step) {
+      log('Capture: ' + (step === 1 ? 'new capture – into capture mode' : 'another capture'));
+      cap.mode = true;
+      cap.leaving = cap.saving = false;
+      cap.progress = 0;
+      cap.source = false;
+      cap.meterMax = [0, 0];
+      cap.slotPicking = false;
+      cap.chosenSlot = 0;
+      capShow(step);
+      capSend('start capture mode', CAPM.StartCapture);
+      capCheckLater(500);   // the state then holds CAPTURE IN / OUTPUT LEVEL
+    }
+
+    function capAutoStop() {
+      if (cap.autoTimer) clearInterval(cap.autoTimer);
+      cap.autoTimer = null;
+    }
+
+    function capListen(source) {
+      cap.source = source;
+      capSend('A/B', CAPM.AbCompare, pbVar(3, source ? 1 : 0));
+      capRender();
+    }
+
+    async function capSave(slot) {
+      const name = $('capName').value.trim();
+      if (name.length < 4) { capMsg(4, 'The name needs at least 4 characters.'); return; }
+      if ((state.library.user || []).some(x => sameName(x.name, name))) { capMsg(4, 'A capture with this name is already in My Neural Captures.'); return; }
+      const record = [...pbStr(2, name), ...pbStr(6, CAP_SAVE_TYPES[cap.saveType]), ...pbStr(10, 'guitar')];
+      cap.name = name;
+      cap.saveSlot = slot;
+      cap.saving = true;
+      capRender();
+      log('Capture: saving "' + name + '" (' + CAP_SAVE_TYPES[cap.saveType] + ')' + (slot ? ' and loading it into slot ' + slot : ''));
+      capSend('save', CAPM.SaveCapture, pbBytes(4, record));
+    }
+
+    function capDone(text) {
+      cap.saving = false;
+      $('capDoneTitle').textContent = cap.name + ' is saved';
+      $('capDoneText').textContent = text;
+      capShow(5);
+      requestLibraryContent();
+    }
+
+    // State reply: in capture mode only the capture's values count (true = handled, the preset stays as it was).
+    function capStateReply(fields) {
+      const value = n => fields[n] && fields[n][0] ? fields[n][0].value : 0;
+      if (value(23) !== 1) {
+        if (!cap.mode) return false;
+        if (cap.contextSeen) { capLeft(); return false; }
+        return true;
+      }
+      if (!cap.contextSeen) log('Capture: the Nano reports capture mode in its state (field 23)');
+      cap.contextSeen = true;
+      cap.gain = Math.min(255, value(3));
+      cap.level = Math.min(255, value(4));
+      capEntered('state');
+      if (cap.leaving) {
+        if (++cap.exitTries > 4) {
+          cap.leaving = false;
+          capShow(2, 'The Nano stays in capture mode – press EXIT on the Nano.');
+          return true;
+        }
+        capExitStep();
+        capCheckLater(700);
+        return true;
+      }
+      if (!$('capOverlay').hidden) capRender();
+      return true;
+    }
+
+    function capMeter(data) {
+      const f = framePayloadFields(data);
+      const which = f[3] && f[3][0] ? f[3][0].value : 0, value = f[4] && f[4][0] ? f[4][0].value : 0;
+      if (which > 1) return false;   // (2 = the expression pedal)
+      cap.lastMeterAt = Date.now();
+      if (value > cap.meterMax[which]) { cap.meterMax[which] = value; log('Capture meter ' + (which ? 'OUTPUT' : 'IN') + ': new highest value ' + value); }
+      if (!cap.mode && !cap.leaving) { capEntered('levels from the Nano'); requestCurrentPresetState(); }
+      const v = Math.max(0, Math.min(255, value)), pct = v / 255 * 100;
+      const fill = $('capFill' + which), peak = $('capPeak' + which);
+      fill.style.width = pct + '%';
+      fill.classList.toggle('hot', v > 240);
+      const now = Date.now();
+      if (v >= cap.peak[which] || now - cap.peakAt[which] > 1500) { cap.peak[which] = v; cap.peakAt[which] = now; peak.style.left = pct + '%'; }
+      return true;
+    }
+
+    // Messages of the capture (true = handled).
+    function capMessage(type, data) {
+      if (![CAPM.Button, CAPM.TrainingProgress, CAPM.TrainingDone, CAPM.CaptureState, CAPM.CaptureSanity, CAPM.AbCompare,
+            CAPM.CompareCab, CAPM.SaveCaptureResponse, MSG.SetCaptureSlotContentResponse, CAPM.Value, CAPM.StateResponse].includes(type)) return false;
+      const f = framePayloadFields(data);
+      const value = n => f[n] && f[n][0] ? f[n][0].value : 0;
+      switch (type) {
+        case CAPM.StateResponse:   // (a small, complete one: in capture mode)
+          if (data[1] !== 0xC0 || !cap.mode) return false;
+          return capStateReply(f);
+        case CAPM.Button: {
+          const button = value(3);
+          log('Capture: ' + ['EXIT', 'CAPTURE', 'SAVE'][button] + ' pressed on the Nano');
+          if (button === 1) { capEntered('CAPTURE on the Nano'); requestCurrentPresetState(); }
+          else if (button === 2) { if (cap.mode) capMsg(cap.step, 'Saving on the Nano itself: choose the slot with its knobs, hold SAVE to confirm.'); }
+          else if (cap.mode && !cap.leaving) {
+            if (cap.step >= 3 && cap.step < 5) { cap.progress = 0; capShow(2); capCheckLater(400); }
+            else { cap.leaving = true; cap.exitsNeeded = cap.exitsSent = 1; capCloseDialog(); capCheckLater(1500); }
+          }
+          return true;
+        }
+        case CAPM.TrainingProgress: {   // 0-255 (Cortex Cloud shows value / 255; seen on the Nano: done after ~220)
+          const percent = Math.min(100, Math.floor(value(3) * 100 / 255)), changed = percent !== cap.progress;
+          cap.progress = percent;
+          capEntered('capturing');
+          if (changed) log('Capture: ' + percent + ' % (' + value(3) + ')');
+          if (cap.step !== 3) capShow(3); else capRender();
+          return true;
+        }
+        case CAPM.TrainingDone:
+          log('Capture: done – compare and save');
+          cap.progress = 100;
+          cap.source = false;
+          capSend('state request', CAPM.CaptureStateRequest);
+          capShow(4);
+          $('capName').focus();
+          return true;
+        case CAPM.CaptureState: {
+          const step = value(3);
+          cap.progress = Math.min(100, Math.floor(value(4) * 100 / 255));
+          cap.source = value(7) === 1;
+          cap.cab = value(8);
+          log('Capture state: step ' + step + ', ' + cap.progress + ' %, listening to the ' + (cap.source ? 'original' : 'capture') + ', cab ' + cap.cab);
+          if (step === 1) capShow(2); else if (step === 2) capShow(3); else if (step === 3 && cap.step !== 5) capShow(4); else capRender();
+          return true;
+        }
+        case CAPM.CaptureSanity: {
+          const status = value(3);
+          log('Capture: signal check ' + status);
+          if (status === 0) capShow(2, 'No signal, or it was too low. Check the cables and raise Capture In, then start again.');
+          else if (status === 1) capShow(2, 'The signal was too hot. Turn BOOST off or the amp’s / pedal’s output down, then start again.');
+          return true;
+        }
+        case CAPM.AbCompare: cap.source = value(3) === 1; capRender(); return true;
+        case CAPM.CompareCab: cap.cab = value(3); capRender(); return true;
+        case CAPM.SaveCaptureResponse: {
+          const status = value(3);
+          log('Capture saved into the Nano’s library (status ' + status + ')');
+          if (!cap.saving) { requestLibraryContent(); return true; }   // (Cortex Cloud saved one)
+          if (status !== 1) {
+            cap.saving = false;
+            const why = f[5] && f[5][0] && f[5][0].raw ? new TextDecoder().decode(new Uint8Array(f[5][0].raw)) : '';
+            capShow(4, 'The Nano did not save the capture' + (why ? ' (' + why + ')' : '') + '.');
+            return true;
+          }
+          const id = f[4] && f[4][0] && f[4][0].raw ? Array.from(f[4][0].raw) : null;
+          if (cap.saveSlot && id) {
+            capSend('into slot ' + cap.saveSlot, MSG.SetCaptureSlotContentRequest, [...pbVar(3, cap.saveSlot - 1), ...pbBytes(5, id)]);
+            return true;
+          }
+          capDone('My Neural Captures' + (cap.saveSlot ? ' – not loaded into the slot (no id in the Nano’s answer)' : ''));
+          return true;
+        }
+        case MSG.SetCaptureSlotContentResponse: {
+          if (!cap.saving) return false;
+          const ok = value(3) === 1, s = cap.saveSlot;
+          capDone('My Neural Captures' + (ok ? ' · capture bank ' + (Math.floor((s - 1) / 5) + 1) + ', slot ' + ((s - 1) % 5 + 1) : ' (the slot was not changed)'));
+          if (ok) beginPresetLoad();
+          return true;
+        }
+        case CAPM.Value:
+          if (value(5) !== 1) return false;
+          if (value(3) === 1) cap.level = value(4); else cap.gain = value(4);
+          log('Capture: IN ' + cap.gain + ', OUTPUT ' + cap.level + ' (set on the Nano or in an app)');
+          capEntered('capture value');
+          capRender();
+          return true;
+      }
+      return false;
+    }
+
+    function capDisconnected() {
+      if (!cap.mode && $('capOverlay').hidden) return;
+      cap.mode = cap.leaving = cap.saving = false;
+      clearTimeout(cap.checkTimer);
+      capCloseDialog();
+    }
+
+    // ---- the dialog's controls ----
+    $('captureBtn').addEventListener('click', capOpen);
+    $('capClose').addEventListener('click', capLeave);
+    $('capTypes').addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      cap.type = Number(b.dataset.type);
+      cap.saveType = [1, 0, 3][cap.type];
+      capRender();
+    });
+    ['capGain', 'capLevel'].forEach((id, which) => $(id).addEventListener('input', e => {
+      const v = Number(e.target.value);
+      if (which) cap.level = v; else cap.gain = v;
+      $(which ? 'capLevelVal' : 'capGainVal').textContent = capDbText(which, v);
+      capSend(which ? 'output level' : 'capture in', CAPM.Value, [0x18, which, ...pbVar(4, v), 0x28, 0x01]);
+    }));
+    document.querySelectorAll('#capOverlay [data-cabs]').forEach(seg => seg.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      cap.cab = Number(b.dataset.cab);
+      capSend('listen through cab', CAPM.CompareCab, pbVar(3, cap.cab));
+      capRender();
+    }));
+    $('capListen').addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      cap.auto = 0;
+      capAutoStop();
+      capListen(b.dataset.listen === '1');
+    });
+    $('capAuto').addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      cap.auto = Number(b.dataset.auto);
+      capAutoStop();
+      if (cap.auto) cap.autoTimer = setInterval(() => capListen(!cap.source), cap.auto * 1000);
+      capRender();
+    });
+    $('capSaveTypes').addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      cap.saveType = Number(b.dataset.save);
+      capRender();
+    });
+    $('capName').addEventListener('input', () => capRender());
+    $('capName').addEventListener('keydown', e => { if (e.key === 'Enter' && !$('capSaveLib').disabled) capSave(0); });
+    document.querySelectorAll('#capOverlay [data-cap]').forEach(b => b.addEventListener('click', async () => {
+      switch (b.dataset.cap) {
+        case 'close': capLeave(); break;
+        case 'levels': cap.step = 2; capRender(); break;
+        case 'connect': cap.step = 1; capRender(); break;
+        case 'start':
+          log('Capture: start (IN ' + cap.gain + ', OUTPUT ' + cap.level + ')');
+          cap.progress = 0;
+          capSend('start', CAPM.StartTraining);
+          capShow(3);
+          break;
+        case 'stop':
+          if (!await askConfirm('Stop the capture?', 'What the Nano has learned so far is lost; you go back to the levels.', { ok: 'Stop capture', danger: true })) break;
+          capExitStep();
+          cap.progress = 0;
+          capShow(2);
+          capCheckLater(700);
+          break;
+        case 'discard':
+          if (!await askConfirm('Discard this capture?', 'It is not saved; you go back to the levels for a new try.', { ok: 'Discard', danger: true })) break;
+          capAutoStop();
+          cap.auto = 0;
+          capExitStep();
+          capShow(2);
+          capCheckLater(700);
+          break;
+        case 'savelib': capSave(0); break;
+        case 'saveslot':
+          if (!cap.slotPicking) { cap.slotPicking = true; cap.chosenSlot = 0; capRender(); break; }
+          if (cap.chosenSlot) { cap.slotPicking = false; capSave(cap.chosenSlot); }
+          break;
+        case 'slotback': cap.slotPicking = false; cap.chosenSlot = 0; capRender(); break;
+        case 'again': capStart(2); break;
+        case 'done': capLeave(); break;
+      }
+    }));
+
     function handleTypedMessage(data) {
       const type = frameType(data);
+      if (capMessage(type, data)) return true;
 
       if (type === MSG.Selector) {
         handleSelector(data);
