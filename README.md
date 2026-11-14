@@ -325,6 +325,25 @@ without a server of its own. Sharing needs a free GitHub account; looking and lo
   not needed by the editor. Without login, GitHub answers a computer 60 times an hour; the editor asks once when the
   list opens and keeps it for ten minutes, unless you press **Refresh**.
 
+## Neural Capture (V1)
+
+From 1.18.0 the editor guides a capture on the Nano itself – amp, cab or pedal, Neural Capture V1, which the Nano learns
+on its own (no internet, no account): **…** → **New Neural Capture…**.
+
+1. **Connect** – choose *Amp + cab (mic)*, *Amp head* (reactive load box or D.I. out) or *Pedal*; the cabling for it is
+   listed step by step. Never connect a tube amp's speaker output to the Nano without a reactive load box.
+2. **Levels** – Capture In and Output level with live meters from the Nano: strum hard, both bars in the marked field.
+   Still too low at +24 dB? Set it to 0 and switch BOOST on at the Nano (+26 dB). Output level is only what you hear.
+3. **Capture** – about 5 minutes; the Nano plays test tones through the amp. Don't play and don't touch anything.
+   If the Nano finds the signal too low or too hot, the editor goes back to the levels and says so.
+4. **Compare & save** – Capture / Original (also switching by itself every 2, 4 or 8 s), a name (4+ characters, used
+   once) and the type, then **Save to library** (My Neural Captures) or **Save to slot …** (the capture in that slot
+   stays in the library).
+
+While the Nano is in capture mode the editor sends nothing else to it, and it notices capture mode started with the
+Nano's CAPTURE button or in Cortex Cloud. The steps follow Neural DSP's guide to capturing on the Nano Cortex; the
+messages are the ones Cortex Cloud 2.8.3 uses. Not yet tried on a Nano – please report how it went.
+
 ## MIDI controller
 
 Click the **MIDI** icon → **Start MIDI Learn**, click a knob, slider or switch in the editor and move a control on your
