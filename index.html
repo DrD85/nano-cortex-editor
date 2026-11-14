@@ -1101,6 +1101,7 @@
     .pd { position: relative; flex: 0 1 auto; min-width: 0; display: grid; justify-items: center; gap: 8px; cursor: pointer; user-select: none; }
     .pd .art { position: relative; display: grid; place-items: end center; min-height: 40px; }
     .pd .art img.amp-photo { max-width: 240px; max-height: 150px; }
+    .pd .art img.small { max-height: 112px; }
     .capture-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; }
     .capture-row > select { min-width: 0; }
     .capture-row:has(> .amp-thumb[hidden]) { grid-template-columns: minmax(0, 1fr); }
@@ -3089,8 +3090,18 @@
       'MX Phase 95': 'img/mxr phase 95.png',
       'MX Vibes': 'img/MXR Univibe.png',
       'MX Vibe': 'img/MXR Univibe.png',
-      'Love Meat': 'img/Lovetone Meatball.png'
+      'Love Meat': 'img/Lovetone Meatball.png',
+      // Neural DSP's utility effects (no original): the nearest real device or Neural's own plugin picture
+      'Adaptive Gate': 'img/Fortin Zuul.png',
+      'Utility Gate': 'img/ISP Decimator.png',
+      'Graphic 9': 'img/Nolly Graphic 9.png',
+      'Parametric 3': 'img/Empress ParaEq.png',
+      'Low-High Cut': 'img/Cory Wong EQ.png',
+      'Volume': 'img/Ernie Ball VP.png',
+      'Envelope Filter': 'img/Cory Wong Postal Service.png',
+      'Tremolo': 'img/Fender MTG Tremolo.png'
     };
+    const GATE_IMAGE = 'img/Fortin Zuul.png';   // the input gate in the pedal view
     // The pictures are not part of the public editor: the picture column only shows where img/ exists.
     {
       const probe = new Image();
@@ -11283,7 +11294,7 @@ function parseSelectedCaptureState(payload) {
       const ampPhoto = state.capture.on ? captureAmpPicture() : amalgamFor(state.currentCapture.name);
       const cabName = state.cabIR.on ? state.currentIR.shortName || 'Cab / IR' : 'Bypassed';
       box.innerHTML = '<div class="io">IN</div>' +
-        pedal('gate', state.gate.on, '#F2F2F2', drawn('gate', 'small'), 'Gate', gateValue) + fx('pre1') + fx('pre2') +
+        pedal('gate', state.gate.on, '#F2F2F2', pictures ? '<img class="small" src="' + GATE_IMAGE + '" alt="">' : drawn('gate', 'small'), 'Gate', gateValue) + fx('pre1') + fx('pre2') +
         pedal('capture', state.capture.on, '#F2F2F2', ampPhoto ? '<img class="amp-photo" src="' + escapeHTML(ampPhoto.file) + '" alt="">'
           : '<div class="amp"><div class="grille"><span class="plate">' + escapeHTML(captureName) +
           '</span></div><div class="panel"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>', 'Capture', captureName) +
