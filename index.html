@@ -1853,7 +1853,7 @@
     .fxi-tips { margin: 10px 0 0; padding-left: 16px; font-size: 12.5px; line-height: 1.5; color: #b8bcc1; }
     .fxi-tips li + li { margin-top: 4px; }
     .fxi-foot { margin-top: 12px; padding-top: 10px; border-top: 1px solid #2c3035; font-size: 10.5px; line-height: 1.45; color: #6f747a; }
-    /* the large view of an effect (personal build, notes from img/fx-info/index.js): the original, starting points, tips */
+    /* the large view of an effect (FX_INFO_MORE): the original, starting points, tips; the photo only where img/ is */
     .fxi-panel { width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: auto; border-top: 2px solid var(--block-color); }
     .fxi-panel .fxi-sub { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; margin-left: 4px; }
     .fxi-cols { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; margin-top: 16px; }
@@ -3064,34 +3064,34 @@
     const postFx2Models = [].concat(deviceModels.postUtilityEQ.slice(1), deviceModels.delay);
     const postFx3Models = [].concat(deviceModels.postUtilityEQ.slice(1), deviceModels.reverb);
 
-    // Originals: Pedal Playground's photos (img/pp, the same as in the QC Editor); wahs, LA-2A, Whammy, Lexicon and the
-    // utility stand-ins: the pictures chosen before.
+    // Pedal Playground's photos (img/pp, as in the QC Editor): the original where there is one, else the nearest real
+    // device for Neural DSP's own models; Budda wah, LA-2A, SSL and Lexicon 224: photos of the originals themselves.
     const MODEL_IMAGES = {
-      'Circular Delay': 'img/Circular delay.png',
-      'Digital Delay (ST)': 'img/Digital Delay.png',
-      'Ambience': 'img/ambience reverb.png',
-      'Hall': 'img/Hall.png',
-      'Modulated': 'img/modulated reverb.png',
-      'Room': 'img/Room reverb.png',
+      'Circular Delay': 'img/pp/strymon-volante.png',
+      'Digital Delay (ST)': 'img/pp/boss-dd3.png',
+      'Ambience': 'img/pp/mrblack-ambience.png',
+      'Hall': 'img/pp/ehx-holy-grail.png',
+      'Modulated': 'img/pp/catalinbread-sinkhole.png',
+      'Room': 'img/pp/boss-rv6.png',
 
-      'Bass Wah': 'img/Bass wah.png',
-      'Bass wah': 'img/Bass wah.png',
-      'modulated': 'img/modulated reverb.png',
-      'Cave': 'img/Cave delay.png',
+      'Bass Wah': 'img/pp/dunlop-105q.png',
+      'Bass wah': 'img/pp/dunlop-105q.png',
+      'modulated': 'img/pp/catalinbread-sinkhole.png',
+      'Cave': 'img/pp/earthquaker-afterneath.png',
 
-      'Tape Delay': 'img/Tape Delay.png',
-      'Circular delay': 'img/Circular delay.png',
-      'Analoge Delay': 'img/Analog Delay.png',
-      'Analog Delay': 'img/Analog Delay.png',
-      'Digital Delay': 'img/Digital Delay.png',
-      'Dual Delay': 'img/Dual Delay.png',
-      'Dual Reverse Delay': 'img/Reverse delay.png',
-      'Cave Reverb': 'img/Cave delay.png',
-      'modulated reverb': 'img/modulated reverb.png',
-      'Bass wah': 'img/Bass wah.png',
+      'Tape Delay': 'img/pp/boss-re2.png',
+      'Circular delay': 'img/pp/strymon-volante.png',
+      'Analoge Delay': 'img/pp/boss-dm2.png',
+      'Analog Delay': 'img/pp/boss-dm2.png',
+      'Digital Delay': 'img/pp/boss-dd3.png',
+      'Dual Delay': 'img/pp/strymon-timeline.png',
+      'Dual Reverse Delay': 'img/pp/tc-flashback.png',
+      'Cave Reverb': 'img/pp/earthquaker-afterneath.png',
+      'modulated reverb': 'img/pp/catalinbread-sinkhole.png',
+      'Bass wah': 'img/pp/dunlop-105q.png',
       'Bubba Wah': 'img/Budda Wah.png',
-      'Crying Clyde Wah': 'img/Crying Clyde wah.png',
-      'Crying Wah': 'img/cry Baby.png',
+      'Crying Clyde Wah': 'img/pp/dunlop-cm95.png',
+      'Crying Wah': 'img/pp/dunlop-gcb95.png',
       'Chief BD 2': 'img/pp/boss-bd2.png',
       'Chief BD2': 'img/pp/boss-bd2.png',
       'Chief OD1': 'img/pp/boss-od1.png',
@@ -3105,10 +3105,10 @@
       'Exotic Bass Z Boost': 'img/pp/xotic-bass-rcboosterv2.png',
       'Microtubes B3K': 'img/pp/darkglass-b3k.png',
       'Mind Hall': 'img/Lexicon224.png',
-      'Shimmer': 'img/Shimmer Reverb.png',
+      'Shimmer': 'img/pp/eventide-h9.png',
       'Blossom (ST)': 'img/pp/strymon-bigsky.png',
       'Poly Octaver': 'img/pp/ehx-micro-pog.png',
-      'Wham': 'img/DigiTech Whammy.png',
+      'Wham': 'img/pp/digitech-whammy.png',
       'Chief OC2': 'img/pp/boss-oc2.png',
       'Legendary 87 (M)': 'img/pp/ua-1176.png',
       'Legendary 87 (ST)': 'img/pp/ua-1176.png',
@@ -3116,8 +3116,8 @@
       'Opto Comp (ST)': 'img/Opto Comp.png',
       'Solid State Comp (M)': 'img/SSL Comp.png',
       'Solid State Comp (ST)': 'img/SSL Comp.png',
-      'VCA Comp (M)': 'img/VCA Comp.png',
-      'VCA Comp (ST)': 'img/VCA Comp.png',
+      'VCA Comp (M)': 'img/pp/mxr-m102.png',
+      'VCA Comp (ST)': 'img/pp/mxr-m102.png',
       'Chief CE2W (ST)': 'img/pp/boss-ce2w.png',
       'Chief DC2W (ST)': 'img/pp/boss-dc2w.png',
       'Chorus 229T': 'img/pp/tc-2290p.png',
@@ -3128,17 +3128,19 @@
       'MX Vibes': 'img/pp/mxr-m68.png',
       'MX Vibe': 'img/pp/mxr-m68.png',
       'Love Meat': 'img/pp/lovetone-meatball.png',
-      // Neural DSP's utility effects (no original): the nearest real device or Neural's own plugin picture
-      'Adaptive Gate': 'img/Fortin Zuul.png',
-      'Utility Gate': 'img/ISP Decimator.png',
-      'Graphic 9': 'img/Nolly Graphic 9.png',
-      'Parametric 3': 'img/Empress ParaEq.png',
-      'Low-High Cut': 'img/Cory Wong EQ.png',
-      'Volume': 'img/Ernie Ball VP.png',
-      'Envelope Filter': 'img/Cory Wong Postal Service.png',
-      'Tremolo': 'img/Fender MTG Tremolo.png'
+      // Neural DSP's own effects: the nearest real device
+      'Adaptive Gate': 'img/pp/fortin-zuul.png',
+      'Utility Gate': 'img/pp/isp-decimator.png',
+      'Graphic 9': 'img/pp/mxr-m108s.png',
+      'Parametric 3': 'img/pp/empress-para-eq.png',
+      'Low-High Cut': 'img/pp/broughton-low-high-pass-filter.png',
+      'Volume': 'img/pp/ernie-ball-vp.png',
+      'Envelope Filter': 'img/pp/ehx-q-tron-plus.png',
+      'Doubler': 'img/pp/tc-mimiq.png',
+      'Transpose': 'img/pp/digitech-drop.png',
+      'Tremolo': 'img/pp/boss-tr2.png'
     };
-    const GATE_IMAGE = 'img/Fortin Zuul.png';   // the input gate in the pedal view
+    const GATE_IMAGE = 'img/pp/fortin-zuul.png';   // the input gate in the pedal view
     // The pictures are not part of the public editor: the picture column only shows where img/ exists.
     {
       const probe = new Image();
@@ -3149,11 +3151,6 @@
         amps.src = 'img/amalgam/index.js';
         amps.onload = () => render();
         document.head.appendChild(amps);
-        // the richer effect notes with the real devices and starting points (private as well)
-        const notes = document.createElement('script');
-        notes.src = 'img/fx-info/index.js';
-        notes.onload = () => render();
-        document.head.appendChild(notes);
       };
       probe.src = Object.values(MODEL_IMAGES)[0];
     }
@@ -11133,12 +11130,784 @@ function parseSelectedCaptureState(payload) {
       'Shimmer': { cat: 'Reverb', text: 'Reverb with a pitch-shifted tail – the octave shimmer of ambient guitar.',
         tips: ['Pitch sets the interval of the tail (+12 is the classic octave), Feedback how much of it builds up.', REVERB_TIP] }
     };
-    // The personal build adds richer notes from img/fx-info/index.js (private: real devices, players, starting points);
-    // they replace the neutral text and tips of the same model and open in the large view instead of the popover.
+    // The richer notes per model (the large view): basedOn (the original, as named by Neural DSP or the Unofficial Quad
+    // Cortex Device List) or like (classic devices of the same kind, for orientation only), made (year, maker), text,
+    // heard, starts ([{ name, values: { control: value in the Nano's own units, enums by their label }, why }]), tips,
+    // photo (show the model's picture in the large view without a basedOn - only where the pictures are, img/ is private).
+    // Written for this editor from the device list's notes and general knowledge; values are starting points, not recipes.
+    // They replace the short text and tips above and open in the large view instead of the popover.
+    const FX_INFO_MORE = {
+      // ---------------------------------------------------------------- guitar overdrive
+      'Chief BD2': {
+        basedOn: 'BOSS BD-2 Blues Driver',
+        made: '1995 · BOSS (Roland), Japan',
+        text: 'An open, amp-like overdrive that keeps your guitar\'s character. It reacts strongly to pick attack and the guitar volume – from a slightly hairy clean to a gritty, almost fuzzy crunch – and has more low end and bite than a Tube Screamer-style drive.',
+        starts: [
+          { name: 'Edge of breakup', values: { Gain: 2.5, Tone: 4.5, Volume: 6.5 }, why: 'Clean when you play soft, gritty when you dig in.' },
+          { name: 'Blues crunch', values: { Gain: 5.5, Tone: 5, Volume: 5.5 }, why: 'Into a clean capture; roll back the guitar volume for rhythm.' },
+          { name: 'Hairy lead', values: { Gain: 8, Tone: 4, Volume: 5.5 }, why: 'Thick and fuzzy – keep Tone below the middle.' }
+        ],
+        tips: [
+          'Tone gets bright quickly – most settings live between 3.5 and 5.5.',
+          'Above 7 on Gain it turns fuzzy and compressed; for a cleaner push stay low and raise Volume.',
+          'Great as an always-on "amp" in front of a clean capture.'
+        ]
+      },
+      'Chief OD1': {
+        basedOn: 'BOSS OD-1 OverDrive',
+        made: '1977 · BOSS – one of the very first BOSS compact pedals',
+        text: 'The pedal that made "overdrive" a word: asymmetric clipping gives a smooth, mid-forward drive that is more open and less compressed than the Tube Screamer that followed it. No tone control – it lets the amp do the voicing.',
+        starts: [
+          { name: 'Amp pusher', values: { Gain: 2, Level: 70 }, why: 'The classic use: low drive, high level, into a crunchy capture.' },
+          { name: 'Mild crunch', values: { Gain: 5, Level: 55 }, why: 'On a clean capture.' },
+          { name: 'Full drive', values: { Gain: 8, Level: 45 } }
+        ],
+        tips: [
+          'The device list\'s tip: drive below 9 o\'clock (about 2) and level above 2 o\'clock (about 70 %) to make the amp work.',
+          'No tone control – shape it with the capture or an EQ after it.'
+        ]
+      },
+      'Exotic': {
+        basedOn: 'Xotic BB Preamp',
+        made: 'about 2005 · Xotic Effects, California – "BB" stands for Bluesbreaker',
+        text: 'A wide-range overdrive with a ±15 dB active two-band EQ: from a big clean boost to a smooth, compressed, singing lead. It keeps more bass than a Tube Screamer and gets considerably wilder.',
+        heard: 'Andy Timmons, Greg Howe.',
+        starts: [
+          { name: 'Booster', values: { Gain: 1, Bass: 6, Treble: 4, Volume: 7 }, why: 'Device list: gain at 8 o\'clock, volume 2 o\'clock, treble 11, bass 1.' },
+          { name: 'With a clean amp', values: { Gain: 7, Bass: 5, Treble: 4, Volume: 6 }, why: 'Device list: gain 2 o\'clock, volume 1, treble 11, bass 12.' },
+          { name: 'Singing lead', values: { Gain: 8.5, Bass: 5, Treble: 5, Volume: 6 } }
+        ],
+        tips: [
+          'Bass and Treble are active: 5 is flat, every step is a few dB – small moves go a long way.',
+          'Cut a little Bass in front of a high-gain capture to keep it tight.'
+        ]
+      },
+      'Exotic Z Boost': {
+        basedOn: 'Xotic RC Booster',
+        made: 'Xotic Effects, California – "RC" for "really clean"',
+        text: 'A transparent clean boost with up to about 20 dB of gain and an active two-band EQ: it makes a Strat sound like a louder Strat. Turn up the gain and it adds a light, Klon-ish grit.',
+        heard: 'Brad Paisley, Brent Mason.',
+        starts: [
+          { name: 'Clean boost', values: { Gain: 2, Volume: 5, Bass: 5, Treble: 5 }, why: 'Device list: volume 12 o\'clock, gain 9 o\'clock.' },
+          { name: 'Light overdrive', values: { Gain: 6, Volume: 4, Bass: 5, Treble: 5 }, why: 'Device list: volume 11 o\'clock, gain 1 o\'clock.' },
+          { name: 'Lead boost', values: { Gain: 7, Volume: 5.5, Bass: 5, Treble: 5.5 }, why: 'Device list: volume 12:30, gain 2 o\'clock.' }
+        ],
+        tips: [
+          'After a drive it is a pure volume boost for solos; before the capture it pushes the amp.',
+          'A touch of Treble brings back sparkle that long cables or dark captures lose.'
+        ]
+      },
+      'Exotic Bass Z Boost': {
+        basedOn: 'Xotic RC Bass Booster',
+        made: 'Xotic Effects, California',
+        text: 'The bass version of the RC Booster: a transparent boost of up to about 20 dB with an active EQ voiced for bass. It thickens the tone and puts the bass a little forward in the mix without changing its character.',
+        starts: [
+          { name: 'Always-on preamp', values: { Gain: 2, Volume: 4, Treble: 4, Bass: 5 }, why: 'Device list: gain 9 o\'clock, volume 11, treble 11, bass 12.' },
+          { name: 'Fat low end', values: { Gain: 2, Volume: 5, Treble: 5, Bass: 7 }, why: 'After a distortion it puts the low end back.' },
+          { name: 'Grit', values: { Gain: 6.5, Volume: 4.5, Treble: 5, Bass: 5.5 } }
+        ],
+        tips: [
+          'Place it after the B3K or another drive with Bass around 7 to bring back the low end distortion takes away.'
+        ]
+      },
+      'Facial Fuzz': {
+        basedOn: 'Dunlop Fuzz Face (Arbiter Fuzz Face)',
+        made: '1966 · Arbiter, London – today made by Dunlop',
+        text: 'The classic two-transistor fuzz in the round case: thick, woolly and extremely touch-sensitive. Rolling back the guitar volume cleans it up to a glassy, slightly hairy tone – that interplay is the whole point.',
+        heard: 'Jimi Hendrix, David Gilmour, Eric Johnson.',
+        starts: [
+          { name: 'Classic', values: { Fuzz: 10, Volume: 5, Pickup: 'Single', 'Pickup Level': 5 }, why: 'Full fuzz at about unity – play the rest with the guitar volume.' },
+          { name: 'Cleaned up', values: { Fuzz: 6, Volume: 6, Pickup: 'Single', 'Pickup Level': 4 }, why: 'Edge-of-fuzz rhythm, very dynamic.' },
+          { name: 'Humbucker lead', values: { Fuzz: 9, Volume: 5, Pickup: 'HB', 'Pickup Level': 6 } }
+        ],
+        tips: [
+          'Pickup and Pickup Level stand for the guitar in front: the real fuzz sounds different with every pickup. Match them to your guitar.',
+          'Place it first in the chain – after a buffer or a wah it can turn harsh.',
+          'At full guitar volume it is dark and compressed; pull the volume back a little for solos so it cuts through.'
+        ]
+      },
+      'Green 808': {
+        basedOn: 'Ibanez TS808 Tube Screamer',
+        made: 'about 1979 · Ibanez (built by Maxon / Nisshin Onpa) – designed by Susumu Tamura',
+        text: 'The "holy grail" overdrive: a mid hump around 700 Hz, tightened bass and soft clipping. On its own a smooth blues drive; in front of a driven amp the most famous boost in rock and metal.',
+        heard: 'Stevie Ray Vaughan – and the boost in front of countless metal rigs.',
+        starts: [
+          { name: 'Metal tightener', values: { Overdrive: 0.5, Tone: 6, Level: 85 }, why: 'In front of a high-gain capture: tighter low end, more focus.' },
+          { name: 'Texas blues', values: { Overdrive: 5, Tone: 5.5, Level: 60 }, why: 'Into a capture at the edge of breakup.' },
+          { name: 'Smooth lead', values: { Overdrive: 7.5, Tone: 5, Level: 55 } }
+        ],
+        tips: [
+          'Level is in per cent here (50 % = the middle).',
+          'Cut low end is part of the sound – if a capture gets thin, lower Overdrive rather than adding bass.'
+        ]
+      },
+      'OD250': {
+        basedOn: 'DOD Overdrive Preamp 250',
+        made: 'late 1970s · DOD Electronics, Salt Lake City',
+        text: 'A two-knob legend: flat mids, slightly rolled-off lows and hard diode clipping. At low gain a bright boost with a little grit, at high gain raspy and almost fuzzy – more open than a Tube Screamer.',
+        heard: 'Yngwie Malmsteen.',
+        starts: [
+          { name: 'Gritty boost', values: { Gain: 1, Volume: 7.5 }, why: 'With gain at zero the original is a clean boost.' },
+          { name: 'Crunch', values: { Gain: 7, Volume: 7 }, why: 'Device list: gain and level at 2 o\'clock.' },
+          { name: 'Neo-classical lead', values: { Gain: 3, Volume: 8 }, why: 'Push a driven capture hard, as in the 80s.' }
+        ],
+        tips: [
+          'The more Gain, the brighter and more aggressive it gets – tame it with a Low-High Cut or the capture\'s Treble.'
+        ]
+      },
+      'Obsessive Drive': {
+        basedOn: 'Fulltone OCD',
+        made: '2004 · Fulltone, Los Angeles – designed by Mike Fuller',
+        text: 'Obsessive Compulsive Drive: an overdriven op-amp followed by MOSFET clipping gives an amp-like drive from light crunch to thick distortion. Very dynamic and cleans up well with the guitar volume.',
+        starts: [
+          { name: 'Blues / rock rhythm', values: { Drive: 3, Peak: 'LP', Tone: 5, Volume: 4 }, why: 'Device list: neck pickup into a clean amp – volume 11, drive 10 o\'clock, LP.' },
+          { name: 'British rock', values: { Drive: 6, Peak: 'HP', Tone: 5, Volume: 3 }, why: 'Device list: bridge pickup into a clean amp – volume 10, drive 1 o\'clock, HP.' },
+          { name: 'Thick lead', values: { Drive: 8, Peak: 'HP', Tone: 4, Volume: 4 } }
+        ],
+        tips: [
+          'Peak HP gives more gain, highs and output; LP is flatter and smoother.',
+          'It has a lot of output – Volume usually stays below 5.',
+          'For a smoother tone: more Drive, less Volume.'
+        ]
+      },
+      'Rodent Drive': {
+        basedOn: 'Pro Co RAT',
+        made: '1978 · Pro Co Sound, Kalamazoo, Michigan',
+        text: 'Half distortion, half fuzz: an op-amp drive with hard clipping diodes and a raspy, cutting voice. From gritty blues boost to thick, hairy grunge distortion – one of the most copied pedals ever.',
+        heard: 'Jeff Beck, Dave Grohl (the first Foo Fighters album, into a Vox AC30).',
+        starts: [
+          { name: 'Gritty boost', values: { Distortion: 2, Filter: 4, Volume: 7 }, why: 'In front of a capture that already crunches.' },
+          { name: 'Classic crunch', values: { Distortion: 4.5, Filter: 4, Volume: 5.5 }, why: 'Into a clean or edge-of-breakup capture.' },
+          { name: 'Grunge', values: { Distortion: 8, Filter: 3, Volume: 5 }, why: 'Thick, fuzzy rhythm sound.' }
+        ],
+        tips: [
+          'Filter is a low-pass that works backwards: turning it up makes the sound darker. Most players live between 3 and 5.',
+          'It pairs well with British-voiced captures – the classic RAT + Marshall / AC30 combination.',
+          'Set Volume so that on and off are equally loud, then add a little for solos.'
+        ]
+      },
+      // ---------------------------------------------------------------- bass overdrive
+      'Microtubes B3K': {
+        basedOn: 'Darkglass Microtubes B3K',
+        made: 'Darkglass Electronics, Helsinki, Finland',
+        text: 'The modern bass grind: a CMOS overdrive with a clean blend, voiced flat instead of mid-scooped so the growl cuts through. From warm saturation to all-out distortion while the low end stays solid.',
+        starts: [
+          { name: 'Warm-up', values: { Drive: 3, Growl: 'Off', Midboost: 'Off', Tone: 5, Level: 50, Blend: 4 }, why: 'A little saturation, mostly clean bass.' },
+          { name: 'Modern grind', values: { Drive: 6.5, Growl: 'On', Midboost: 'On', Tone: 6, Level: 50, Blend: 6 }, why: 'The classic metal / prog bass tone.' },
+          { name: 'Full fuzz', values: { Drive: 9, Growl: 'On', Midboost: 'Off', Tone: 4, Level: 45, Blend: 8 } }
+        ],
+        tips: [
+          'Blend mixes the clean bass back in – it keeps the low end and the attack. Above 7 the distortion dominates.',
+          'Growl adds low-end weight, Midboost helps the bass cut through a dense mix.',
+          'Level is in per cent; set it so the pedal is not louder than bypassed.'
+        ]
+      },
+      // ---------------------------------------------------------------- utility and EQ
+      'Adaptive Gate': {
+        like: 'Fortin Zuul',
+        photo: true,
+        text: 'Neural DSP\'s one-knob gate: it adapts to the noise floor by itself, so you only set how strongly it reduces the noise. The input gate of the Nano is the same idea.',
+        starts: [
+          { name: 'Light', values: { 'Noise Reduction': 25 }, why: 'Clean and low-gain sounds – keeps note tails.' },
+          { name: 'Medium', values: { 'Noise Reduction': 50 }, why: 'Crunch and classic rock.' },
+          { name: 'Tight', values: { 'Noise Reduction': 75 }, why: 'High gain with palm mutes and stops.' }
+        ],
+        tips: [
+          'Raise it until hiss and hum disappear in the pauses – stop before sustained notes get cut.',
+          'In Pre FX in front of a drive it removes noise before it gets amplified.'
+        ]
+      },
+      'Utility Gate': {
+        like: 'ISP Decimator · BOSS NS-2',
+        photo: true,
+        text: 'A full noise gate with threshold, attack, hold, release and range – for when the one-knob gate is not precise enough, e.g. tight djent stops or a gate that only lowers the noise a little.',
+        starts: [
+          { name: 'Natural', values: { Threshold: -60, Attack: 2, Hold: 50, Release: 200, Range: -20 }, why: 'Lowers the noise without hard cut-offs.' },
+          { name: 'High gain', values: { Threshold: -50, Attack: 1, Hold: 20, Release: 80, Range: -60 }, why: 'Closes quickly between chugs.' },
+          { name: 'Staccato', values: { Threshold: -45, Attack: 1, Hold: 5, Release: 30, Range: -90 }, why: 'Machine-gun stops – very tight.' }
+        ],
+        tips: [
+          'Set Threshold just above the noise floor (play nothing, raise it until the hiss stops).',
+          'Range sets how far the gate closes: −20 dB sounds natural, −90 dB is a hard mute.',
+          'A longer Release keeps note tails; a short one is tighter.'
+        ]
+      },
+      'Volume': {
+        like: 'Ernie Ball VP Jr',
+        photo: true,
+        text: 'A volume control – on an expression pedal a volume pedal for swells, fades and a quieter rhythm level. Before the capture it also acts like the guitar volume (less gain); after it only the loudness changes.',
+        starts: [
+          { name: 'Full', values: { Level: 100, Curve: 'Log' } },
+          { name: 'Rhythm level', values: { Level: 70, Curve: 'Log' }, why: 'Switch it on for a quieter part.' }
+        ],
+        tips: [
+          'Curve Log feels more natural for swells, Linear changes evenly.',
+          'Assign Level in the Expression panel to play it with your foot.',
+          'For violin swells: Post FX before the delay and reverb, so the tails ring out.'
+        ]
+      },
+      'Doubler': {
+        like: 'TC Electronic Mimiq',
+        photo: true,
+        text: 'Fakes a second take: a slightly delayed and varied copy panned against the original gives the wide, double-tracked sound of studio rhythm guitars.',
+        starts: [
+          { name: 'Tight double', values: { Spread: 12, 'Dry Level': 0, 'FX Level': -3 }, why: 'Subtle width for rhythm parts.' },
+          { name: 'Wide wall', values: { Spread: 30, 'Dry Level': 0, 'FX Level': 0 }, why: 'Big stereo rhythm guitars.' },
+          { name: 'Slapback double', values: { Spread: 55, 'Dry Level': 0, 'FX Level': -4 } }
+        ],
+        tips: [
+          'Spread sets how far apart the two takes are; around 10–30 ms is a convincing double.',
+          'Only works in stereo – check it in mono, too, if you play through one speaker.',
+          'Only in Post FX 1.'
+        ]
+      },
+      'Graphic 9': {
+        like: 'MXR Ten Band EQ · BOSS GE-7',
+        photo: true,
+        text: 'A nine-band graphic EQ from 65 Hz to 16 kHz with a high-pass and a low-pass filter. Before the capture it changes what drives the amp (like a boost pedal); after it, it shapes the final sound.',
+        starts: [
+          { name: 'Mid boost (pre)', values: { '65Hz': -3, '125Hz': -2, '250Hz': 0, '500hz': 3, '1kHz': 4, '2kHz': 2, '4kHz': 0, '8kHz': -2, '16kHz': -3, HPF: 100, LPF: 8000, Output: 3 }, why: 'Before a driven capture: tighter and more focused, like a Tube Screamer.' },
+          { name: 'Scooped', values: { '65Hz': 2, '125Hz': 3, '250Hz': 0, '500hz': -3, '1kHz': -4, '2kHz': -2, '4kHz': 2, '8kHz': 3, '16kHz': 0, HPF: 60, LPF: 12000, Output: 0 }, why: '80s / thrash rhythm after the capture.' },
+          { name: 'Clean-up (post)', values: { '65Hz': 0, '125Hz': 0, '250Hz': -2, '500hz': 0, '1kHz': 0, '2kHz': 0, '4kHz': -2, '8kHz': -3, '16kHz': -4, HPF: 80, LPF: 9000, Output: 0 }, why: 'Less mud and fizz on a high-gain sound.' }
+        ],
+        tips: [
+          'Cut before you boost: removing 250 Hz mud or 4–8 kHz fizz usually helps more than adding.',
+          'The EQ view shows the curve – click the small curve on the card.'
+        ]
+      },
+      'Parametric 3': {
+        like: 'Empress ParaEq',
+        photo: true,
+        text: 'A three-band parametric EQ: each band can be a peak, a shelf or a pass filter with its own frequency and Q. The surgical tool for one problem frequency or a broad tone shape.',
+        starts: [
+          { name: 'Tame fizz', values: { '1 Active': 'On', '1 Type': 'Hi Pass', '1 Freq': 90, '2 Active': 'On', '2 Type': 'Peak', '2 Freq': 300, '2 Gain': -3, '2 Q': 1.2, '3 Active': 'On', '3 Type': 'Hi Shelf', '3 Freq': 6000, '3 Gain': -4 }, why: 'Tighter bass, less mud and fizz after a high-gain capture.' },
+          { name: 'Presence lift', values: { '1 Active': 'Off', '2 Active': 'On', '2 Type': 'Peak', '2 Freq': 1600, '2 Gain': 3, '2 Q': 0.8, '3 Active': 'Off' }, why: 'Helps a guitar cut through the band.' },
+          { name: 'Notch a peak', values: { '1 Active': 'Off', '2 Active': 'On', '2 Type': 'Peak', '2 Freq': 2500, '2 Gain': -6, '2 Q': 4, '3 Active': 'Off' }, why: 'Sweep 2 Freq until the harsh note disappears.' }
+        ],
+        tips: [
+          'A narrow Q (above 3) fixes a single problem frequency, a wide Q (below 1) shapes the tone broadly.',
+          'Find a problem frequency by boosting a narrow band, sweeping it until it hurts, then cutting there.'
+        ]
+      },
+      'Low-High Cut': {
+        like: 'Broughton Low + High Pass Filter',
+        photo: true,
+        text: 'A high-pass and a low-pass filter with selectable slopes – the quickest way to remove rumble and fizz, or to make a guitar sit in a band mix.',
+        starts: [
+          { name: 'Band mix', values: { 'HPF Slope': '-12', 'HPF Freq': 100, 'LPF Slope': '-12', 'LPF Freq': 7000, Output: 0 }, why: 'Room for bass and vocals.' },
+          { name: 'Tight high gain', values: { 'HPF Slope': '-24', 'HPF Freq': 120, 'LPF Slope': '-12', 'LPF Freq': 6000, Output: 0 } },
+          { name: 'Lo-fi / radio', values: { 'HPF Slope': '-24', 'HPF Freq': 600, 'LPF Slope': '-24', 'LPF Freq': 3000, Output: 3 }, why: 'Telephone sound for an intro.' }
+        ],
+        tips: [
+          'High-pass around 80–100 Hz tightens a guitar; low-pass around 6–8 kHz tames fizz.',
+          'Steeper slopes (−24 and more) cut harder but can sound unnatural on clean sounds.'
+        ]
+      },
+      // ---------------------------------------------------------------- wah and filter
+      'Bubba Wah': {
+        basedOn: 'Dunlop Budda Bud-Wah',
+        made: 'Dunlop, designed with Budda Amplification',
+        text: 'A smooth, vocal wah with a wide sweep and a warm, throaty voice – less quacky and shrill at the toe than a standard Cry Baby.',
+        starts: [
+          { name: 'Cocked (half)', values: { Wah: 0.5 }, why: 'A fixed "cocked wah" – a nasal, mid-heavy lead tone.' },
+          { name: 'Toe down', values: { Wah: 0.9 } }
+        ],
+        tips: [
+          'Play Wah with an expression pedal (Expression panel).',
+          'Put it before the drive for the classic sound; after a high-gain capture it is more extreme.'
+        ]
+      },
+      'Crying Wah': {
+        basedOn: 'Dunlop Cry Baby GCB-95',
+        made: 'Dunlop – the standard Cry Baby since 1982 (the wah itself goes back to Thomas Organ / Vox, 1966)',
+        text: 'The best-selling wah of all time: the vocal, quacky "wacka-wacka" sweep heard on countless records, from funk rhythm to screaming metal leads.',
+        heard: 'Jimi Hendrix (with the original Vox / Thomas Organ wah), Slash, Kirk Hammett, Zakk Wylde – all have their own Cry Baby models.',
+        starts: [
+          { name: 'Cocked (half)', values: { Wah: 0.5 }, why: 'The fixed mid-peak lead tone.' },
+          { name: 'Toe down', values: { Wah: 0.9 } }
+        ],
+        tips: [
+          'Play Wah with an expression pedal (Expression panel).',
+          'Before the drive: classic and vocal. After a high-gain capture: more extreme and piercing.'
+        ]
+      },
+      'Crying Clyde Wah': {
+        basedOn: 'Dunlop Cry Baby Clyde McCoy (CM95)',
+        made: 'the 1967 Vox / Thomas Organ wah named after trumpeter Clyde McCoy – reissued by Dunlop',
+        text: 'The vintage wah sound: a throaty, voice-like midrange from the original inductor design – warmer and more vocal than the standard Cry Baby.',
+        heard: 'Jimi Hendrix and Eric Clapton in the 60s.',
+        starts: [
+          { name: 'Cocked (half)', values: { Wah: 0.5 } },
+          { name: 'Heel (dark)', values: { Wah: 0.15 } }
+        ],
+        tips: [
+          'Play Wah with an expression pedal (Expression panel).',
+          'Best with vintage-style captures and a fuzz or light overdrive after it.'
+        ]
+      },
+      'Bass Wah': {
+        like: 'Dunlop Cry Baby Bass Wah (105Q)',
+        photo: true,
+        text: 'A wah voiced for bass: the sweep sits lower and the fundamental stays, so the bass keeps its weight while it moves.',
+        starts: [
+          { name: 'Cocked (half)', values: { Wah: 0.5 } }
+        ],
+        tips: [
+          'Play Wah with an expression pedal (Expression panel).',
+          'Also nice on a guitar played an octave down (Chief OC2 before it).'
+        ]
+      },
+      'Love Meat': {
+        basedOn: 'Lovetone Meatball',
+        made: 'mid-1990s · Lovetone, England – a rare, hand-built cult pedal',
+        text: 'A deep, very adjustable envelope filter: a trigger section that follows your playing and a filter section with low-, band- and high-pass. From funky quack to synth-like and flanger-like sweeps.',
+        heard: 'Kirk Hammett.',
+        starts: [
+          { name: 'Funk quack', values: { Sensitivity: 6, Attack: 10, Decay: 4, Color: 6, Intensity: 6, Blend: 10, 'Trig Detection': 'Up', 'Filter Type': 'Bandpass', 'Filter Cutoff': 'A', Level: 50 }, why: 'Clean guitar or bass, played with dynamics.' },
+          { name: 'Synth bass', values: { Sensitivity: 5, Attack: 30, Decay: 6, Color: 7, Intensity: 7, Blend: 8, 'Trig Detection': 'Up', 'Filter Type': 'Lowpass', 'Filter Cutoff': 'Low', Level: 55 } },
+          { name: 'Subtle movement', values: { Sensitivity: 4, Attack: 50, Decay: 5, Color: 4, Intensity: 4, Blend: 5, 'Trig Detection': 'Up', 'Filter Type': 'Lowpass', 'Filter Cutoff': 'B', Level: 50 } }
+        ],
+        tips: [
+          'Sensitivity sets how hard you have to play to open the filter – too high and it stays open all the time.',
+          'Trig Detection Down sweeps the other way (closing on the attack).',
+          'Blend mixes the dry signal back in – essential on bass.'
+        ]
+      },
+      'Envelope Filter': {
+        like: 'Electro-Harmonix Q-Tron · Mu-Tron III',
+        photo: true,
+        text: 'An auto-wah: the filter follows your picking – the harder you play, the further it opens. The sound of 70s funk clavinet and guitar.',
+        heard: 'The Mu-Tron III style: Stevie Wonder ("Higher Ground"), Jerry Garcia, Bootsy Collins.',
+        starts: [
+          { name: 'Funk', values: { Sens: 6, Attack: 5, Decay: 4, 'LP/BP/HP': 0, Freq: 400, 'Freq Depth': 70, Reso: 6, Mix: 100, Level: 50 }, why: 'Band-pass quack for clean rhythm parts.' },
+          { name: 'Bass synth', values: { Sens: 5, Attack: 15, Decay: 6, 'LP/BP/HP': -1, Freq: 200, 'Freq Depth': 60, Reso: 5, Mix: 100, Level: 55 } },
+          { name: 'Gentle', values: { Sens: 4, Attack: 20, Decay: 5, 'LP/BP/HP': -1, Freq: 600, 'Freq Depth': 40, Reso: 3, Mix: 60, Level: 50 } }
+        ],
+        tips: [
+          'Sens: how strongly it reacts. Set it with your normal picking strength, then play harder for the full sweep.',
+          'LP/BP/HP morphs the filter type from low-pass (−1) over band-pass (0) to high-pass (+1); Reso sets the peak.',
+          'Put it before the drive and compressor for the most dynamic response.'
+        ]
+      },
+      // ---------------------------------------------------------------- compressor
+      'Legendary 87': {
+        basedOn: 'Universal Audio 1176LN',
+        made: '1967 · Universal Audio – designed by Bill Putnam; the first all-transistor (FET) limiter',
+        text: 'The famous FET studio compressor: very fast, punchy and present – it adds bite and sustain and pushes a guitar forward. Fixed threshold: Input sets how hard it compresses, Makeup the level after it.',
+        starts: [
+          { name: 'Clean sparkle', values: { Input: -24, Ratio: '4', Attack: 0.5, Release: 0.5, Makeup: 6, Mix: 100 }, why: 'Even, present clean and funk rhythm.' },
+          { name: 'Country squash', values: { Input: -14, Ratio: '8', Attack: 0.6, Release: 0.3, Makeup: 10, Mix: 100 }, why: 'Chicken picking and snappy leads.' },
+          { name: 'All buttons in', values: { Input: -18, Ratio: 'All', Attack: 0.3, Release: 0.2, Makeup: 6, Mix: 50 }, why: 'The aggressive "British mode", blended in parallel.' }
+        ],
+        tips: [
+          'Attack here is in milliseconds below 1 – 0.02 ms is the fastest. A slower Attack lets the pick attack through.',
+          'Ratio All is the famous "all buttons in" mode: aggressive, distorted pumping – best with Mix below 60 %.',
+          'Mix blends the uncompressed signal back in (parallel compression). (M) runs in the Pre slots, (ST) in stereo in the Post slots.'
+        ]
+      },
+      'Opto Comp': {
+        basedOn: 'Teletronix LA-2A',
+        made: 'early 1960s · Teletronix – Jim Lawrence\'s tube compressor with an optical cell; later made by Universal Audio',
+        text: 'The smoothest classic compressor: a light-dependent cell reacts gently and program-dependent, so the compression is hard to hear but the sound gets even and warm. Great for cleans that should just sit there.',
+        starts: [
+          { name: 'Gentle leveller', values: { Threshold: -24, Ratio: 3, Attack: 10, Release: 500, Makeup: 4, Mix: 100 }, why: 'Evens out clean chords without killing dynamics.' },
+          { name: 'Sustain', values: { Threshold: -34, Ratio: 6, Attack: 15, Release: 800, Makeup: 8, Mix: 100 }, why: 'Long-ringing clean leads and arpeggios.' },
+          { name: 'Bass', values: { Threshold: -28, Ratio: 4, Attack: 20, Release: 400, Makeup: 5, Mix: 100 } }
+        ],
+        tips: [
+          'The original has only two knobs (Peak Reduction and Gain); here Threshold does the first job, Makeup the second.',
+          'Opto compression is slow by nature – for snappy country compression use Legendary 87.',
+          'Mix blends the uncompressed signal back in (parallel compression). (M) runs in the Pre slots, (ST) in stereo in the Post slots.'
+        ]
+      },
+      'Solid State Comp': {
+        basedOn: 'SSL Bus Compressor',
+        made: '1980s · Solid State Logic, England – the centre-section compressor of the SL 4000 E / G consoles',
+        text: 'The mix-bus "glue" compressor: it makes a sound bigger and more coherent without audibly squashing it. On guitar a subtle density and punch rather than an effect.',
+        starts: [
+          { name: 'Glue', values: { Threshold: -18, Ratio: '2', Attack: 10, Release: 0.3, Makeup: 2, Mix: 100 }, why: 'Classic bus setting: 2:1, 10 ms attack, auto-like release.' },
+          { name: 'Punch', values: { Threshold: -22, Ratio: '4', Attack: 30, Release: 0.1, Makeup: 4, Mix: 100 }, why: 'Slow attack lets the pick through, fast release breathes.' },
+          { name: 'Parallel smash', values: { Threshold: -30, Ratio: '10', Attack: 1, Release: 0.1, Makeup: 10, Mix: 35 } }
+        ],
+        tips: [
+          'Aim for 2–4 dB of gain reduction – the editor\'s gain reduction meter shows it.',
+          'After the capture (ST in Post FX 1) it is the "finishing" compressor of the whole sound.',
+          'Mix blends the uncompressed signal back in (parallel compression).'
+        ]
+      },
+      'VCA Comp': {
+        like: 'dbx 160 · classic VCA bus compressors',
+        text: 'A clean, precise VCA compressor: predictable, fast and transparent. The workhorse for even levels, sustain and keeping a bass under control.',
+        starts: [
+          { name: 'Even rhythm', values: { Threshold: -24, Ratio: 3, Attack: 10, Release: 200, Makeup: 4, Mix: 100 } },
+          { name: 'Bass control', values: { Threshold: -26, Ratio: 4, Attack: 20, Release: 150, Makeup: 5, Mix: 100 }, why: 'Every note equally loud.' },
+          { name: 'Sustainer', values: { Threshold: -36, Ratio: 8, Attack: 5, Release: 500, Makeup: 10, Mix: 70 }, why: 'Long clean leads.' }
+        ],
+        tips: [
+          'A slower Attack (15 ms and more) keeps the pick attack; a fast one smooths it away.',
+          'Mix blends the uncompressed signal back in (parallel compression). (M) runs in the Pre slots, (ST) in stereo in the Post slots.'
+        ]
+      },
+      // ---------------------------------------------------------------- pitch
+      'Transpose': {
+        like: 'DigiTech Drop',
+        photo: true,
+        text: 'A polyphonic pitch shifter: play in another tuning without retuning, or add an octave or a harmony at a lower Mix.',
+        starts: [
+          { name: 'Eb tuning', values: { Mix: 100, Semitones: -1, 'Pitch Fine': 0 }, why: 'Half a step down – Hendrix, SRV, Guns N\' Roses.' },
+          { name: 'Drop to D standard', values: { Mix: 100, Semitones: -2, 'Pitch Fine': 0 } },
+          { name: 'Octave down blend', values: { Mix: 40, Semitones: -12, 'Pitch Fine': 0 }, why: 'A big, bass-heavy riff sound.' }
+        ],
+        tips: [
+          'Put it first in the chain, before drive and modulation – pitch shifting tracks a clean signal best.',
+          'Pitch Fine detunes in cents; −8 to −12 at a lower Mix gives a chorus-like double.',
+          'Only in Pre FX 1.'
+        ]
+      },
+      'Poly Octaver': {
+        basedOn: 'Electro-Harmonix Micro POG',
+        made: 'Electro-Harmonix, New York – the compact version of the 2005 POG',
+        text: 'A polyphonic octave generator: one octave up and one down, tracking whole chords. From 12-string jangle to organ pads and fake bass lines.',
+        heard: 'Joe Satriani, Nick Zinner (Yeah Yeah Yeahs).',
+        starts: [
+          { name: '12-string', values: { Dry: 60, Oct: 70, Sub: 10 }, why: 'Device list: dry at 60 %, octave up at 70 %, a touch of sub.' },
+          { name: 'Organ', values: { Dry: 50, Oct: 50, Sub: 50 }, why: 'All three – add a vibe or rotary and a volume pedal.' },
+          { name: 'Bass', values: { Dry: 0, Oct: 0, Sub: 100 }, why: 'Only the sub octave – a guitar becomes a bass.' }
+        ],
+        tips: [
+          'Before a fuzz or distortion: dry all the way up, sub around 80 %, octave up around 50 % (device list).',
+          'It tracks best with the neck pickup and a clean signal in front of it.'
+        ]
+      },
+      'Wham': {
+        basedOn: 'DigiTech Whammy',
+        made: '1989 · DigiTech, Utah',
+        text: 'The red pitch pedal: bends the pitch between two intervals with an expression pedal – dive bombs, octave jumps and harmonies with its own metallic, otherworldly character.',
+        heard: 'Tom Morello, Jack White, Jonny Greenwood and Ed O\'Brien (Radiohead), Dimebag Darrell.',
+        starts: [
+          { name: 'Octave up', values: { Mix: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 12, Blend: 0 }, why: 'The classic Morello / White sound.' },
+          { name: 'Dive bomb', values: { Mix: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': -24, Blend: 0 } },
+          { name: 'Harmony 5th', values: { Mix: 50, 'Heel Pitch 1': 0, 'Toe Pitch 1': 7, Blend: 0, Pedal: 100 } }
+        ],
+        tips: [
+          'Pedal moves from the heel pitch to the toe pitch – assign it to an expression pedal in the Expression panel.',
+          'Blend moves towards the second pair of pitches; with Mix below 100 % you get harmonies instead of a full shift.'
+        ]
+      },
+      'Chief OC2': {
+        basedOn: 'BOSS OC-2 Octave',
+        made: '1982 · BOSS',
+        text: 'An analog-style octaver one and two octaves down: thick, synth-like and best on single notes in the lower register.',
+        starts: [
+          { name: 'Fat riff', values: { Output: 0, Dry: 70, 'Oct 1': 60, 'Oct 2': 0 }, why: 'Doubles a riff an octave lower.' },
+          { name: 'Synth bass', values: { Output: 0, Dry: 30, 'Oct 1': 80, 'Oct 2': 50 } },
+          { name: 'Into a fuzz', values: { Output: 2, Dry: 80, 'Oct 1': 50, 'Oct 2': 20 }, why: 'Octave before a fuzz – the classic stoner sound.' }
+        ],
+        tips: [
+          'Oct 1 and Oct 2 are the two lower octaves, Dry the guitar itself.',
+          'Play single notes with the neck pickup and the tone rolled back a little – chords confuse the tracking.'
+        ]
+      },
+      // ---------------------------------------------------------------- modulation
+      'Chief CE2W': {
+        basedOn: 'BOSS CE-2W (Waza Craft)',
+        made: '2016 · BOSS – the CE-2 (1979) and the CE-1 Chorus Ensemble (1976) in one pedal',
+        text: 'The analog bucket-brigade chorus that started it all: a liquid, watery shimmer that thickens rather than alters the guitar. Type switches between the CE-2, the deeper CE-1 chorus and the CE-1 vibrato.',
+        starts: [
+          { name: 'Classic CE-2', values: { Mix: 50, Rate: 30, Depth: 50, Type: 'CE2-C', Width: 60 }, why: 'The "10 to 2" knob setting – 80s clean.' },
+          { name: 'CE-1 lush', values: { Mix: 50, Rate: 25, Depth: 70, Type: 'CE1-C', Width: 80 } },
+          { name: 'Vibrato', values: { Mix: 100, Rate: 45, Depth: 55, Type: 'CE1-V' }, why: 'Warbly Leslie-ish leads.' }
+        ],
+        tips: [
+          'Type CE1-V is a true vibrato (pitch only) – Mix at 100 % for the full effect.',
+          'Width spreads it in stereo; Sync locks the rate to the tempo.'
+        ]
+      },
+      'Chief DC2W': {
+        basedOn: 'BOSS DC-2W Dimension C (Waza Craft)',
+        made: '2018 · BOSS – the DC-2 (1985) and the Roland SDD-320 Dimension D studio rack (1979)',
+        text: 'The Dimension effect: wide, three-dimensional shimmer without the obvious wobble of a chorus. Four buttons, combinable in pairs – button 4 was the famous "grey button" of 80s studios.',
+        starts: [
+          { name: 'Subtle width', values: { Mix: 100, Mode: '1', 'Mode Type': 'S' }, why: 'About like a CE-2 at "10 to 2".' },
+          { name: 'Rich', values: { Mix: 100, Mode: '2+3', 'Mode Type': 'S' } },
+          { name: 'Studio grey button', values: { Mix: 100, Mode: '4', 'Mode Type': 'SDD-320' }, why: 'The strongest Dimension D setting.' }
+        ],
+        tips: [
+          'Mode Type S is the DC-2 pedal, SDD-320 the rack unit.',
+          'Best in stereo; it also works well after drive, where a chorus would get messy.'
+        ]
+      },
+      'Chorus 229T': {
+        basedOn: 'TC Electronic 2290 (modulation section)',
+        made: '1985 · TC Electronic, Denmark – the rack delay of 80s studios and stadium rigs',
+        text: 'Clean, lush 80s studio chorus from the modulation of the famous rack delay – hi-fi and wide instead of warm and murky.',
+        starts: [
+          { name: '80s clean', values: { Mix: 50, Rate: 0.8, Depth: 45, Width: 80 } },
+          { name: 'Slow shimmer', values: { Mix: 35, Rate: 0.3, Depth: 60, Width: 100 }, why: 'Wide and calm under clean arpeggios.' },
+          { name: 'Detune lead', values: { Mix: 25, Rate: 1.2, Depth: 20, Width: 100 } }
+        ],
+        tips: [
+          'Rate is in Hz here (0.2–3 Hz) – below 1 Hz sounds most natural.',
+          'Width spreads it in stereo; Sync locks the rate to the tempo.'
+        ]
+      },
+      'Dream Chorus': {
+        basedOn: 'TC Electronic The Dreamscape (chorus section)',
+        made: 'TC Electronic – John Petrucci\'s signature modulation pedal',
+        text: 'Lush, wide stereo chorus voiced by John Petrucci, based on TC\'s TriChorus: CHO1 is a subtle, glassy shimmer, CHO2 (inspired by Alex Lifeson) thickens without turning to mush.',
+        heard: 'John Petrucci (Dream Theater).',
+        starts: [
+          { name: 'Glassy clean', values: { Mix: 50, Speed: 30, Depth: 45, Mode: 'CHO1' }, why: 'Clean arpeggios, Petrucci-style.' },
+          { name: 'Thick', values: { Mix: 50, Speed: 25, Depth: 60, Mode: 'CHO2' } },
+          { name: 'Lead shimmer', values: { Mix: 30, Speed: 35, Depth: 35, Mode: 'CHO1' } }
+        ],
+        tips: [
+          'Mode selects the voicing; Speed and Depth the movement. Sync locks it to the tempo.'
+        ]
+      },
+      'MX Flanger': {
+        basedOn: 'MXR Flanger (M117R)',
+        made: 'MXR',
+        text: 'The classic analog flanger: from a subtle sweep to the jet-plane whoosh, with lots of regeneration on tap.',
+        heard: 'Eddie Van Halen ("Unchained"), Jerry Cantrell.',
+        starts: [
+          { name: 'Van Halen', values: { Mix: 50, Manual: 4, Width: 35, Speed: 50, Regen: 6.5 }, why: 'Device list: manual 11, width 10, speed 12, regen 1:30 o\'clock.' },
+          { name: 'Cantrell', values: { Mix: 50, Manual: 0, Width: 15, Speed: 35, Regen: 0 }, why: 'Device list: manual min, width 8, speed 10, regen min.' },
+          { name: 'Jet', values: { Mix: 50, Manual: 6, Width: 80, Speed: 15, Regen: 8 } }
+        ],
+        tips: [
+          'Regen (feedback) makes it more metallic; Manual sets the centre of the sweep.',
+          'At Speed 0 it becomes a fixed comb filter – a "frozen" flange.'
+        ]
+      },
+      'MX Phase 95': {
+        basedOn: 'MXR Phase 95',
+        made: 'MXR – the Phase 90 (1974) and Phase 45 in one mini pedal, each in block and script voicing',
+        text: 'The compact classic phaser: the four-stage Phase 90 or the subtler two-stage Phase 45, each with the older script or the newer block logo voicing.',
+        heard: 'The Phase 90: Eddie Van Halen ("Eruption").',
+        starts: [
+          { name: 'Eruption', values: { Mix: 50, Speed: 25, Type: '90', Mode: 'Script' }, why: 'Script Phase 90 – rich, builds with the highs.' },
+          { name: 'Subtle swirl', values: { Mix: 50, Speed: 20, Type: '45', Mode: 'Script' }, why: 'Phase 45 script – a uni-vibe-like warmth.' },
+          { name: 'Funk', values: { Mix: 50, Speed: 55, Type: '90', Mode: 'Block' }, why: 'Faster and more pronounced.' }
+        ],
+        tips: [
+          'Script mode is smoother and vintage, Block mode more pronounced (it adds feedback).',
+          'Before a driven capture it is the classic 70s / 80s sound; after it, it is more obvious.'
+        ]
+      },
+      'MX Vibe': {
+        basedOn: 'MXR M68 Uni-Vibe',
+        made: 'MXR – after the 1968 Shin-ei Uni-Vibe (designed by Fumio Mieda, sold as Univox)',
+        text: 'The throbbing, watery 60s swirl: a four-stage phaser with uneven stages and a lamp-driven LFO that was meant to imitate a Leslie speaker. Chorus mode (Vibe off) swirls, Vibe mode is pure pitch vibrato.',
+        heard: 'Jimi Hendrix ("Machine Gun"), Robin Trower, David Gilmour ("Breathe").',
+        starts: [
+          { name: 'Breathe', values: { Mix: 100, Vibe: 'Off', Speed: 30, Depth: 55 }, why: 'Device list: speed 10 o\'clock, depth 10–2 o\'clock, strum Em.' },
+          { name: 'Machine Gun', values: { Mix: 100, Vibe: 'Off', Speed: 55, Depth: 70 }, why: 'Before a fuzz.' },
+          { name: 'Vibrato', values: { Mix: 100, Vibe: 'On', Speed: 50, Depth: 60 } }
+        ],
+        tips: [
+          'In Vibe mode the effect only becomes obvious from about Speed 40 on.',
+          'The classic chain: Uni-Vibe before a fuzz – here that means a Post FX Vibe with the fuzz drawn into the capture.'
+        ]
+      },
+      'Tremolo': {
+        like: 'BOSS TR-2 · Fender amp tremolo',
+        photo: true,
+        text: 'Volume tremolo with several waveforms: from the smooth pulse of a 60s amp to choppy, square-wave stutter. Duty Cycle and Smoothing shape the pulse.',
+        starts: [
+          { name: 'Surf amp', values: { Rate: 5.5, Depth: 60, Waveform: 'Sine', Smoothing: 60, 'LFO Active': 'On' }, why: 'Fender-style amp tremolo.' },
+          { name: 'Slow pulse', values: { Rate: 2.5, Depth: 50, Waveform: 'Triangle', 'LFO Active': 'On' }, why: 'Under ambient chords.' },
+          { name: 'Stutter', values: { Rate: 8, Depth: 100, Waveform: 'Square', 'Duty Cycle': 50, Smoothing: 10, 'LFO Active': 'On' }, why: 'Choppy, with Sync on for tempo-locked chops.' }
+        ],
+        tips: [
+          'Sync locks it to the tempo – 1/8 or 1/16 notes are common.',
+          'Fade In / Fade Out let the tremolo grow in after you switch it on.'
+        ]
+      },
+      // ---------------------------------------------------------------- delay
+      'Analog Delay': {
+        like: 'BOSS DM-2 · MXR Carbon Copy · Electro-Harmonix Memory Man',
+        photo: true,
+        text: 'Bucket-brigade echo: every repeat gets darker and a little softer, so the delay sits behind the dry note instead of fighting it. Drive adds BBD grit, the modulation a gentle chorus on the repeats.',
+        starts: [
+          { name: 'Slapback', values: { Mix: 30, Feedback: 5, 'Delay Time': 200, 'Mod Depth': 0, Drive: 3 }, why: 'Rockabilly, country, blues.' },
+          { name: 'Warm lead', values: { Mix: 25, Feedback: 35, 'Delay Time': 420, 'Mod Rate': 0.5, 'Mod Depth': 20, Drive: 4, 'Low Pass': 3500 } },
+          { name: 'Self-oscillation', values: { Mix: 40, Feedback: 90, 'Delay Time': 350, 'Mod Depth': 30, Drive: 7 }, why: 'Careful – it builds up. Lower Feedback to stop it.' }
+        ],
+        tips: [
+          'Delay Time runs from 200 to 1100 ms – shorter slapbacks need the Digital or Tape Delay.',
+          'Keep Low Pass between 2.5 and 4 kHz for the classic dark repeats.',
+          'Sync locks the time to the tempo.'
+        ]
+      },
+      'Digital Delay': {
+        like: 'BOSS DD-3 · TC Electronic 2290',
+        photo: true,
+        text: 'Clean, precise repeats with optional modulation and a ducking / gating dynamics section – the hi-fi delay for leads and rhythmic patterns.',
+        starts: [
+          { name: 'Lead (ducked)', values: { Mix: 30, Feedback: 35, 'Delay Time': 450, 'Dyn Mode': 'Duck', 'Dyn Depth': 60, Threshold: -40, 'Mod Depth': 10 }, why: 'The repeats get quieter while you play and swell up in the gaps.' },
+          { name: 'Dotted eighths', values: { Mix: 30, Feedback: 30, Sync: 'On', 'Sync Note': '1/8D', 'Ping Pong': 'Off' }, why: 'The U2 / Edge rhythm – needs the preset tempo.' },
+          { name: 'Wide ping pong', values: { Mix: 25, Feedback: 40, 'Delay Time': 380, 'Ping Pong': 'On', Width: 100 } }
+        ],
+        tips: [
+          'Dyn Mode Duck lowers the repeats while you play, Gate does the opposite.',
+          'High Pass around 150 Hz keeps the repeats out of the bass.'
+        ]
+      },
+      'Tape Delay': {
+        like: 'BOSS RE-2 Space Echo · Maestro Echoplex EP-3 · Roland RE-201',
+        photo: true,
+        text: 'Tape echo: every repeat is a little darker and wobblier than the one before – warm, saturated and never in the way of the dry note.',
+        starts: [
+          { name: 'Slapback', values: { Mix: 30, Feedback: 5, 'Delay Time': 110, Wow: 1, Flutter: 1 }, why: 'Rockabilly and country: one short, quick repeat.' },
+          { name: 'Rhythmic echo', values: { Mix: 25, Feedback: 35, 'Delay Time': 375, Wow: 2, Flutter: 2 }, why: 'Dotted eighths at 120 BPM.' },
+          { name: 'Ambient wash', values: { Mix: 35, Feedback: 65, 'Delay Time': 620, 'Low Pass': 2500, Wow: 4 }, why: 'Long, dark repeats that melt into each other.' }
+        ],
+        tips: [
+          'Low Pass around 2–3 kHz sounds most like worn tape.',
+          'Drive pushes the repeats into tape saturation – more Feedback with more Drive builds up into self-oscillation.',
+          'Sync locks Delay Time to the tempo.'
+        ]
+      },
+      'Dual Delay': {
+        like: 'Strymon TimeLine (dual delay)',
+        photo: true,
+        text: 'Two independent delays, left and right, with cross feedback: for rhythmic stereo patterns, wide leads and the classic "two delay times" trick of 80s rack rigs.',
+        starts: [
+          { name: 'Wide lead', values: { Mix: 30, 'Delay Time L': 380, 'Feedback L': 30, 'Delay Time R': 510, 'Feedback R': 30, 'X-Feedback': 0 }, why: 'Two unrelated times give a big, diffuse stereo image.' },
+          { name: 'Ping-pong', values: { Mix: 30, 'Delay Time L': 250, 'Feedback L': 0, 'Delay Time R': 500, 'Feedback R': 0, 'X-Feedback': 45 } },
+          { name: 'Quarter + dotted eighth', values: { Mix: 30, 'Sync L': 'On', 'Sync Note L': '1/4', 'Sync R': 'On', 'Sync Note R': '1/8D', 'Feedback L': 25, 'Feedback R': 25 }, why: 'The rhythmic cascade – needs the preset tempo.' }
+        ],
+        tips: [
+          'X-Feedback sends each side into the other for ping-pong patterns.',
+          'Link FBack sets both feedbacks together.'
+        ]
+      },
+      'Dual Reverse Delay': {
+        like: 'TC Electronic Flashback (reverse mode)',
+        photo: true,
+        text: 'Reversed repeats in stereo: the backwards-tape sound of psychedelic records, from subtle swells to full "backwards solo" effects.',
+        starts: [
+          { name: 'Backwards solo', values: { Mix: 100, 'Delay Time L': 600, 'Delay Time R': 600, 'Feedback L': 0, 'Feedback R': 0 }, why: 'Only the reversed signal – play slow, legato lines.' },
+          { name: 'Subtle swells', values: { Mix: 25, 'Delay Time L': 500, 'Delay Time R': 700, 'Feedback L': 20, 'Feedback R': 20 } },
+          { name: 'Ambient', values: { Mix: 40, 'Delay Time L': 1200, 'Delay Time R': 1500, 'Feedback L': 45, 'Feedback R': 45, 'X-Feedback': 20 } }
+        ],
+        tips: [
+          'Long delay times make the reverse effect obvious; short ones blur.',
+          'Put a reverb after it for the classic dreamy pad.'
+        ]
+      },
+      'Circular Delay': {
+        like: 'Strymon Volante (multi-head echo)',
+        photo: true,
+        text: 'Neural DSP\'s diffused multi-tap delay: tap patterns smeared by diffusion and modulation until the echo turns into an ambient cloud somewhere between delay and reverb.',
+        starts: [
+          { name: 'Ambient cloud', values: { Mix: 35, 'Tap Preset': '4', 'Delay Time': 600, Feedback: 50, Diffusion: 70, 'Mod Depth': 30 } },
+          { name: 'Rhythmic taps', values: { Mix: 30, 'Tap Preset': '2', 'Delay Time': 450, Feedback: 30, Diffusion: 15 } },
+          { name: 'Lo-fi wash', values: { Mix: 40, 'Tap Preset': '6', 'Delay Time': 800, Feedback: 60, Diffusion: 60, 'Vintage Mode': 'On', 'Low Pass': 3000 } }
+        ],
+        tips: [
+          'Diffusion smears the repeats towards a reverb; Tap Preset picks the tap pattern.',
+          'Vintage Mode darkens and roughens the repeats.'
+        ]
+      },
+      // ---------------------------------------------------------------- reverb
+      'Room': {
+        like: 'BOSS RV-6 (Room)',
+        photo: true,
+        text: 'A small to medium room: natural space without a long tail – the "amp in a room" sound that makes a dry capture feel real.',
+        starts: [
+          { name: 'Always on', values: { Mix: 15, Decay: 0.6, 'Pre Delay': 5, 'High Pass': 150, 'Low Pass': 6000 }, why: 'You hear it when it is gone.' },
+          { name: 'Live room', values: { Mix: 25, Decay: 1.2, 'Pre Delay': 10, 'High Pass': 120, 'Low Pass': 7000 } }
+        ],
+        tips: ['Pre Delay keeps the note clear before the reverb starts; High Pass and Low Pass keep the tail out of the mud and the fizz.']
+      },
+      'Hall': {
+        like: 'Electro-Harmonix Holy Grail (Hall)',
+        photo: true,
+        text: 'A concert hall with a smooth, longer decay – the big, classic reverb for leads and slow songs.',
+        starts: [
+          { name: 'Lead', values: { Mix: 20, Decay: 2.5, 'Pre Delay': 30, 'High Pass': 200, 'Low Pass': 5000 }, why: 'Pre Delay keeps the notes clear.' },
+          { name: 'Ballad', values: { Mix: 30, Decay: 4, 'Pre Delay': 25, 'High Pass': 150, 'Low Pass': 6000 } },
+          { name: 'Huge', values: { Mix: 40, Decay: 8, 'Pre Delay': 40, 'High Pass': 250, 'Low Pass': 4500 } }
+        ],
+        tips: ['Pre Delay keeps the note clear before the reverb starts; High Pass and Low Pass keep the tail out of the mud and the fizz.']
+      },
+      'Mind Hall': {
+        basedOn: 'Lexicon 224',
+        made: '1978 · Lexicon – one of the first digital studio reverbs',
+        text: 'The lush, grainy hall of late-70s and 80s records: dense, smooth and slightly dark, it sounds "expensive" behind cleans and leads.',
+        starts: [
+          { name: '80s lead', values: { Mix: 25, Decay: 3, 'Pre Delay': 30, 'High Pass': 180, 'Low Pass': 6000, Damping: 40 } },
+          { name: 'Dark hall', values: { Mix: 30, Decay: 5, 'Pre Delay': 20, 'High Pass': 150, 'Low Pass': 4000, Damping: 65 } }
+        ],
+        tips: ['Damping darkens the tail.', 'Pre Delay keeps the note clear before the reverb starts; High Pass and Low Pass keep the tail out of the mud and the fizz.']
+      },
+      'Modulated': {
+        like: 'Catalinbread Sinkhole',
+        photo: true,
+        text: 'A reverb with a slowly modulated, chorus-like tail – lush, wide and dreamy, great for clean arpeggios.',
+        starts: [
+          { name: 'Dreamy clean', values: { Mix: 30, Decay: 3.5, 'Pre Delay': 20, 'Mod Speed': 0.6, 'Mod Depth': 40, 'High Pass': 150, 'Low Pass': 6000 } },
+          { name: 'Seasick', values: { Mix: 40, Decay: 6, 'Pre Delay': 10, 'Mod Speed': 1.5, 'Mod Depth': 80, 'High Pass': 200, 'Low Pass': 5000 } }
+        ],
+        tips: ['Mod Speed and Mod Depth set the movement of the tail – keep Speed below 1 Hz for a natural shimmer.', 'Pre Delay keeps the note clear before the reverb starts.']
+      },
+      'Ambience': {
+        like: 'Mr. Black Ambience',
+        photo: true,
+        text: 'Early reflections only: space and size without an audible tail. It makes a close-miked sound feel like it is in a room – and never washes out fast playing.',
+        starts: [
+          { name: 'Subtle air', values: { Mix: 20, Size: 'Small', 'Pre Delay': 0, 'High Pass': 150, 'Low Pass': 8000 } },
+          { name: 'Big space', values: { Mix: 30, Size: 'Large', 'Pre Delay': 10, 'High Pass': 120, 'Low Pass': 7000 } }
+        ],
+        tips: ['Size sets how big the space feels.', 'Good for high-gain rhythm, where a real tail would blur the riffs.']
+      },
+      'Cave': {
+        like: 'EarthQuaker Devices Afterneath',
+        photo: true,
+        text: 'A huge, dark, cavernous space with a very long decay – for ambient pads, swells and doom.',
+        starts: [
+          { name: 'Ambient pad', values: { Mix: 40, Decay: 10, 'Pre Delay': 40, Damping: 50, 'High Pass': 250, 'Low Pass': 4000 } },
+          { name: 'Doom', values: { Mix: 30, Decay: 14, 'Pre Delay': 20, Damping: 70, 'High Pass': 150, 'Low Pass': 3000 } }
+        ],
+        tips: ['Damping darkens the tail further.', 'Combine with a volume swell (Volume on an expression pedal) for pads.']
+      },
+      'Blossom': {
+        basedOn: 'Strymon BigSky (Bloom mode)',
+        made: '2013 · Strymon, California',
+        text: 'A reverb that swells and blooms behind the note: the tail starts soft and grows into a big, slow, diffuse wash. Ducking keeps it out of the way while you play.',
+        starts: [
+          { name: 'Slow bloom', values: { Mix: 35, Decay: 8, 'Pre Delay': 30, Diffusion: 80, 'E.R. Length': 60, Ducking: 0, Modulation: 30 } },
+          { name: 'Ducked lead', values: { Mix: 30, Decay: 5, 'Pre Delay': 40, Diffusion: 70, Ducking: 50, Modulation: 20 }, why: 'Big when you stop, clear while you play.' },
+          { name: 'Endless pad', values: { Mix: 50, Decay: 18, 'Pre Delay': 60, Diffusion: 90, Modulation: 50, Bass: -6, Treble: -4 } }
+        ],
+        tips: [
+          'Diffusion and E.R. Length set how slowly it blooms.',
+          'Bass and Treble shape the tail; cutting Bass keeps it clear.',
+          'Pre Delay keeps the note clear before the reverb starts.'
+        ]
+      },
+      'Shimmer': {
+        like: 'Eventide H9 (ShimmerVerb) · Strymon BigSky (Shimmer)',
+        photo: true,
+        text: 'A reverb whose tail is pitch-shifted and fed back into itself: the octave-up halo of ambient guitar, made famous by Brian Eno and Daniel Lanois\' productions.',
+        starts: [
+          { name: 'Octave halo', values: { Mix: 35, Decay: 8, Pitch: 12, Feedback: 50, Brightness: 50, 'Pre Delay': 30 } },
+          { name: 'Fifth + octave', values: { Mix: 30, Decay: 10, Pitch: 7, Feedback: 40, Brightness: 45 } },
+          { name: 'Dark sub', values: { Mix: 30, Decay: 12, Pitch: -12, Feedback: 40, Brightness: 30, Damping: 60 } }
+        ],
+        tips: [
+          'Pitch sets the interval of the tail (+12 is the classic octave), Feedback how much of it builds up.',
+          'Keep Mix low on chords – the shimmer adds up fast.',
+          'Pre Delay keeps the note clear before the reverb starts.'
+        ]
+      }
+    };
     const fxInfoOf = model => {
       const key = String(model || '').replace(/\s*\((M|ST)\)$/, '');
-      const pub = FX_INFO[key], own = window.FX_INFO_PRIVATE && window.FX_INFO_PRIVATE[key];
-      return own ? Object.assign({}, pub || {}, own, { rich: true }) : pub || null;
+      const pub = FX_INFO[key], more = FX_INFO_MORE[key];
+      return more ? Object.assign({}, pub || {}, more, { rich: true }) : pub || null;
     };
     // A starting point's values ({ Distortion: 2, Sync: 'On' }) on the block's own controls (names without case).
     const fxStartParams = (block, start) => Object.entries(start.values || {}).map(([name, value]) => {
