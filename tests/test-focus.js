@@ -75,7 +75,7 @@ setTimeout(async () => {
       ok('info dialog lists them: ' + cards.join(', '), cards.includes('Blues crunch') && cards.includes('John Mayer: Keeley BD-2') && cards.includes('Geese: Blues Driver'));
       ok('with the note on what is ours', /Players' sounds: the pedal is the one/.test($('fxiBody').textContent));
       document.querySelector('#fxiBody .fxi-start button[data-players][data-i="1"]').click();
-      ok('Apply sets a player\'s sound: ' + [val('Gain'), val('Tone'), val('Volume')], val('Gain') === 6 && val('Tone') === 5.5 && val('Volume') === 5.5);
+      ok('Apply sets a player\'s sound: ' + [val('Gain'), val('Tone'), val('Volume')], val('Gain') === 0.5 && val('Tone') === 8.5 && val('Volume') === 5);
       ok('marked as applied', document.querySelector('#fxiBody .fxi-start button[data-players][data-i="1"]').textContent === 'Applied');
       document.querySelector('#fxiBody .fxi-start button:not([data-players])[data-i="0"]').click();
       ok('starting points still apply: ' + val('Gain'), val('Gain') === 2.5);

@@ -12748,9 +12748,13 @@ function parseSelectedCaptureState(payload) {
 
     // ---- Players' sounds ----
     // Settings modelled on what players are documented to use. The pedal comes from a source (named in each note);
-    // the numbers are almost always OUR reading of the records - published knob positions are rare. Only two are
-    // taken from a source: John Mayer's Tube Screamers (read off a live board) and Deftones' "Digital Bath" (a
-    // third-party reading of the song). Where the Nano has no model of the pedal, the note says so.
+    // the numbers are mostly OUR reading of the records - published knob positions are rare. Taken from a source
+    // are John Mayer's Tube Screamers (a live board read off by Guitar Chalk) and Deftones' "Digital Bath" (a
+    // third-party reading of the song). Read off pedalboard photos by us (2026-11-15, Premier Guitar's Rig Rundown
+    // photos at full size; a knob at seven o'clock = 0, noon = 5, five o'clock = 10): Geese's BD-2 and DD-5, MJ
+    // Lenderman's Flashback 2, Jack White's Whammy. Photos that were too small or too oblique to read: Frusciante's
+    // 2022 board (Ground Guitar), Mayer's 2019 board (MusicRadar), the Black Keys' 2014 rack (Premier Guitar).
+    // Where the Nano has no model of the pedal, the note says so.
     // Shown in the info dialog ("Players' sounds") and in the focus view's corner menu ("Players").
     // Sources, read 2026-11-15: guitarchalk.com (john-mayer-tube-screamer-settings, john-mayer-pedalboard,
     // digital-bath-amp-settings), groundguitar.com (Frusciante: Stadium Arcadium, Californication, CE-1; Mayer:
@@ -12767,8 +12771,8 @@ function parseSelectedCaptureState(payload) {
       'Chief BD2': [
         { name: 'John Mayer: Keeley BD-2', values: { Gain: 3, Tone: 4.5, Volume: 6.5 },
           why: 'A Keeley-modded BD-2 sat on his 2005 board. Settings are ours: just breaking up, clean when you play soft.' },
-        { name: 'Geese: Blues Driver', values: { Gain: 6, Tone: 5.5, Volume: 5.5 },
-          why: 'Emily Green has a BD-2 on her board (Premier Guitar Rig Rundown). Settings are ours: a wiry, open crunch.' }
+        { name: 'Geese: Blues Driver', values: { Gain: 0.5, Tone: 8.5, Volume: 5 },
+          why: 'Read off Emily Green\'s BD-2 in Premier Guitar\'s Rig Rundown photo: Gain almost off (half past seven), Tone near four o\'clock (marked with tape), Level at noon – a bright, nearly clean push.' }
       ],
       'Rodent Drive': [
         { name: 'Wednesday: wall of dirt', values: { Distortion: 7.5, Filter: 4.5, Volume: 5.5 },
@@ -12798,7 +12802,7 @@ function parseSelectedCaptureState(payload) {
       ],
       'Envelope Filter': [
         { name: 'John Mayer: Q-Tron funk', values: { Sens: 6, Attack: 5, Decay: 4, 'LP/BP/HP': 0, Freq: 400, 'Freq Depth': 70, Reso: 6, Mix: 100, Level: 50 },
-          why: 'He uses a Q-Tron Plus for funky parts (Guitar Chalk). Settings are ours.' },
+          why: 'A Q-Tron Plus for funky parts, also on his 2019 board with Dead & Company (Guitar Chalk, MusicRadar). That photo is too small to read; settings are ours.' },
         { name: 'Frusciante: fast filter', values: { Sens: 7, Attack: 3, Decay: 2.5, 'LP/BP/HP': -1, Freq: 300, 'Freq Depth': 85, Reso: 7.5, Mix: 100, Level: 50 },
           why: 'Moog low-pass filters with a fast, wah-like sweep on "Dani California" and "Storm in a Teacup" (Ground Guitar). Settings are ours.' }
       ],
@@ -12814,13 +12818,13 @@ function parseSelectedCaptureState(payload) {
       ],
       'Wham': [
         { name: 'Jack White: octave down', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': -12, Blend: 0 },
-          why: 'The "Seven Nation Army" riff: a Whammy on its octave-down setting (Guitar.com).' },
+          why: 'The "Seven Nation Army" riff: a Whammy on its octave-down setting (Guitar.com). On his 2024 board the drop-tune side of the Whammy sits at the bottom of its scale (Premier Guitar\'s photo).' },
         { name: 'Jack White: octave solo', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 12, Blend: 0 },
-          why: 'For solos he sets the Whammy an octave up to cut through (gear rundowns); some say two octaves – try Toe Pitch 24.' }
+          why: 'Read off his 2024 board in Premier Guitar\'s Rig Rundown photo: the Whammy\'s light sits at one octave up, the knob taped over. Earlier accounts also name two octaves – try Toe Pitch 24.' }
       ],
       'Chief OC2': [
         { name: 'Black Keys: OC-2', values: { Output: 0, Dry: 80, 'Oct 1': 50, 'Oct 2': 0 },
-          why: 'A Boss OC-2 sits in Dan Auerbach\'s rack (Premier Guitar). Settings are ours: one octave under the riff.' }
+          why: 'A Boss Super Octave sits in Dan Auerbach\'s rack – the rundown names an OC-2, its photo shows an OC-3 (Premier Guitar). The photo is too small to read; settings are ours: one octave under the riff.' }
       ],
       'Chief CE2W': [
         { name: 'Frusciante: CE-1 chorus', values: { Mix: 50, Rate: 35, Depth: 60, Type: 'CE1-C', Width: 80 },
@@ -12834,7 +12838,7 @@ function parseSelectedCaptureState(payload) {
       ],
       'MX Flanger': [
         { name: 'Frusciante: Mistress', values: { Mix: 50, Manual: 4, Width: 55, Speed: 20, Regen: 4 },
-          why: 'An Electric Mistress in the bridge of "Hard to Concentrate" (Ground Guitar). Settings are ours: slow and soft.' },
+          why: 'An Electric Mistress in the bridge of "Hard to Concentrate"; on his 2022 board the flanger is an MXR (Ground Guitar, Guitar World). Its photo is too small to read; settings are ours: slow and soft.' },
         { name: 'Deftones: slow flange', values: { Mix: 50, Manual: 5, Width: 70, Speed: 12, Regen: 6 },
           why: 'The band has used a Boss BF-3 flanger (Killer Rig). Settings are ours.' }
       ],
@@ -12842,7 +12846,7 @@ function parseSelectedCaptureState(payload) {
         { name: 'Black Keys: Tighten Up', values: { Mix: 50, Speed: 45, Type: '90', Mode: 'Block' },
           why: 'Dan Auerbach uses a Boss PH-3 phaser for "Tighten Up" (Premier Guitar). Settings are ours.' },
         { name: 'Frusciante: slow phase', values: { Mix: 50, Speed: 10, Type: '90', Mode: 'Script' },
-          why: 'Slow phasing on "Strip My Mind" and "She Looks to Me", a Phase 100 on the "Parallel Universe" outro (Ground Guitar). Settings are ours.' }
+          why: 'Slow phasing on "Strip My Mind" and "She Looks to Me"; an MXR Phase 90 sits on his 2022 board (Ground Guitar, Guitar World). Settings are ours.' }
       ],
       'Tremolo': [
         { name: 'Black Keys: gentle trem', values: { Rate: 5, Depth: 40, Waveform: 'Triangle', Smoothing: 60, 'LFO Active': 'On' },
@@ -12863,10 +12867,12 @@ function parseSelectedCaptureState(payload) {
           why: 'A slight delay of about 400 ms at 15 % mix (Guitar Chalk\'s reading of the song). Feedback is ours.' },
         { name: 'Frusciante: quick delay', values: { Mix: 30, Feedback: 15, 'Delay Time': 130, 'Ping Pong': 'Off', 'Mod Rate': 1, 'Mod Depth': 20, 'Dyn Mode': 'Off' },
           why: 'A DeltaLab Effectron II set to a quick delay with slight modulation on "She\'s Only 18" (Ground Guitar). Settings are ours.' },
+        { name: 'MJ Lenderman: Flashback', values: { Mix: 33, Feedback: 40, 'Delay Time': 500, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Duck', 'Dyn Depth': 50 },
+          why: 'Read off his TC Flashback 2 in Premier Guitar\'s Rig Rundown photo (his board with The Wind): Delay and Level at noon, Feedback at eleven, the type on DYN – repeats that duck while he plays. The time behind "noon" is our estimate.' },
         { name: 'Wednesday: noise delay', values: { Mix: 50, Feedback: 95, 'Delay Time': 300, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
           why: 'MJ Lenderman uses a TC Flashback as a noise generator: repeats cranked, the time moved by hand (Mixdown). Ours – turn Delay Time while it rings, and mind the volume.' },
-        { name: 'Geese: DD-5', values: { Mix: 25, Feedback: 30, 'Delay Time': 330, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
-          why: 'Emily Green has a Boss DD-5 on her board (Premier Guitar Rig Rundown). Settings are ours.' }
+        { name: 'Geese: DD-5', values: { Mix: 33, Feedback: 0, 'Delay Time': 135, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
+          why: 'Read off Emily Green\'s Boss DD-5 in Premier Guitar\'s Rig Rundown photo: E.Level at half past one, Feedback at minimum, Time just past noon, the mode on one of the two short ranges – one slap of about 135 ms if it is the 50–200 ms range.' }
       ],
       'Tape Delay': [
         { name: 'Black Keys: tight slap', values: { Mix: 30, Feedback: 8, 'Delay Time': 110, Wow: 2, Flutter: 2, Drive: 40 },
@@ -12883,8 +12889,8 @@ function parseSelectedCaptureState(payload) {
           why: 'A plate reverb at about 20 % mix (Guitar Chalk\'s reading of the song). Decay and filters are ours.' }
       ]
     };
-    const FX_ARTIST_FOOT = 'Players\' sounds: the pedal is the one the player is documented with; unless a note says otherwise the settings are ' +
-      'our own reading of the records – places to begin. Names of players and bands only say whose sound a setting is modelled on; no affiliation or endorsement.';
+    const FX_ARTIST_FOOT = 'Players\' sounds: the pedal is the one the player is documented with. Where a note says "read off", the settings come from ' +
+      'a photo of the player\'s board; otherwise they are our own reading of the records – places to begin. Names of players and bands only say whose sound a setting is modelled on; no affiliation or endorsement.';
     const fxArtistsOf = model => FX_ARTIST_SOUNDS[String(model || '').replace(/\s*\((M|ST)\)$/, '')] || [];
 
     // ---- Focus view (after Line 6's Helix Stadium and our QC Editor) ----
