@@ -399,6 +399,7 @@
       --ico-power: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v8'/><path d='M6.6 6.6a8 8 0 1 0 10.8 0'/></g></svg>");
       --ico-close: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M6 6l12 12M18 6L6 18'/></g></svg>");
       --ico-info: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 11v6'/><path d='M12 7.5h0'/></g></svg>");
+      --ico-focus: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15'/></g></svg>");
       --ico-bluetooth: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M7 7l10 10-5 4V3l5 4L7 17'/></g></svg>");
       --ico-keyboard: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='6' width='20' height='12' rx='2'/><path d='M6 10h0M10 10h0M14 10h0M18 10h0M6 14h0M18 14h0M9 14h6'/></g></svg>");
       --ico-mic-57: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M9 2.5h6l-.6 6.5h-4.8z'/><path d='M9.3 5.5h5.4'/><path d='M10.2 9l.8 12.5h2l.8-12.5'/></g></svg>");
@@ -1886,6 +1887,72 @@
     .fxi-start.on button { background: var(--block-color); border-color: var(--block-color); color: var(--icon-ink); }
     .fxi-panel .fxi-tips { margin-top: 0; }
     @media (max-width: 760px) { .fxi-cols, .fxi-starts { grid-template-columns: 1fr; } }
+    /* focus view: the effect large, a lens to drag between four sounds in the corners (the QC Editor's pattern) */
+    .fx-icon.opens-focus { cursor: pointer; transition: box-shadow .12s; }
+    .fx-icon.opens-focus:hover, .fx-icon.opens-focus:focus-visible { outline: none; box-shadow: 0 0 0 2px #0d0e10, 0 0 0 4px var(--block-color); }
+    #fxiFocus { height: 32px; padding: 0 12px 0 10px; border-radius: 9px; display: flex; align-items: center; gap: 7px; font-size: 12.5px;
+                background: #1d2024; border-color: #2c3035; color: #c8ccd1; }
+    #fxiFocus:hover { border-color: var(--block-color); color: #fff; }
+    #fxiFocus .ico { width: 15px; height: 15px; }
+    #fxiFocus[hidden] { display: none; }
+    .fp-panel { width: min(1040px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: auto; border-top: 2px solid var(--block-color); }
+    .fp-panel .fxi-sub { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; margin-left: 4px; }
+    .fp-head-actions { display: flex; align-items: center; gap: 10px; }
+    #fpStart { height: 32px; padding: 0 14px; border-radius: 9px; font-size: 12.5px; background: #1d2024; border-color: #2c3035; color: #c8ccd1; }
+    #fpStart:hover { border-color: var(--block-color); color: #fff; }
+    .fp-main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 22px; }
+    .fp-stage { position: relative; height: min(470px, calc(100vh - 250px)); min-height: 280px; border-radius: 14px; overflow: hidden; cursor: crosshair;
+                touch-action: none; user-select: none; -webkit-user-select: none; display: grid; place-items: center;
+                background: radial-gradient(ellipse at 50% 45%, #25292e, #0f1113 78%); border: 1px solid #23272b; }
+    .fp-stage::before, .fp-stage::after { content: ""; position: absolute; background: rgba(255, 255, 255, .05); pointer-events: none; }
+    .fp-stage::before { left: 50%; top: 14px; bottom: 14px; width: 1px; }
+    .fp-stage::after { top: 50%; left: 14px; right: 14px; height: 1px; }
+    .fp-pic { position: absolute; inset: 17% 24% 21%; display: grid; place-items: center; pointer-events: none; }
+    .fp-pic img { width: 100%; height: 100%; min-height: 0; object-fit: contain; filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .6)); }
+    .fp-symbol { display: grid; }
+    .fp-symbol .fx-icon { width: 132px; height: 132px; border-radius: 30px; }
+    .fp-symbol .fx-icon::after { inset: 26px; }
+    #fpLens { position: absolute; z-index: 1; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; pointer-events: none;
+              border: 2px solid #fff; background: color-mix(in srgb, var(--block-color) 30%, transparent);
+              box-shadow: 0 0 0 1px rgba(0, 0, 0, .55), 0 0 22px color-mix(in srgb, var(--block-color) 55%, transparent); transition: left .12s, top .12s; }
+    .fp-stage.dragging #fpLens { transition: none; }
+    .fp-zone { position: absolute; z-index: 2; display: flex; align-items: center; gap: 6px; max-width: 46%; height: 34px; padding: 0 6px 0 14px; border-radius: 17px;
+               font-size: 13px; font-weight: 600; color: #e6e6e6; background: rgba(15, 17, 19, .78); border: 1px solid color-mix(in srgb, var(--block-color) 55%, #2c3035);
+               white-space: nowrap; }
+    .fp-zone:hover { border-color: var(--block-color); }
+    .fp-zone .zn { overflow: hidden; text-overflow: ellipsis; }
+    .fp-zone .zm { flex: none; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; font-size: 13px; line-height: 1; color: #9aa0a6; }
+    .fp-zone .zm:hover { background: rgba(255, 255, 255, .14); color: #fff; }
+    .fp-zone.own { border-style: dashed; }
+    .fp-zone.near { background: var(--block-color); border-color: var(--block-color); border-style: solid; color: var(--icon-ink); }
+    .fp-zone.near .zm { color: var(--icon-ink); }
+    .fp-zone.tl { left: 14px; top: 14px; } .fp-zone.tr { right: 14px; top: 14px; }
+    .fp-zone.bl { left: 14px; bottom: 14px; } .fp-zone.br { right: 14px; bottom: 14px; }
+    .fp-zone.centre { left: 50%; top: 79%; transform: translate(-50%, 10px); height: 26px; padding: 0 12px; font-size: 11px; color: #b8bcc1; border-color: #3a3f45; }
+    .fp-zone.centre.near { color: var(--icon-ink); }
+    .fp-side { min-width: 0; display: grid; align-content: start; }
+    .fp-side .fxi-cap { margin-top: 0; }
+    #fpList { display: grid; gap: 9px; max-height: min(440px, calc(100vh - 280px)); overflow: auto; padding-right: 4px; }
+    .fp-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; }
+    .fp-row .n { font-size: 12.5px; color: #c8ccd1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fp-row .v { font-size: 12.5px; font-weight: 600; color: #f2f2f2; font-variant-numeric: tabular-nums; }
+    .fp-row .bar { grid-column: 1 / span 2; height: 5px; border-radius: 3px; background: #23272b; overflow: hidden; }
+    .fp-row .bar i { display: block; height: 100%; border-radius: 3px; background: var(--block-color); }
+    .fp-row.still .n, .fp-row.still .v { color: #6f747a; font-weight: 500; }
+    .fp-row.still .bar i { background: #4a4f55; }
+    .fp-hint { font-size: 12px; line-height: 1.45; color: #8e9297; }
+    .fp-menu { position: fixed; z-index: 70; min-width: 220px; max-width: 300px; max-height: min(420px, 70vh); overflow: auto; padding: 6px; display: grid; gap: 1px;
+               border-radius: var(--r-panel, 12px); background: #1a1d20; border: 1px solid #33383e; box-shadow: 0 18px 50px rgba(0, 0, 0, .7); }
+    .fp-menu .h { padding: 8px 10px 3px; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #8e9297; }
+    .fp-menu button { display: grid; justify-items: start; text-align: left; padding: 7px 10px; border-radius: 8px; background: none; border: 0; color: #e6e6e6;
+                      font-size: 13px; font-weight: 500; }
+    .fp-menu button small { font-size: 11px; color: #8e9297; font-weight: 400; }
+    .fp-menu button:hover { background: rgba(255, 255, 255, .08); }
+    .fp-menu button.on { background: rgba(255, 255, 255, .14); }
+    @media (max-width: 760px) {
+      .fp-main { grid-template-columns: 1fr; }
+      #fpList { grid-template-columns: 1fr 1fr; gap: 9px 16px; max-height: 180px; }
+    }
 
     /* A/B compare: two segments next to Rename; the lit one is the side you hear */
     .ab-box { display: inline-flex; align-items: stretch; height: 40px; flex: none; border: 1px solid #3a3d40; border-radius: 10px; overflow: hidden;
@@ -2382,9 +2449,30 @@
     <div class="ask-panel fxi-panel" role="dialog" aria-label="Effect info">
       <div class="tuner-head">
         <div class="block-title" id="fxiTitle"></div>
-        <button id="fxiClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+        <div class="fp-head-actions">
+          <button id="fxiFocus" title="Focus view: blend this effect between four sounds" hidden><span class="ico" style="--icon: var(--ico-focus)"></span>Focus view</button>
+          <button id="fxiClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+        </div>
       </div>
       <div id="fxiBody"></div>
+    </div>
+  </div>
+
+  <div id="focusOverlay" class="ask-overlay" hidden>
+    <div class="ask-panel fp-panel" role="dialog" aria-label="Focus view">
+      <div class="tuner-head">
+        <div class="block-title" id="fpTitle"></div>
+        <div class="fp-head-actions">
+          <button id="fpStart" title="Back to the settings the block had when this view opened">Start</button>
+          <button id="fpClose" class="dlg-close" title="Close (Esc)" aria-label="Close"><span class="ico" style="--icon: var(--ico-close)"></span></button>
+        </div>
+      </div>
+      <div class="fp-main">
+        <div id="fpStage" class="fp-stage"><div id="fpPic" class="fp-pic"></div><b id="fpLens"></b></div>
+        <div class="fp-side"><div class="fxi-cap">Controls</div><div id="fpList"></div></div>
+      </div>
+      <div class="fp-hint">Drag the lens: the controls move between the four sounds in the corners. The centre is the block as it was when you opened this view.
+        Click a corner to jump there; ▾ puts another sound into it.</div>
     </div>
   </div>
 
@@ -9007,6 +9095,16 @@ function parseSelectedCaptureState(payload) {
       const head = document.createElement('div');
       head.className = 'block-head';
       head.innerHTML = '<div class="block-title">' + fxIconHTML(style.icon) + '<h2>' + block.title + '</h2></div>';
+      if (focusHas(block.model)) {   // the symbol opens the focus view (the head has no room for another button)
+        const symbol = head.querySelector('.fx-icon');
+        symbol.classList.add('opens-focus');
+        symbol.title = 'Focus view: blend ' + block.model + ' between four sounds';
+        symbol.setAttribute('role', 'button');
+        symbol.setAttribute('tabindex', '0');
+        symbol.setAttribute('aria-label', 'Focus view of ' + block.model);
+        symbol.addEventListener('click', e => { e.stopPropagation(); openFocusView(key); });
+        symbol.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFocusView(key); } });
+      }
 
       const toggle = document.createElement('div');
       toggle.className = 'toggle-switch ' + (block.on ? 'on' : '');
@@ -12624,9 +12722,9 @@ function parseSelectedCaptureState(payload) {
     const fxStartParams = (block, start) => Object.entries(start.values || {}).map(([name, value]) => {
       const param = block.params.find(p => p.name.toLowerCase() === name.toLowerCase());
       if (!param) return null;
-      const raw = param.meta && param.meta.kind === 'enum' && typeof value === 'string'
-        ? param.meta.options.findIndex(o => String(o).toLowerCase() === value.toLowerCase()) : value;
-      const v = raw === -1 ? null : coerceParamValue(param, raw);
+      const label = param.meta && param.meta.kind === 'enum' && typeof value === 'string';
+      const raw = label ? param.meta.options.findIndex(o => String(o).toLowerCase() === value.toLowerCase()) : value;
+      const v = label && raw === -1 ? null : coerceParamValue(param, raw);
       return v === null ? null : { param, value: v };
     }).filter(Boolean);
     const fxStartIsOn = (block, start) => {
@@ -12647,6 +12745,545 @@ function parseSelectedCaptureState(payload) {
       fillFxInfoDialog();
     }
 
+    // ---- Focus view (after Line 6's Helix Stadium and our QC Editor) ----
+    // The effect large, a lens to drag over it: the four corners are sounds, the centre is the block as it was when
+    // the view opened. Dragging blends the controls between them and sends them to the Nano.
+    // The corners are our own suggestions: four sounds per model that differ as much as the model allows. Where it
+    // fits, left to right is less -> more (gain, speed, size) and top to bottom is bright / tight -> dark / deep.
+    // Order: top left, top right, bottom left, bottom right. Values in the Nano's own units, switches by their label.
+    // Delays and modulations carry the time and the note value: whichever the block's Sync uses then applies.
+    // Models with a single control (the wahs, Adaptive Gate, Volume) have no focus view.
+    const FOCUS_CORNERS = {
+      // ---------------------------------------------------------------- overdrive
+      'Chief BD2': [
+        { name: 'Sparkle boost', values: { Gain: 1, Tone: 6, Volume: 7.5 } },
+        { name: 'Biting crunch', values: { Gain: 6.5, Tone: 6.5, Volume: 5 } },
+        { name: 'Warm edge', values: { Gain: 3, Tone: 3, Volume: 6.5 } },
+        { name: 'Fuzzy wall', values: { Gain: 10, Tone: 3.5, Volume: 4.5 } }
+      ],
+      'Chief OD1': [
+        { name: 'Amp pusher', values: { Gain: 1, Level: 85 } },
+        { name: 'Solo lift', values: { Gain: 7, Level: 80 } },
+        { name: 'Hint of hair', values: { Gain: 2.5, Level: 45 } },
+        { name: 'Full drive', values: { Gain: 10, Level: 45 } }
+      ],
+      'Exotic': [
+        { name: 'Bright booster', values: { Gain: 1, Bass: 4, Treble: 7, Volume: 7.5 } },
+        { name: 'Cutting lead', values: { Gain: 8.5, Bass: 4, Treble: 6.5, Volume: 6 } },
+        { name: 'Fat clean', values: { Gain: 2, Bass: 7, Treble: 3.5, Volume: 6.5 } },
+        { name: 'Thick sustain', values: { Gain: 10, Bass: 6.5, Treble: 3.5, Volume: 5.5 } }
+      ],
+      'Exotic Z Boost': [
+        { name: 'Sparkle', values: { Gain: 1, Bass: 4, Treble: 7.5, Volume: 6 } },
+        { name: 'Bright grit', values: { Gain: 9, Bass: 4.5, Treble: 6.5, Volume: 5 } },
+        { name: 'Fat clean boost', values: { Gain: 1.5, Bass: 7.5, Treble: 4, Volume: 6.5 } },
+        { name: 'Warm push', values: { Gain: 8, Bass: 7, Treble: 3.5, Volume: 5.5 } }
+      ],
+      'Exotic Bass Z Boost': [
+        { name: 'Slap sparkle', values: { Gain: 1, Bass: 5.5, Treble: 7.5, Volume: 5.5 } },
+        { name: 'Rock grit', values: { Gain: 8.5, Bass: 5, Treble: 6.5, Volume: 5 } },
+        { name: 'Deep and round', values: { Gain: 1.5, Bass: 8.5, Treble: 3, Volume: 5.5 } },
+        { name: 'Tube warmth', values: { Gain: 6, Bass: 8, Treble: 3, Volume: 5 } }
+      ],
+      'Facial Fuzz': [
+        { name: 'Glassy clean-up', values: { Fuzz: 10, Volume: 7.5, Pickup: 'Single', 'Pickup Level': 2.5 } },
+        { name: 'Classic 60s fuzz', values: { Fuzz: 10, Volume: 5, Pickup: 'Single', 'Pickup Level': 7 } },
+        { name: 'Soft overdrive', values: { Fuzz: 3.5, Volume: 6.5, Pickup: 'HB', 'Pickup Level': 4 } },
+        { name: 'Woolly wall', values: { Fuzz: 10, Volume: 5, Pickup: 'HB', 'Pickup Level': 10 } }
+      ],
+      'Green 808': [
+        { name: 'Metal tightener', values: { Overdrive: 0, Tone: 7, Level: 95 } },
+        { name: 'Nasal bite', values: { Overdrive: 10, Tone: 7, Level: 50 } },
+        { name: 'Warm clean push', values: { Overdrive: 1.5, Tone: 3, Level: 75 } },
+        { name: 'Creamy lead', values: { Overdrive: 8.5, Tone: 3.5, Level: 55 } }
+      ],
+      'OD250': [
+        { name: 'Gritty boost', values: { Gain: 1, Volume: 8.5 } },
+        { name: 'Wide open', values: { Gain: 10, Volume: 8 } },
+        { name: 'Unity grit', values: { Gain: 2.5, Volume: 5 } },
+        { name: 'Fuzzy crunch', values: { Gain: 9, Volume: 4.5 } }
+      ],
+      'Obsessive Drive': [
+        { name: 'Clean sparkle', values: { Drive: 1, Peak: 'LP', Tone: 7, Volume: 6 } },
+        { name: 'British bite', values: { Drive: 8, Peak: 'HP', Tone: 6.5, Volume: 3.5 } },
+        { name: 'Low-gain warmth', values: { Drive: 2.5, Peak: 'LP', Tone: 3, Volume: 5.5 } },
+        { name: 'Thick wall', values: { Drive: 10, Peak: 'HP', Tone: 3, Volume: 3.5 } }
+      ],
+      'Rodent Drive': [   // Filter works backwards: up is darker
+        { name: 'Gritty boost', values: { Distortion: 1.5, Filter: 2, Volume: 7.5 } },
+        { name: 'Raspy lead', values: { Distortion: 8, Filter: 2, Volume: 5 } },
+        { name: 'Smooth crunch', values: { Distortion: 4, Filter: 7, Volume: 6 } },
+        { name: 'Grunge wall', values: { Distortion: 10, Filter: 6.5, Volume: 4.5 } }
+      ],
+      'Microtubes B3K': [
+        { name: 'Clean clank', values: { Drive: 2, Growl: 'Off', Midboost: 'On', Tone: 7.5, Level: 50, Blend: 3 } },
+        { name: 'Cutting grind', values: { Drive: 8, Growl: 'Off', Midboost: 'On', Tone: 7, Level: 50, Blend: 7 } },
+        { name: 'Round warmth', values: { Drive: 3, Growl: 'On', Midboost: 'Off', Tone: 3, Level: 50, Blend: 4 } },
+        { name: 'Full fuzz', values: { Drive: 10, Growl: 'On', Midboost: 'Off', Tone: 3.5, Level: 45, Blend: 10 } }
+      ],
+      // ---------------------------------------------------------------- utility and EQ
+      'Utility Gate': [
+        { name: 'Barely there', values: { Threshold: -70, Attack: 5, Hold: 100, Release: 400, Range: -12 } },
+        { name: 'Staccato chop', values: { Threshold: -40, Attack: 1, Hold: 5, Release: 20, Range: -90 } },
+        { name: 'Slow fade', values: { Threshold: -50, Attack: 50, Hold: 500, Release: 3000, Range: -30 } },
+        { name: 'High-gain clamp', values: { Threshold: -48, Attack: 1, Hold: 30, Release: 90, Range: -70 } }
+      ],
+      'Doubler': [
+        { name: 'Subtle thickening', values: { Spread: 5, 'Dry Level': 0, 'FX Level': -14 } },
+        { name: 'Wide wall', values: { Spread: 22, 'Dry Level': 0, 'FX Level': 0 } },
+        { name: 'Second take only', values: { Spread: 20, 'Dry Level': -40, 'FX Level': 0 } },
+        { name: 'Slapback twin', values: { Spread: 60, 'Dry Level': -6, 'FX Level': 0 } }
+      ],
+      'Graphic 9': [
+        { name: 'Mid push', values: { '65Hz': -6, '125Hz': -3, '250Hz': 0, '500hz': 4, '1kHz': 6, '2kHz': 3, '4kHz': 0, '8kHz': -2, '16kHz': -4, HPF: 110, LPF: 8000, Output: 2 } },
+        { name: 'Bright and tight', values: { '65Hz': -6, '125Hz': -3, '250Hz': -2, '500hz': -2, '1kHz': 0, '2kHz': 3, '4kHz': 6, '8kHz': 6, '16kHz': 4, HPF: 120, LPF: 16000, Output: 0 } },
+        { name: 'Warm and dark', values: { '65Hz': 3, '125Hz': 4, '250Hz': 3, '500hz': 1, '1kHz': -1, '2kHz': -3, '4kHz': -5, '8kHz': -8, '16kHz': -12, HPF: 40, LPF: 4000, Output: 1 } },
+        { name: 'Scooped', values: { '65Hz': 4, '125Hz': 4, '250Hz': 0, '500hz': -4, '1kHz': -6, '2kHz': -3, '4kHz': 2, '8kHz': 4, '16kHz': 2, HPF: 50, LPF: 14000, Output: 0 } }
+      ],
+      'Parametric 3': [   // the same three filter types in every corner, so only numbers move between them
+        { name: 'Presence lift', values: { '1 Active': 'On', '1 Type': 'Hi Pass', '1 Freq': 90, '2 Active': 'On', '2 Type': 'Peak', '2 Freq': 1800, '2 Gain': 4, '2 Q': 0.8,
+          '3 Active': 'On', '3 Type': 'Hi Shelf', '3 Freq': 7000, '3 Gain': 2, Output: 0 } },
+        { name: 'Telephone', values: { '1 Active': 'On', '1 Type': 'Hi Pass', '1 Freq': 450, '2 Active': 'On', '2 Type': 'Peak', '2 Freq': 1200, '2 Gain': 6, '2 Q': 1.5,
+          '3 Active': 'On', '3 Type': 'Hi Shelf', '3 Freq': 3500, '3 Gain': -12, Output: 0 } },
+        { name: 'Warm and smooth', values: { '1 Active': 'On', '1 Type': 'Hi Pass', '1 Freq': 40, '2 Active': 'On', '2 Type': 'Peak', '2 Freq': 300, '2 Gain': 2, '2 Q': 0.7,
+          '3 Active': 'On', '3 Type': 'Hi Shelf', '3 Freq': 4500, '3 Gain': -6, Output: 0 } },
+        { name: 'Scooped', values: { '1 Active': 'On', '1 Type': 'Hi Pass', '1 Freq': 60, '2 Active': 'On', '2 Type': 'Peak', '2 Freq': 750, '2 Gain': -7, '2 Q': 0.7,
+          '3 Active': 'On', '3 Type': 'Hi Shelf', '3 Freq': 5000, '3 Gain': 4, Output: 0 } }
+      ],
+      'Low-High Cut': [
+        { name: 'Low cut only', values: { 'HPF Slope': '-24', 'HPF Freq': 150, 'LPF Slope': 'Flat', 'LPF Freq': 20000, Output: 0 } },
+        { name: 'Radio', values: { 'HPF Slope': '-48', 'HPF Freq': 500, 'LPF Slope': '-48', 'LPF Freq': 3000, Output: 3 } },
+        { name: 'High cut only', values: { 'HPF Slope': 'Flat', 'HPF Freq': 20, 'LPF Slope': '-24', 'LPF Freq': 4000, Output: 0 } },
+        { name: 'Gentle trim', values: { 'HPF Slope': '-6', 'HPF Freq': 60, 'LPF Slope': '-6', 'LPF Freq': 12000, Output: 0 } }
+      ],
+      // ---------------------------------------------------------------- filter
+      'Love Meat': [
+        { name: 'Funk quack', values: { Sensitivity: 6.5, Attack: 8, Decay: 3.5, Color: 6, Intensity: 7, Blend: 10, 'Trig Detection': 'Up', 'Filter Type': 'Bandpass', 'Filter Cutoff': 'A', Level: 50 } },
+        { name: 'Thin squeal', values: { Sensitivity: 8, Attack: 3, Decay: 2.5, Color: 8.5, Intensity: 9, Blend: 10, 'Trig Detection': 'Up', 'Filter Type': 'Highpass', 'Filter Cutoff': 'High', Level: 50 } },
+        { name: 'Soft swell', values: { Sensitivity: 4, Attack: 60, Decay: 6, Color: 3.5, Intensity: 3.5, Blend: 5, 'Trig Detection': 'Up', 'Filter Type': 'Lowpass', 'Filter Cutoff': 'B', Level: 50 } },
+        { name: 'Synth bass dive', values: { Sensitivity: 6, Attack: 20, Decay: 7, Color: 7.5, Intensity: 8, Blend: 9, 'Trig Detection': 'Down', 'Filter Type': 'Lowpass', 'Filter Cutoff': 'Low', Level: 55 } }
+      ],
+      'Envelope Filter': [
+        { name: 'Funk quack', values: { Sens: 6.5, Attack: 5, Decay: 3.5, 'LP/BP/HP': 0, Freq: 450, 'Freq Depth': 75, Reso: 6.5, Mix: 100, Level: 50 } },
+        { name: 'Sharp squeal', values: { Sens: 8, Attack: 2, Decay: 2.5, 'LP/BP/HP': 1, Freq: 900, 'Freq Depth': 90, Reso: 8.5, Mix: 100, Level: 50 } },
+        { name: 'Gentle opening', values: { Sens: 4, Attack: 25, Decay: 5.5, 'LP/BP/HP': -1, Freq: 700, 'Freq Depth': 35, Reso: 2.5, Mix: 55, Level: 50 } },
+        { name: 'Bass synth', values: { Sens: 5.5, Attack: 15, Decay: 7, 'LP/BP/HP': -1, Freq: 150, 'Freq Depth': 65, Reso: 7, Mix: 100, Level: 55 } }
+      ],
+      // ---------------------------------------------------------------- compressor
+      'Legendary 87': [
+        { name: 'Clean sparkle', values: { Input: -26, Ratio: '4', Attack: 0.7, Release: 0.5, Makeup: 5, Mix: 100 } },
+        { name: 'All buttons in', values: { Input: -14, Ratio: 'All', Attack: 0.1, Release: 0.08, Makeup: 8, Mix: 100 } },
+        { name: 'Parallel glue', values: { Input: -18, Ratio: '8', Attack: 0.4, Release: 0.9, Makeup: 6, Mix: 40 } },
+        { name: 'Sustain squash', values: { Input: -10, Ratio: '20', Attack: 0.05, Release: 1, Makeup: 10, Mix: 100 } }
+      ],
+      'Opto Comp': [
+        { name: 'Gentle leveller', values: { Threshold: -22, Ratio: 3, Attack: 30, Release: 300, Makeup: 3, Mix: 100 } },
+        { name: 'Country snap', values: { Threshold: -34, Ratio: 8, Attack: 40, Release: 150, Makeup: 9, Mix: 100 } },
+        { name: 'Parallel thickness', values: { Threshold: -38, Ratio: 10, Attack: 5, Release: 600, Makeup: 10, Mix: 35 } },
+        { name: 'Endless sustain', values: { Threshold: -40, Ratio: 12, Attack: 3, Release: 1200, Makeup: 12, Mix: 100 } }
+      ],
+      'Solid State Comp': [
+        { name: 'Glue', values: { Threshold: -16, Ratio: '2', Attack: 30, Release: 0.3, Makeup: 2, Mix: 100 } },
+        { name: 'Punch', values: { Threshold: -24, Ratio: '4', Attack: 30, Release: 0.1, Makeup: 5, Mix: 100 } },
+        { name: 'Parallel smash', values: { Threshold: -32, Ratio: '10', Attack: 0.5, Release: 0.1, Makeup: 12, Mix: 30 } },
+        { name: 'Brick wall', values: { Threshold: -30, Ratio: '10', Attack: 0.1, Release: 0.6, Makeup: 10, Mix: 100 } }
+      ],
+      'VCA Comp': [
+        { name: 'Even strum', values: { Threshold: -22, Ratio: 3, Attack: 25, Release: 200, Makeup: 3, Mix: 100 } },
+        { name: 'Chicken picking', values: { Threshold: -34, Ratio: 8, Attack: 35, Release: 80, Makeup: 9, Mix: 100 } },
+        { name: 'Parallel body', values: { Threshold: -36, Ratio: 10, Attack: 3, Release: 400, Makeup: 10, Mix: 40 } },
+        { name: 'Sustainer', values: { Threshold: -40, Ratio: 10, Attack: 2, Release: 900, Makeup: 12, Mix: 100 } }
+      ],
+      // ---------------------------------------------------------------- pitch
+      'Transpose': [
+        { name: 'Octave up', values: { Mix: 40, Semitones: 12, 'Pitch Fine': 0 } },
+        { name: 'Detune', values: { Mix: 50, Semitones: 0, 'Pitch Fine': 14 } },
+        { name: 'Octave down', values: { Mix: 45, Semitones: -12, 'Pitch Fine': 0 } },
+        { name: 'Drop tuning', values: { Mix: 100, Semitones: -2, 'Pitch Fine': 0 } }
+      ],
+      'Poly Octaver': [
+        { name: '12-string', values: { Dry: 70, Oct: 60, Sub: 0 } },
+        { name: 'Organ', values: { Dry: 50, Oct: 70, Sub: 70 } },
+        { name: 'Fat riff', values: { Dry: 80, Oct: 0, Sub: 60 } },
+        { name: 'Bass only', values: { Dry: 0, Oct: 0, Sub: 100 } }
+      ],
+      'Wham': [
+        { name: 'Octave up', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 12, Blend: 0 } },
+        { name: 'Harmony fifth', values: { Mix: 50, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 7, Blend: 0 } },
+        { name: 'Dive bomb', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': -24, Blend: 0 } },
+        { name: 'Octaves both ways', values: { Mix: 60, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 12, 'Heel Pitch 2': 0, 'Toe Pitch 2': -12, Blend: 50 } }
+      ],
+      'Chief OC2': [
+        { name: 'Fat riff', values: { Output: 0, Dry: 80, 'Oct 1': 55, 'Oct 2': 0 } },
+        { name: 'Bass only', values: { Output: 0, Dry: 0, 'Oct 1': 100, 'Oct 2': 0 } },
+        { name: 'Sub rumble', values: { Output: 0, Dry: 70, 'Oct 1': 0, 'Oct 2': 70 } },
+        { name: 'Full stack', values: { Output: 0, Dry: 30, 'Oct 1': 80, 'Oct 2': 80 } }
+      ],
+      // ---------------------------------------------------------------- modulation
+      'Chief CE2W': [
+        { name: 'Classic shimmer', values: { Mix: 50, Rate: 30, Depth: 50, Type: 'CE2-C', Width: 60, 'Sync Note': '1/2' } },
+        { name: 'Fast swirl', values: { Mix: 50, Rate: 85, Depth: 60, Type: 'CE2-C', Width: 100, 'Sync Note': '1/8' } },
+        { name: 'Slow and wide', values: { Mix: 50, Rate: 12, Depth: 85, Type: 'CE1-C', Width: 100, 'Sync Note': '1/1' } },
+        { name: 'Vibrato', values: { Mix: 100, Rate: 55, Depth: 60, Type: 'CE1-V', Width: 50, 'Sync Note': '1/4' } }
+      ],
+      'Chief DC2W': [
+        { name: 'Subtle width', values: { Mix: 100, Mode: '1', 'Mode Type': 'S', Drive: 10 } },
+        { name: 'Deep swirl', values: { Mix: 100, Mode: '4', 'Mode Type': 'S', Drive: 10 } },
+        { name: 'Studio rack', values: { Mix: 100, Mode: '2', 'Mode Type': 'SDD-320', Drive: 20 } },
+        { name: 'All in, driven', values: { Mix: 100, Mode: '3+4', 'Mode Type': 'SDD-320', Drive: 75 } }
+      ],
+      'Chorus 229T': [
+        { name: 'Subtle detune', values: { Mix: 30, Rate: 0.5, Depth: 20, Width: 100, 'Sync Note': '1/1' } },
+        { name: 'Fast shimmer', values: { Mix: 45, Rate: 2.4, Depth: 30, Width: 100, 'Sync Note': '1/8' } },
+        { name: 'Slow and deep', values: { Mix: 50, Rate: 0.25, Depth: 90, Width: 100, 'Sync Note': '1/1D' } },
+        { name: 'Seasick', values: { Mix: 60, Rate: 1.8, Depth: 100, Width: 60, 'Sync Note': '1/4' } }
+      ],
+      'Dream Chorus': [
+        { name: 'Glassy', values: { Mix: 40, Speed: 25, Depth: 30, Mode: 'CHO1', 'Sync Note': '1/1' } },
+        { name: 'Fast shimmer', values: { Mix: 45, Speed: 80, Depth: 30, Mode: 'CHO1', 'Sync Note': '1/8' } },
+        { name: 'Thick and slow', values: { Mix: 55, Speed: 12, Depth: 85, Mode: 'CHO2', 'Sync Note': '1/1D' } },
+        { name: 'Wobble', values: { Mix: 60, Speed: 70, Depth: 90, Mode: 'CHO2', 'Sync Note': '1/4' } }
+      ],
+      'MX Flanger': [
+        { name: 'Soft chorus', values: { Mix: 50, Manual: 2, Width: 20, Speed: 35, Regen: 0, 'Sync Note': '1/2' } },
+        { name: 'Fast swirl', values: { Mix: 50, Manual: 5, Width: 45, Speed: 85, Regen: 3, 'Sync Note': '1/8' } },
+        { name: 'Jet plane', values: { Mix: 50, Manual: 6, Width: 90, Speed: 8, Regen: 8.5, 'Sync Note': '1/1D' } },
+        { name: 'Ray gun', values: { Mix: 60, Manual: 7, Width: 100, Speed: 75, Regen: 10, 'Sync Note': '1/4' } }
+      ],
+      'MX Phase 95': [
+        { name: 'Soft swirl', values: { Mix: 50, Speed: 15, Type: '45', Mode: 'Script', 'Sync Note': '1/1' } },
+        { name: 'Soft flutter', values: { Mix: 50, Speed: 80, Type: '45', Mode: 'Script', 'Sync Note': '1/8' } },
+        { name: 'Deep sweep', values: { Mix: 50, Speed: 18, Type: '90', Mode: 'Block', 'Sync Note': '1/1' } },
+        { name: 'Rotary', values: { Mix: 50, Speed: 90, Type: '90', Mode: 'Block', 'Sync Note': '1/8' } }
+      ],
+      'MX Vibe': [
+        { name: 'Breathe', values: { Mix: 100, Vibe: 'Off', Speed: 25, Depth: 55, 'Sync Note': '1/1' } },
+        { name: 'Machine gun', values: { Mix: 100, Vibe: 'Off', Speed: 75, Depth: 80, 'Sync Note': '1/8' } },
+        { name: 'Seasick vibrato', values: { Mix: 100, Vibe: 'On', Speed: 42, Depth: 85, 'Sync Note': '1/2' } },
+        { name: 'Fast vibrato', values: { Mix: 100, Vibe: 'On', Speed: 80, Depth: 45, 'Sync Note': '1/8' } }
+      ],
+      'Tremolo': [
+        { name: 'Slow pulse', values: { Rate: 2, Depth: 50, Waveform: 'Sine', Smoothing: 70, 'LFO Active': 'On', 'Sync Note': '1/4' } },
+        { name: 'Fast shimmer', values: { Rate: 9, Depth: 45, Waveform: 'Sine', Smoothing: 60, 'LFO Active': 'On', 'Sync Note': '1/16' } },
+        { name: 'Slow chop', values: { Rate: 3, Depth: 100, Waveform: 'Square', 'Duty Cycle': 50, Smoothing: 10, 'LFO Active': 'On', 'Sync Note': '1/8' } },
+        { name: 'Stutter', values: { Rate: 12, Depth: 100, Waveform: 'Square', 'Duty Cycle': 30, Smoothing: 0, 'LFO Active': 'On', 'Sync Note': '1/32' } }
+      ],
+      // ---------------------------------------------------------------- delay
+      'Analog Delay': [
+        { name: 'Slapback', values: { Mix: 35, Feedback: 5, 'Delay Time': 200, 'Sync Note': '1/16', 'Mod Depth': 0, Drive: 3, 'Low Pass': 5000 } },
+        { name: 'Runaway', values: { Mix: 40, Feedback: 88, 'Delay Time': 330, 'Sync Note': '1/8', 'Mod Rate': 0.5, 'Mod Depth': 25, Drive: 7, 'Low Pass': 3000 } },
+        { name: 'Dark lead echo', values: { Mix: 22, Feedback: 35, 'Delay Time': 450, 'Sync Note': '1/4', 'Mod Rate': 0.5, 'Mod Depth': 20, Drive: 4, 'Low Pass': 2500 } },
+        { name: 'Warbly wash', values: { Mix: 45, Feedback: 65, 'Delay Time': 900, 'Sync Note': '1/2', 'Mod Rate': 1.5, 'Mod Depth': 70, Drive: 5, 'Low Pass': 2000 } }
+      ],
+      'Digital Delay': [
+        { name: 'Doubling slap', values: { Mix: 35, Feedback: 0, 'Delay Time': 90, 'Sync Note': '1/16', 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off', 'Low Pass': 12000 } },
+        { name: 'Dotted eighths', values: { Mix: 35, Feedback: 35, 'Delay Time': 375, 'Sync Note': '1/8D', 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off', 'Low Pass': 9000 } },
+        { name: 'Ducked lead', values: { Mix: 30, Feedback: 40, 'Delay Time': 480, 'Sync Note': '1/4', 'Ping Pong': 'Off', 'Mod Depth': 10, 'Dyn Mode': 'Duck', 'Dyn Depth': 70, Threshold: -40, 'Low Pass': 6000 } },
+        { name: 'Ping-pong wash', values: { Mix: 45, Feedback: 70, 'Delay Time': 750, 'Sync Note': '1/2', 'Ping Pong': 'On', Width: 100, 'Mod Rate': 0.6, 'Mod Depth': 30, 'Dyn Mode': 'Off', 'Low Pass': 5000 } }
+      ],
+      'Tape Delay': [
+        { name: 'Rockabilly slap', values: { Mix: 35, Feedback: 5, 'Delay Time': 110, 'Sync Note': '1/16', Wow: 1, Flutter: 1, Drive: 30, 'High Pass': 120, 'Low Pass': 5000 } },
+        { name: 'Rhythmic echo', values: { Mix: 30, Feedback: 40, 'Delay Time': 375, 'Sync Note': '1/8D', Wow: 2, Flutter: 2, Drive: 40, 'High Pass': 120, 'Low Pass': 4000 } },
+        { name: 'Worn tape', values: { Mix: 30, Feedback: 30, 'Delay Time': 280, 'Sync Note': '1/8', Wow: 8, Flutter: 7, Drive: 75, 'High Pass': 300, 'Low Pass': 1800 } },
+        { name: 'Ambient wash', values: { Mix: 45, Feedback: 72, 'Delay Time': 700, 'Sync Note': '1/2', Wow: 4, Flutter: 3, Drive: 50, 'High Pass': 150, 'Low Pass': 2500 } }
+      ],
+      'Dual Delay': [
+        { name: 'Stereo slap', values: { Mix: 35, 'Delay Time L': 90, 'Delay Time R': 140, 'Sync Note L': '1/16', 'Sync Note R': '1/16D', 'Feedback L': 0, 'Feedback R': 0, 'X-Feedback': 0, 'Mod Depth': 0 } },
+        { name: 'Quarter + dotted eighth', values: { Mix: 32, 'Delay Time L': 500, 'Delay Time R': 375, 'Sync Note L': '1/4', 'Sync Note R': '1/8D', 'Feedback L': 30, 'Feedback R': 30, 'X-Feedback': 0, 'Mod Depth': 0 } },
+        { name: 'Ping-pong', values: { Mix: 30, 'Delay Time L': 250, 'Delay Time R': 500, 'Sync Note L': '1/8', 'Sync Note R': '1/4', 'Feedback L': 0, 'Feedback R': 0, 'X-Feedback': 55, 'Mod Depth': 0 } },
+        { name: 'Galloping wash', values: { Mix: 45, 'Delay Time L': 600, 'Delay Time R': 900, 'Sync Note L': '1/4D', 'Sync Note R': '1/2', 'Feedback L': 60, 'Feedback R': 60, 'X-Feedback': 30, 'Mod Depth': 30, 'Low Pass': 5000 } }
+      ],
+      'Dual Reverse Delay': [
+        { name: 'Subtle swells', values: { Mix: 25, 'Delay Time L': 500, 'Delay Time R': 700, 'Sync Note L': '1/4', 'Sync Note R': '1/4D', 'Feedback L': 15, 'Feedback R': 15, 'X-Feedback': 0 } },
+        { name: 'Backwards solo', values: { Mix: 100, 'Delay Time L': 600, 'Delay Time R': 600, 'Sync Note L': '1/2', 'Sync Note R': '1/2', 'Feedback L': 0, 'Feedback R': 0, 'X-Feedback': 0 } },
+        { name: 'Flutter', values: { Mix: 45, 'Delay Time L': 150, 'Delay Time R': 220, 'Sync Note L': '1/16', 'Sync Note R': '1/16D', 'Feedback L': 35, 'Feedback R': 35, 'X-Feedback': 0 } },
+        { name: 'Ambient reverse', values: { Mix: 50, 'Delay Time L': 1400, 'Delay Time R': 1800, 'Sync Note L': '1/1', 'Sync Note R': '1/1D', 'Feedback L': 55, 'Feedback R': 55, 'X-Feedback': 25, 'Low Pass': 5000 } }
+      ],
+      'Circular Delay': [
+        { name: 'Single slap', values: { Mix: 30, 'Tap Preset': '1', 'Delay Time': 140, 'Sync Note': '1/16', Feedback: 5, Diffusion: 0, 'Mod Depth': 0, 'Vintage Mode': 'Off', 'Low Pass': 10000 } },
+        { name: 'Rhythmic taps', values: { Mix: 35, 'Tap Preset': '3', 'Delay Time': 500, 'Sync Note': '1/4', Feedback: 30, Diffusion: 10, 'Mod Depth': 0, 'Vintage Mode': 'Off', 'Low Pass': 9000 } },
+        { name: 'Lo-fi wash', values: { Mix: 40, 'Tap Preset': '6', 'Delay Time': 800, 'Sync Note': '1/4D', Feedback: 60, Diffusion: 60, 'Mod Depth': 20, 'Vintage Mode': 'On', 'Low Pass': 3000 } },
+        { name: 'Ambient cloud', values: { Mix: 50, 'Tap Preset': '4', 'Delay Time': 1200, 'Sync Note': '1/2', Feedback: 70, Diffusion: 100, 'Mod Depth': 40, 'Vintage Mode': 'Off', 'Low Pass': 7000 } }
+      ],
+      // ---------------------------------------------------------------- reverb
+      'Room': [
+        { name: 'Tight booth', values: { Mix: 18, Decay: 0.25, 'Pre Delay': 1, 'High Pass': 200, 'Low Pass': 9000 } },
+        { name: 'Bright live room', values: { Mix: 35, Decay: 1.4, 'Pre Delay': 12, 'High Pass': 150, 'Low Pass': 11000 } },
+        { name: 'Dark closet', values: { Mix: 22, Decay: 0.5, 'Pre Delay': 5, 'High Pass': 100, 'Low Pass': 2500 } },
+        { name: 'Big dark garage', values: { Mix: 45, Decay: 2, 'Pre Delay': 25, 'High Pass': 120, 'Low Pass': 4000 } }
+      ],
+      'Hall': [
+        { name: 'Short bright hall', values: { Mix: 18, Decay: 1.5, 'Pre Delay': 15, 'High Pass': 250, 'Low Pass': 10000 } },
+        { name: 'Cathedral', values: { Mix: 45, Decay: 9, 'Pre Delay': 50, 'High Pass': 250, 'Low Pass': 8000 } },
+        { name: 'Warm ballad', values: { Mix: 28, Decay: 3.5, 'Pre Delay': 25, 'High Pass': 120, 'Low Pass': 3500 } },
+        { name: 'Dark infinity', values: { Mix: 50, Decay: 10, 'Pre Delay': 80, 'High Pass': 150, 'Low Pass': 2500 } }
+      ],
+      'Mind Hall': [
+        { name: 'Bright plate', values: { Mix: 22, Decay: 1.8, 'Pre Delay': 10, 'High Pass': 250, 'Low Pass': 11000, Damping: 15 } },
+        { name: 'Huge bright hall', values: { Mix: 45, Decay: 9, 'Pre Delay': 45, 'High Pass': 250, 'Low Pass': 9000, Damping: 25 } },
+        { name: 'Warm studio', values: { Mix: 25, Decay: 2.5, 'Pre Delay': 20, 'High Pass': 120, 'Low Pass': 3500, Damping: 75 } },
+        { name: 'Dark cathedral', values: { Mix: 45, Decay: 10, 'Pre Delay': 70, 'High Pass': 120, 'Low Pass': 2500, Damping: 85 } }
+      ],
+      'Modulated': [
+        { name: 'Subtle shimmer', values: { Mix: 25, Decay: 2, 'Pre Delay': 15, 'Mod Speed': 0.4, 'Mod Depth': 25, 'High Pass': 150, 'Low Pass': 8000 } },
+        { name: 'Dreamy pad', values: { Mix: 45, Decay: 9, 'Pre Delay': 40, 'Mod Speed': 0.3, 'Mod Depth': 40, 'High Pass': 200, 'Low Pass': 5000 } },
+        { name: 'Vibrato room', values: { Mix: 35, Decay: 1.5, 'Pre Delay': 5, 'Mod Speed': 3.5, 'Mod Depth': 90, 'High Pass': 150, 'Low Pass': 7000 } },
+        { name: 'Seasick wash', values: { Mix: 55, Decay: 8, 'Pre Delay': 30, 'Mod Speed': 1.5, 'Mod Depth': 100, 'High Pass': 200, 'Low Pass': 3500 } }
+      ],
+      'Ambience': [
+        { name: 'Subtle air', values: { Mix: 15, Size: 'Small', 'Pre Delay': 0, 'High Pass': 200, 'Low Pass': 10000 } },
+        { name: 'Bright stage', values: { Mix: 35, Size: 'Large', 'Pre Delay': 20, 'High Pass': 150, 'Low Pass': 11000 } },
+        { name: 'Tight and dark', values: { Mix: 25, Size: 'Small', 'Pre Delay': 0, 'High Pass': 100, 'Low Pass': 2500 } },
+        { name: 'Big dark space', values: { Mix: 45, Size: 'Large', 'Pre Delay': 40, 'High Pass': 100, 'Low Pass': 3500 } }
+      ],
+      'Cave': [
+        { name: 'Bright cavern', values: { Mix: 25, Decay: 6, 'Pre Delay': 20, Damping: 15, 'High Pass': 300, 'Low Pass': 8000 } },
+        { name: 'Endless shine', values: { Mix: 50, Decay: 20, 'Pre Delay': 60, Damping: 10, 'High Pass': 300, 'Low Pass': 7000 } },
+        { name: 'Doom', values: { Mix: 30, Decay: 9, 'Pre Delay': 10, Damping: 85, 'High Pass': 100, 'Low Pass': 2000 } },
+        { name: 'Abyss pad', values: { Mix: 65, Decay: 20, 'Pre Delay': 120, Damping: 70, 'High Pass': 150, 'Low Pass': 2500 } }
+      ],
+      'Blossom': [
+        { name: 'Short bloom', values: { Mix: 25, Decay: 2.5, 'Pre Delay': 20, Diffusion: 60, 'E.R. Length': 30, Ducking: 0, Modulation: 15, Bass: -6, Treble: 0, 'Low Pass': 12000 } },
+        { name: 'Ducked lead', values: { Mix: 35, Decay: 6, 'Pre Delay': 60, Diffusion: 70, 'E.R. Length': 50, Ducking: 75, Modulation: 20, Bass: -6, Treble: 0, 'Low Pass': 10000 } },
+        { name: 'Dark swell', values: { Mix: 40, Decay: 9, 'Pre Delay': 150, Diffusion: 100, 'E.R. Length': 100, Ducking: 0, Modulation: 40, Bass: 0, Treble: -12, 'Low Pass': 5000 } },
+        { name: 'Endless pad', values: { Mix: 60, Decay: 20, 'Pre Delay': 60, Diffusion: 90, 'E.R. Length': 70, Ducking: 0, Modulation: 60, Bass: -6, Treble: -4, 'Low Pass': 8000 } }
+      ],
+      'Shimmer': [
+        { name: 'Octave halo', values: { Mix: 30, Decay: 7, Pitch: 12, Feedback: 45, Brightness: 60, Damping: 30, 'Pre Delay': 30, 'Mod Depth': 20 } },
+        { name: 'Organ fifths', values: { Mix: 45, Decay: 14, Pitch: 7, Feedback: 70, Brightness: 40, Damping: 50, 'Pre Delay': 30, 'Mod Depth': 20 } },
+        { name: 'Dark sub', values: { Mix: 30, Decay: 12, Pitch: -12, Feedback: 40, Brightness: 25, Damping: 65, 'Pre Delay': 30, 'Mod Depth': 20 } },
+        { name: 'Endless ascent', values: { Mix: 50, Decay: 18, Pitch: 12, Feedback: 85, Brightness: 75, Damping: 20, 'Pre Delay': 60, 'Mod Depth': 50 } }
+      ]
+    };
+
+    const FOCUS_OWN_KEY = 'nanoFocusCorners';   // { model: [corner | null x 4] }: what the user put into a corner
+    const FOCUS_ZONES = ['tl', 'tr', 'bl', 'br'], FOCUS_AT = [[0, 0], [1, 0], [0, 1], [1, 1]];
+    const fpad = { key: null, model: '', base: [], zones: [], affected: [], lens: [0.5, 0.5], frame: 0 };
+    const focusModelKey = model => String(model || '').replace(/\s*\((M|ST)\)$/, '');
+    const focusHas = model => !!FOCUS_CORNERS[focusModelKey(model)];
+    const focusOwn = () => { try { return JSON.parse(localStorage.getItem(FOCUS_OWN_KEY)) || {}; } catch (e) { return {}; } };
+    function focusOwnSet(model, index, corner) {
+      const all = focusOwn(), list = all[model] || [null, null, null, null];
+      list[index] = corner;
+      if (list.some(Boolean)) all[model] = list; else delete all[model];
+      try { localStorage.setItem(FOCUS_OWN_KEY, JSON.stringify(all)); } catch (e) {}
+    }
+    // The four corners of the block's model on its own controls: { name, own, values: { control index: value } }
+    function focusZonesOf(block) {
+      const key = focusModelKey(block.model), own = focusOwn()[key] || [];
+      return (FOCUS_CORNERS[key] || []).map((suggested, i) => {
+        const corner = own[i] || suggested, values = {};
+        fxStartParams(block, corner).forEach(({ param, value }) => { values[param.index] = value; });
+        return { name: corner.name, own: !!own[i], values };
+      });
+    }
+    function focusSetZones() {
+      const block = state.blocks[fpad.key];
+      fpad.zones = focusZonesOf(block);
+      fpad.affected = [...new Set(fpad.zones.flatMap(z => Object.keys(z.values).map(Number)))].sort((a, b) => a - b);
+    }
+
+    function openFocusView(blockKey) {
+      const block = state.blocks[blockKey];
+      if (!block || !focusHas(block.model)) return;
+      closeFxInfo();
+      closeFxpList();
+      Object.assign(fpad, { key: blockKey, model: block.model, base: block.params.map(p => p.value), lens: [0.5, 0.5] });
+      focusSetZones();
+      const style = fxStyle(block.models.find(m => m.name === block.model));
+      const panel = document.querySelector('#focusOverlay .fp-panel');
+      panel.style.setProperty('--block-color', style.color);
+      panel.style.setProperty('--icon-ink', iconInk(style.color));
+      $('fpTitle').style.setProperty('--block-color', style.color);
+      $('fpTitle').innerHTML = fxIconHTML(style.icon) + '<h2 class="dlg-title">' + escapeHTML(block.model) + '</h2><span class="fxi-sub">' +
+        escapeHTML(block.title + ' · Focus') + '</span>';
+      const picture = document.documentElement.classList.contains('pedal-pictures') && MODEL_IMAGES[block.model];
+      $('fpPic').innerHTML = picture ? '<img src="' + escapeHTML(picture) + '" alt="">' : '<span class="fp-symbol">' + fxIconHTML(style.icon) + '</span>';
+      fillFocusZones();
+      fillFocusList();
+      $('focusOverlay').hidden = false;
+      placeFocusLens();
+      $('fpClose').focus();
+    }
+    function closeFocusView() {
+      closeFocusMenu();
+      $('focusOverlay').hidden = true;
+      fpad.key = null;
+    }
+    // The page was drawn again: follow the block's values, or close when the block now holds another model
+    function refreshFocusView() {
+      if (!fpad.key) return;
+      const block = state.blocks[fpad.key];
+      if (!block || block.model !== fpad.model) { closeFocusView(); return; }
+      refreshFocusList();
+    }
+
+    // The corner pills on the pad; the centre is the block as it was when the view opened
+    function fillFocusZones() {
+      const stage = $('fpStage');
+      stage.querySelectorAll('.fp-zone').forEach(el => el.remove());
+      const add = (cls, name, html, title) => {
+        const el = document.createElement('button');
+        el.className = 'fp-zone ' + cls;
+        el.dataset.zone = name;
+        el.title = title;
+        el.innerHTML = html;
+        stage.appendChild(el);
+      };
+      add('centre', 'centre', 'Start', 'The block as it was when this view opened');
+      fpad.zones.forEach((zone, i) => add(FOCUS_ZONES[i] + (zone.own ? ' own' : ''), String(i),
+        '<span class="zn">' + escapeHTML(zone.name) + '</span><span class="zm" title="Another sound for this corner">▾</span>',
+        focusZoneText(zone) + (zone.own ? '' : ' – our suggestion') + '. ▾ or right-click: another sound for this corner'));
+    }
+    const focusZoneText = zone => {
+      const block = state.blocks[fpad.key];
+      return Object.entries(zone.values).map(([index, value]) => {
+        const param = block.params[index];
+        return param.name + ' ' + paramDisplayValue(Object.assign({}, param, { value }));
+      }).join(' · ');
+    };
+
+    // The controls beside the pad: the ones the lens moves first, then the rest (dimmed)
+    function fillFocusList() {
+      const block = state.blocks[fpad.key];
+      const rows = block.params.filter(p => fpad.affected.includes(p.index)).concat(block.params.filter(p => !fpad.affected.includes(p.index)));
+      $('fpList').innerHTML = rows.map(p => '<div class="fp-row' + (fpad.affected.includes(p.index) ? '' : ' still') + '" data-index="' + p.index + '">' +
+        '<span class="n">' + escapeHTML(p.name) + '</span><span class="v"></span><span class="bar"><i></i></span></div>').join('');
+      refreshFocusList();
+    }
+    function refreshFocusList() {
+      const block = state.blocks[fpad.key];
+      if (!block) return;
+      for (const row of $('fpList').children) {
+        const param = block.params[Number(row.dataset.index)];
+        if (!param) continue;
+        row.querySelector('.v').textContent = paramDisplayValue(param);
+        row.querySelector('.bar i').style.width = (paramValueToNormalized(param) * 100).toFixed(1) + '%';
+      }
+    }
+
+    // The lens and the zone it is nearest to (that pill is filled)
+    function placeFocusLens() {
+      const [x, y] = fpad.lens, lens = $('fpLens');
+      lens.style.left = 'calc(22px + ' + x + ' * (100% - 44px))';
+      lens.style.top = 'calc(22px + ' + y + ' * (100% - 44px))';
+      const far = at => Math.hypot(at[0] - x, at[1] - y);
+      let near = 'centre', best = far([0.5, 0.5]);
+      FOCUS_AT.forEach((at, i) => { if (far(at) < best) { best = far(at); near = String(i); } });
+      $('fpStage').querySelectorAll('.fp-zone').forEach(el => el.classList.toggle('near', el.dataset.zone === near && best < 0.36));
+    }
+    // The controls at a lens position: the corners blended (bilinear), the starting values weighted towards the
+    // middle. Blended along the control's travel (the Nano's 0-1), so times and frequencies move evenly. A corner
+    // that says nothing about a control keeps its starting value; switches follow the zone that counts most.
+    function focusValuesAt(x, y) {
+      const block = state.blocks[fpad.key], out = [];
+      const centre = Math.pow(Math.max(0, 1 - 2 * Math.max(Math.abs(x - 0.5), Math.abs(y - 0.5))), 1.5);
+      const weight = [(1 - x) * (1 - y), x * (1 - y), (1 - x) * y, x * y].map(w => w * (1 - centre));
+      const top = weight.indexOf(Math.max(...weight));
+      for (const index of fpad.affected) {
+        const param = block.params[index], base = fpad.base[index];
+        const at = k => (fpad.zones[k].values[index] !== undefined ? fpad.zones[k].values[index] : base);
+        if (param.meta && param.meta.kind === 'enum') { out.push([param, centre >= weight[top] ? base : at(top)]); continue; }
+        const travel = value => paramValueToNormalized(Object.assign({}, param, { value }));
+        out.push([param, normalizedToParamValue(param, centre * travel(base) + weight.reduce((sum, w, k) => sum + w * travel(at(k)), 0))]);
+      }
+      return out;
+    }
+    function moveFocusLens(x, y) {
+      const block = state.blocks[fpad.key];
+      if (!block) return;
+      fpad.lens = [clamp(x, 0, 1), clamp(y, 0, 1)];
+      placeFocusLens();
+      const changed = [];
+      for (const [param, value] of focusValuesAt(...fpad.lens)) {
+        const step = param.meta && param.meta.kind === 'range' ? param.meta.step || 0.1 : 1;
+        if (Math.abs(param.value - value) < step / 2) continue;
+        param.value = value;
+        changed.push(param);
+      }
+      refreshFocusList();
+      if (!changed.length) return;
+      block.fxPresetActive = -1;
+      changed.forEach(param => setFXParam(fpad.key, param));   // one waiting write per control: the newest value wins
+      if (!fpad.frame) fpad.frame = requestAnimationFrame(() => { fpad.frame = 0; render(); });
+    }
+
+    // Another sound for a corner: our suggestion, one of the model's starting points, or the block as it is now
+    function closeFocusMenu() { const menu = $('fpMenu'); if (menu) menu.remove(); }
+    function openFocusMenu(index, anchor) {
+      closeFocusMenu();
+      const block = state.blocks[fpad.key], key = focusModelKey(block.model), info = fxInfoOf(block.model), zone = fpad.zones[index];
+      const starts = (info && info.starts) || [];
+      const menu = document.createElement('div');
+      menu.id = 'fpMenu';
+      menu.className = 'fp-menu';
+      menu.innerHTML = '<div class="h">Sound in this corner</div>' +
+        '<button data-pick="suggested" class="' + (zone.own ? '' : 'on') + '">' + escapeHTML(FOCUS_CORNERS[key][index].name) + '<small>Our suggestion</small></button>' +
+        (starts.length ? '<div class="h">Starting points</div>' + starts.map((st, i) =>
+          '<button data-pick="start:' + i + '" class="' + (zone.own && zone.name === st.name ? 'on' : '') + '">' + escapeHTML(st.name) + '</button>').join('') : '') +
+        '<div class="h">Your own</div><button data-pick="now">The settings as they are now<small>Kept for ' + escapeHTML(key) + ' in this browser</small></button>';
+      menu.addEventListener('click', e => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        const pick = b.dataset.pick;
+        if (pick === 'suggested') focusOwnSet(key, index, null);
+        else if (pick === 'now') {
+          const values = {};
+          block.params.forEach(p => { values[p.name] = p.meta && p.meta.kind === 'enum' ? String(p.meta.options[p.value]) : p.value; });
+          focusOwnSet(key, index, { name: 'My sound ' + (index + 1), values });
+        } else { const st = starts[Number(pick.slice(6))]; focusOwnSet(key, index, { name: st.name, values: st.values }); }
+        closeFocusMenu();
+        focusSetZones();
+        fillFocusZones();
+        fillFocusList();
+        placeFocusLens();
+      });
+      document.body.appendChild(menu);
+      const r = anchor.getBoundingClientRect(), fb = fixedFrame();
+      menu.style.left = Math.max(8, Math.min(r.left - fb.left, fb.width - menu.offsetWidth - 8)) + 'px';
+      if (r.top - fb.top > fb.height / 2) menu.style.bottom = (fb.bottom - r.top + 6) + 'px';
+      else menu.style.top = (r.bottom - fb.top + 6) + 'px';
+    }
+
+    (() => {
+      const stage = $('fpStage');
+      const at = e => { const r = stage.getBoundingClientRect(); moveFocusLens((e.clientX - r.left - 22) / (r.width - 44), (e.clientY - r.top - 22) / (r.height - 44)); };
+      stage.addEventListener('pointerdown', e => {
+        if (e.button > 0) return;
+        const zone = e.target.closest('.fp-zone');
+        closeFocusMenu();
+        if (zone) {
+          e.preventDefault();
+          if (zone.dataset.zone === 'centre') moveFocusLens(0.5, 0.5);
+          else if (e.target.closest('.zm')) openFocusMenu(Number(zone.dataset.zone), zone);
+          else moveFocusLens(...FOCUS_AT[Number(zone.dataset.zone)]);
+          return;
+        }
+        stage.setPointerCapture(e.pointerId);
+        stage.classList.add('dragging');
+        at(e);
+        const move = ev => at(ev);
+        const up = () => { stage.classList.remove('dragging'); stage.removeEventListener('pointermove', move); stage.removeEventListener('pointerup', up); stage.removeEventListener('pointercancel', up); };
+        stage.addEventListener('pointermove', move);
+        stage.addEventListener('pointerup', up);
+        stage.addEventListener('pointercancel', up);
+      });
+      stage.addEventListener('contextmenu', e => {
+        const zone = e.target.closest('.fp-zone');
+        if (!zone || zone.dataset.zone === 'centre') return;
+        e.preventDefault();
+        openFocusMenu(Number(zone.dataset.zone), zone);
+      });
+      $('fpStart').addEventListener('click', () => moveFocusLens(0.5, 0.5));
+      $('fpClose').addEventListener('click', closeFocusView);
+      $('focusOverlay').addEventListener('pointerdown', e => {
+        if (e.target === $('focusOverlay')) closeFocusView();
+        else if (!e.target.closest('#fpStage')) closeFocusMenu();
+      });
+      document.addEventListener('pointerdown', e => { if ($('fpMenu') && !e.target.closest('#fpMenu, #fpStage')) closeFocusMenu(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && fpad.key) { if ($('fpMenu')) closeFocusMenu(); else closeFocusView(); } });
+    })();
+
     // The large view (pattern of the microphone dialog): picture and story on the left, starting points and tips on the right.
     function openFxInfoDialog(blockKey) {
       const block = state.blocks[blockKey], info = block && fxInfoOf(block.model);
@@ -12662,6 +13299,7 @@ function parseSelectedCaptureState(payload) {
       $('fxiTitle').innerHTML = fxIconHTML(style.icon) + '<h2 class="dlg-title">' + escapeHTML(block.model) + '</h2><span class="fxi-sub">' +
         escapeHTML(block.title + (info.cat ? ' · ' + info.cat : '')) + '</span>';
       fillFxInfoDialog();
+      $('fxiFocus').hidden = !focusHas(block.model);
       $('fxInfoOverlay').hidden = false;
       $('fxiClose').focus();
     }
@@ -12696,6 +13334,7 @@ function parseSelectedCaptureState(payload) {
         (original || info.starts ? '<div class="fxi-foot">' + escapeHTML(info.basedOn ? FX_INFO_FOOT_OWN : FX_LIKE_FOOT) + '</div>' : '');
     }
     $('fxiClose').addEventListener('click', closeFxInfoDialog);
+    $('fxiFocus').addEventListener('click', () => { const key = fxInfo.dialogKey; closeFxInfoDialog(); openFocusView(key); });
     $('fxInfoOverlay').addEventListener('click', e => { if (e.target === $('fxInfoOverlay')) closeFxInfoDialog(); });
     $('fxiBody').addEventListener('click', e => {
       const b = e.target.closest('.fxi-start button');
@@ -12946,6 +13585,7 @@ function parseSelectedCaptureState(payload) {
       renderPedalBoard();
       if (eqView) eqView.afterRender();
       duoApply();
+      refreshFocusView();
     }
 
     // the iPhone Duo's layout ('' elsewhere): set by the Duo section from the app's posture

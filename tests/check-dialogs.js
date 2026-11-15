@@ -8,6 +8,7 @@ setTimeout(async () => {
     if (location.hash.includes('outer')) { document.documentElement.dataset.posture = 'outer'; duoUpdateLayout(); await wait(50); }
     state.blocks.pre1.on = true; render();
     try { openFxInfoDialog('pre1'); } catch (e) { out.push('fx info: ' + e.message); }
+    try { openFocusView('pre1'); } catch (e) { out.push('focus view: ' + e.message); }
     const W = innerWidth, H = innerHeight;
     document.querySelectorAll('[id$="Overlay"]').forEach(ov => {
       const was = ov.hidden; ov.hidden = false;
