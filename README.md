@@ -103,9 +103,10 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   the model allows (48 models – the wahs, Adaptive Gate and Volume have a single control). **▾** on a corner puts
   another sound there: a starting point, a player's sound or the settings as they are now (kept in this browser).
 - **Players' sounds** (from 1.19.0): settings after documented rigs – John Mayer, John Frusciante, The Black Keys,
-  Jack White, Deftones, Wednesday, Geese – in the effect info with **Apply**, and for the corners of the focus view.
+  Jack White, Deftones, Wednesday, Geese, Muse, Jimi Hendrix – in the effect info with **Apply**, and for the corners of the focus view.
   The pedal behind each sound comes from a published source, named in its note. Some settings are read off photos of
-  the players' boards (the note says "read off"); the others are our own reading of the records. Names of players and bands only say whose sound a setting is modelled
+  the players' boards (the note says "read off") or come from a fan's chart of a board; the others are our own
+  reading of the records. Names of players and bands only say whose sound a setting is modelled
   on – no affiliation or endorsement.
 - Optional: your own pedal pictures next to each effect's model choice (see *Pedal pictures* below)
 - Log export for troubleshooting

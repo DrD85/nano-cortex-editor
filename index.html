@@ -12754,13 +12754,20 @@ function parseSelectedCaptureState(payload) {
     // photos at full size; a knob at seven o'clock = 0, noon = 5, five o'clock = 10): Geese's BD-2 and DD-5, MJ
     // Lenderman's Flashback 2, Jack White's Whammy. Photos that were too small or too oblique to read: Frusciante's
     // 2022 board (Ground Guitar), Mayer's 2019 board (MusicRadar), the Black Keys' 2014 rack (Premier Guitar).
+    // From a fan's chart of John Frusciante's Unlimited Love tour board (Reddit, r/John_Frusciante, "John's pedal
+    // settings (UL tour)" - the user gave us the picture; knobs drawn as clock hands): DS-2 rhythm Level 9 / Tone 9 /
+    // Dist 12 / Turbo II, DS-2 lead the same with Dist ~2, SD-1 Level ~10 / Tone 9 / Drive ~2, Phase 90 ~11,
+    // Micro Amp ~11, Dyna Comp ~2 / ~2, CE-1 High / Level ~11 / Intensity ~1 / Vibrato Depth ~1 / Rate ~11, Variac
+    // Fuzz 9 / 1:30 / 9 / 4:30. Muse: tonemirror.so names the pedals per song but gives no effect settings and no
+    // sources. Hendrix: the chain is documented, no knob positions.
     // Where the Nano has no model of the pedal, the note says so.
     // Shown in the info dialog ("Players' sounds") and in the focus view's corner menu ("Players").
     // Sources, read 2026-11-15: guitarchalk.com (john-mayer-tube-screamer-settings, john-mayer-pedalboard,
     // digital-bath-amp-settings), groundguitar.com (Frusciante: Stadium Arcadium, Californication, CE-1; Mayer:
     // Aqua Puss), premierguitar.com (Rig Rundowns: The Black Keys 2014, Geese), mixdownmag.com.au (Gear Rundown:
     // Wednesday, Jack White), guitar.com (Jack White on Elephant), guitarworld.com (Jack White's gear),
-    // killerrig.com (Deftones), equipboard.com (Deftones White Pony, Cameron Winter), articles.boss.info (Frusciante).
+    // killerrig.com (Deftones), equipboard.com (Deftones White Pony, Cameron Winter), articles.boss.info (Frusciante),
+    // tonemirror.so/artists/muse (Muse), musicradar.com (Roger Mayer on Hendrix), lifestyle.jimdunlop.com (Hendrix).
     const FX_ARTIST_SOUNDS = {
       'Green 808': [
         { name: 'John Mayer: high gain', values: { Overdrive: 9, Tone: 6, Level: 50 },
@@ -12774,11 +12781,23 @@ function parseSelectedCaptureState(payload) {
         { name: 'Geese: Blues Driver', values: { Gain: 0.5, Tone: 8.5, Volume: 5 },
           why: 'Read off Emily Green\'s BD-2 in Premier Guitar\'s Rig Rundown photo: Gain almost off (half past seven), Tone near four o\'clock (marked with tape), Level at noon – a bright, nearly clean push.' }
       ],
+      'Chief OD1': [
+        { name: 'Frusciante: SD-1', values: { Gain: 7, Level: 30 },
+          why: 'A Boss SD-1 on a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante): Level at about ten o\'clock, Tone at nine, Drive at about two. The OD-1 modelled here is its forerunner, without a tone control.' }
+      ],
+      'Microtubes B3K': [
+        { name: 'Muse: Hysteria bass', values: { Drive: 9, Growl: 'On', Midboost: 'On', Tone: 6, Level: 50, Blend: 7 },
+          why: '"Hysteria": Chris Wolstenholme\'s bass through three amps – one clean, one through a Big Muff, one through an Animato distortion; much of the record\'s sound is a synth doubling it (producer Rich Costey, via ToneMirror). Ours: heavy drive with the clean bass blended in.' }
+      ],
       'Rodent Drive': [
         { name: 'Wednesday: wall of dirt', values: { Distortion: 7.5, Filter: 4.5, Volume: 5.5 },
           why: 'Karly Hartzman\'s only pedal is a ProCo RAT – a "heavy midrange wall of dirt" (Mixdown). Settings are ours.' },
         { name: 'Wednesday: steel grit', values: { Distortion: 3.5, Filter: 5.5, Volume: 6 },
-          why: 'Xandy Chelmis runs a RAT 2 on the pedal steel (Mixdown). Settings are ours: low gain, soft top end.' }
+          why: 'Xandy Chelmis runs a RAT 2 on the pedal steel (Mixdown). Settings are ours: low gain, soft top end.' },
+        { name: 'Frusciante: DS-2 rhythm', values: { Distortion: 5, Filter: 6.5, Volume: 5 },
+          why: 'His main distortion is a Boss DS-2 on Turbo II; a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante) shows Level and Tone at nine o\'clock and Dist at noon. The Nano has no DS-2 – carried over to the nearest distortion: Dist as on the chart, a dark Filter for the low Tone.' },
+        { name: 'Frusciante: DS-2 lead', values: { Distortion: 7, Filter: 6.5, Volume: 5 },
+          why: 'The second DS-2 on a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante): as the rhythm one, with Dist at about two o\'clock. The Nano has no DS-2 – the nearest distortion.' }
       ],
       'Facial Fuzz': [
         { name: 'Black Keys: thick fuzz', values: { Fuzz: 10, Volume: 5, Pickup: 'HB', 'Pickup Level': 7 },
@@ -12786,7 +12805,13 @@ function parseSelectedCaptureState(payload) {
         { name: 'Jack White: fuzz wall', values: { Fuzz: 10, Volume: 6.5, Pickup: 'Single', 'Pickup Level': 9 },
           why: 'His fuzz is a Big Muff next to the Whammy (Guitar.com). The Nano has no Muff – this is the nearest: full up and bright.' },
         { name: 'Frusciante: fuzz solo', values: { Fuzz: 8.5, Volume: 6, Pickup: 'Single', 'Pickup Level': 8 },
-          why: 'A Big Muff on the "Strip My Mind" solo, a Boss FZ-3 on the second "Scar Tissue" solo (Ground Guitar). The nearest fuzz on the Nano; settings are ours.' }
+          why: 'A Big Muff on the "Strip My Mind" solo, a Boss FZ-3 on the second "Scar Tissue" solo (Ground Guitar); on the Unlimited Love tour also an MXR Variac Fuzz. The nearest fuzz on the Nano; settings are ours.' },
+        { name: 'Muse: gated fuzz', values: { Fuzz: 10, Volume: 6, Pickup: 'HB', 'Pickup Level': 10 },
+          why: '"Stockholm Syndrome" and "Plug In Baby": a Z.Vex Fuzz Factory built into Matt Bellamy\'s Manson (ToneMirror, which names no source). It grew out of the Fuzz Face, but the Nano cannot gate or sputter like it – the nearest: everything up, humbucker.' },
+        { name: 'Hendrix: Fuzz Face', values: { Fuzz: 10, Volume: 7, Pickup: 'Single', 'Pickup Level': 10 },
+          why: 'His Fuzz Face sat between a Vox wah and the Uni-Vibe (Roger Mayer in MusicRadar; Ground Guitar on Woodstock). No knob positions are documented – ours: fuzz full up, single coils, guitar wide open.' },
+        { name: 'Hendrix: cleaned up', values: { Fuzz: 10, Volume: 7.5, Pickup: 'Single', 'Pickup Level': 3.5 },
+          why: 'The same Fuzz Face with the guitar\'s volume rolled back for rhythm parts – here Pickup Level does that. Ours.' }
       ],
       'Exotic Z Boost': [
         { name: 'John Mayer: clean boost', values: { Gain: 2, Bass: 5, Treble: 5.5, Volume: 7 },
@@ -12794,7 +12819,7 @@ function parseSelectedCaptureState(payload) {
         { name: 'Black Keys: warm boost', values: { Gain: 2, Bass: 6, Treble: 4.5, Volume: 7 },
           why: 'Dan Auerbach uses a Radial BigShot only for a warm boost (Premier Guitar). Settings are ours.' },
         { name: 'Frusciante: Micro Amp', values: { Gain: 1.5, Bass: 5, Treble: 5, Volume: 7.5 },
-          why: 'An MXR Micro Amp for a little more volume (gear lists). Settings are ours: flat and louder.' }
+          why: 'An MXR Micro Amp for a little more volume; a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante) shows its Gain at about eleven o\'clock. This booster has other controls – ours: flat and louder.' }
       ],
       'Crying Wah': [
         { name: 'Wednesday: fixed filter', values: { Wah: 0.45 },
@@ -12808,7 +12833,9 @@ function parseSelectedCaptureState(payload) {
       ],
       'VCA Comp': [
         { name: 'Geese: Compressor Plus', values: { Threshold: -28, Ratio: 4, Attack: 20, Release: 250, Makeup: 5, Mix: 70 },
-          why: 'A Keeley Compressor Plus was seen on Cameron Winter\'s board (Equipboard). Settings are ours: some dry signal left in, as its blend allows.' }
+          why: 'A Keeley Compressor Plus was seen on Cameron Winter\'s board (Equipboard). Settings are ours: some dry signal left in, as its blend allows.' },
+        { name: 'Frusciante: Dyna Comp', values: { Threshold: -36, Ratio: 8, Attack: 5, Release: 800, Makeup: 8, Mix: 100 },
+          why: 'Two MXR Dyna Comps sit on his board (Guitar World); a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante) shows Output and Sensitivity both at about two o\'clock. Carried over to this compressor\'s controls by us: squeezed hard, slow to let go.' }
       ],
       'Poly Octaver': [
         { name: 'Jack White: Blue Orchid', values: { Dry: 70, Oct: 55, Sub: 80 },
@@ -12820,7 +12847,9 @@ function parseSelectedCaptureState(payload) {
         { name: 'Jack White: octave down', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': -12, Blend: 0 },
           why: 'The "Seven Nation Army" riff: a Whammy on its octave-down setting (Guitar.com). On his 2024 board the drop-tune side of the Whammy sits at the bottom of its scale (Premier Guitar\'s photo).' },
         { name: 'Jack White: octave solo', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 12, Blend: 0 },
-          why: 'Read off his 2024 board in Premier Guitar\'s Rig Rundown photo: the Whammy\'s light sits at one octave up, the knob taped over. Earlier accounts also name two octaves – try Toe Pitch 24.' }
+          why: 'Read off his 2024 board in Premier Guitar\'s Rig Rundown photo: the Whammy\'s light sits at one octave up, the knob taped over. Earlier accounts also name two octaves – try Toe Pitch 24.' },
+        { name: 'Muse: octave squeal', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 12, Blend: 0 },
+          why: '"Supermassive Black Hole": a Whammy set one octave up, rocked for the squealing bend after the chorus (ToneMirror, which names no source). Rock Pedal from heel to toe – it is at the toe here.' }
       ],
       'Chief OC2': [
         { name: 'Black Keys: OC-2', values: { Output: 0, Dry: 80, 'Oct 1': 50, 'Oct 2': 0 },
@@ -12828,7 +12857,9 @@ function parseSelectedCaptureState(payload) {
       ],
       'Chief CE2W': [
         { name: 'Frusciante: CE-1 chorus', values: { Mix: 50, Rate: 35, Depth: 60, Type: 'CE1-C', Width: 80 },
-          why: 'His Boss CE-1: the chorus in the outro of "Under the Bridge" and at the start of "Soul to Squeeze" (Ground Guitar, Boss). Settings are ours.' },
+          why: 'His Boss CE-1: the chorus in the outro of "Under the Bridge" and at the start of "Soul to Squeeze" (Ground Guitar, Boss). On a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante) its Chorus Intensity sits at about one o\'clock – Depth here; Rate and Width are ours.' },
+        { name: 'Frusciante: CE-1 vibrato', values: { Mix: 100, Rate: 40, Depth: 60, Type: 'CE1-V', Width: 50 },
+          why: 'The CE-1\'s vibrato side on a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante): Depth at about one o\'clock, Rate at about eleven.' },
         { name: 'Frusciante: full chorus', values: { Mix: 50, Rate: 60, Depth: 100, Type: 'CE1-C', Width: 100 },
           why: '"Animal Bar" has a chorus set to maximum (Ground Guitar). Settings are ours.' },
         { name: 'Wednesday: CE-2', values: { Mix: 50, Rate: 30, Depth: 55, Type: 'CE2-C', Width: 60 },
@@ -12845,8 +12876,16 @@ function parseSelectedCaptureState(payload) {
       'MX Phase 95': [
         { name: 'Black Keys: Tighten Up', values: { Mix: 50, Speed: 45, Type: '90', Mode: 'Block' },
           why: 'Dan Auerbach uses a Boss PH-3 phaser for "Tighten Up" (Premier Guitar). Settings are ours.' },
+        { name: 'Frusciante: Phase 90', values: { Mix: 50, Speed: 40, Type: '90', Mode: 'Block' },
+          why: 'The MXR Phase 90 on a fan\'s chart of his Unlimited Love tour board (r/John_Frusciante): Speed at about eleven o\'clock.' },
         { name: 'Frusciante: slow phase', values: { Mix: 50, Speed: 10, Type: '90', Mode: 'Script' },
-          why: 'Slow phasing on "Strip My Mind" and "She Looks to Me"; an MXR Phase 90 sits on his 2022 board (Ground Guitar, Guitar World). Settings are ours.' }
+          why: 'Slow phasing on "Strip My Mind" and "She Looks to Me"; an MXR Phase 90 sits on his 2022 board (Ground Guitar, Guitar World). Settings are ours.' },
+        { name: 'Muse: Phase 90', values: { Mix: 50, Speed: 30, Type: '90', Mode: 'Block' },
+          why: '"Map of the Problematique" and "Knights of Cydonia": an MXR Phase 90, a sweep on top of the riff (ToneMirror, which gives no settings and names no source). Speed is ours.' }
+      ],
+      'MX Vibe': [
+        { name: 'Hendrix: Woodstock', values: { Mix: 100, Vibe: 'Off', Speed: 45, Depth: 75 },
+          why: 'Fuzz into the Uni-Vibe: "Machine Gun" and the Woodstock "Star-Spangled Banner" (Dunlop, Guitar Player). No settings are documented – ours: chorus mode, a medium throb; put a fuzz in front.' }
       ],
       'Tremolo': [
         { name: 'Black Keys: gentle trem', values: { Rate: 5, Depth: 40, Waveform: 'Triangle', Smoothing: 60, 'LFO Active': 'On' },
@@ -12872,7 +12911,9 @@ function parseSelectedCaptureState(payload) {
         { name: 'Wednesday: noise delay', values: { Mix: 50, Feedback: 95, 'Delay Time': 300, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
           why: 'MJ Lenderman uses a TC Flashback as a noise generator: repeats cranked, the time moved by hand (Mixdown). Ours – turn Delay Time while it rings, and mind the volume.' },
         { name: 'Geese: DD-5', values: { Mix: 33, Feedback: 0, 'Delay Time': 135, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
-          why: 'Read off Emily Green\'s Boss DD-5 in Premier Guitar\'s Rig Rundown photo: E.Level at half past one, Feedback at minimum, Time just past noon, the mode on one of the two short ranges – one slap of about 135 ms if it is the 50–200 ms range.' }
+          why: 'Read off Emily Green\'s Boss DD-5 in Premier Guitar\'s Rig Rundown photo: E.Level at half past one, Feedback at minimum, Time just past noon, the mode on one of the two short ranges – one slap of about 135 ms if it is the 50–200 ms range.' },
+        { name: 'Muse: Starlight', values: { Mix: 30, Feedback: 25, 'Delay Time': 245, 'Sync Note': '1/8', 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
+          why: '"Starlight": the bright, delayed eighth-note figure of the verses, a Line 6 DL4 on Matt Bellamy\'s board of that time (ToneMirror, which gives no settings). Ours: an eighth note at the song\'s tempo.' }
       ],
       'Tape Delay': [
         { name: 'Black Keys: tight slap', values: { Mix: 30, Feedback: 8, 'Delay Time': 110, Wow: 2, Flutter: 2, Drive: 40 },
