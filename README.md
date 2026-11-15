@@ -97,6 +97,16 @@ It runs in the browser (Chrome, Edge – online at **https://drd85.github.io/nan
   tips for its controls and – where Neural DSP names it – the original it is based on (e.g. Green 808 → Ibanez TS808).
   The "based on" names follow Neural DSP's device list; they are trademarks of their owners and only identify the
   originals
+- **Focus view** (from 1.19.0): click the symbol of an effect block (or **Focus view** in its info) and the effect
+  fills a pad with a sound in each corner – drag the lens and the controls move between the four; the centre is the
+  block as it was when you opened it. The corners are our suggestions, four sounds per effect that differ as much as
+  the model allows (48 models – the wahs, Adaptive Gate and Volume have a single control). **▾** on a corner puts
+  another sound there: a starting point, a player's sound or the settings as they are now (kept in this browser).
+- **Players' sounds** (from 1.19.0): settings after documented rigs – John Mayer, John Frusciante, The Black Keys,
+  Jack White, Deftones, Wednesday, Geese – in the effect info with **Apply**, and for the corners of the focus view.
+  The pedal behind each sound comes from a published source, named in its note; the numbers are our own reading of
+  the records unless the note says otherwise. Names of players and bands only say whose sound a setting is modelled
+  on – no affiliation or endorsement.
 - Optional: your own pedal pictures next to each effect's model choice (see *Pedal pictures* below)
 - Log export for troubleshooting
 
