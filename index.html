@@ -12733,17 +12733,159 @@ function parseSelectedCaptureState(payload) {
     };
     const fxStartText = (block, start) => fxStartParams(block, start).map(({ param, value }) =>
       param.name + ' ' + paramDisplayValue(Object.assign({}, param, { value }))).join(' · ');
-    function applyFxStart(blockKey, index) {
-      const block = state.blocks[blockKey], info = block && fxInfoOf(block.model), start = info && info.starts && info.starts[index];
+    function applyFxStart(blockKey, index, players = false) {
+      const block = state.blocks[blockKey], info = block && fxInfoOf(block.model);
+      const start = players ? block && fxArtistsOf(block.model)[index] : info && info.starts && info.starts[index];
       if (!start) return;
       const list = fxStartParams(block, start);
       list.forEach(({ param, value }) => { param.value = value; });
       block.fxPresetActive = -1;
       render();
       list.forEach(({ param }) => setFXParam(blockKey, param));
-      log(block.title + ': starting point "' + start.name + '"');
+      log(block.title + (players ? ': player\'s sound "' : ': starting point "') + start.name + '"');
       fillFxInfoDialog();
     }
+
+    // ---- Players' sounds ----
+    // Settings modelled on what players are documented to use. The pedal comes from a source (named in each note);
+    // the numbers are almost always OUR reading of the records - published knob positions are rare. Only two are
+    // taken from a source: John Mayer's Tube Screamers (read off a live board) and Deftones' "Digital Bath" (a
+    // third-party reading of the song). Where the Nano has no model of the pedal, the note says so.
+    // Shown in the info dialog ("Players' sounds") and in the focus view's corner menu ("Players").
+    // Sources, read 2026-11-15: guitarchalk.com (john-mayer-tube-screamer-settings, john-mayer-pedalboard,
+    // digital-bath-amp-settings), groundguitar.com (Frusciante: Stadium Arcadium, Californication, CE-1; Mayer:
+    // Aqua Puss), premierguitar.com (Rig Rundowns: The Black Keys 2014, Geese), mixdownmag.com.au (Gear Rundown:
+    // Wednesday, Jack White), guitar.com (Jack White on Elephant), guitarworld.com (Jack White's gear),
+    // killerrig.com (Deftones), equipboard.com (Deftones White Pony, Cameron Winter), articles.boss.info (Frusciante).
+    const FX_ARTIST_SOUNDS = {
+      'Green 808': [
+        { name: 'John Mayer: high gain', values: { Overdrive: 9, Tone: 6, Level: 50 },
+          why: 'The first of his two TS10 Tube Screamers as read off a live board: Drive about 9, Tone 6, Level 5 (Guitar Chalk – its author is not sure of it).' },
+        { name: 'John Mayer: low gain', values: { Overdrive: 6, Tone: 5, Level: 45 },
+          why: 'His second TS10, the subtler one: Drive about 6, Tone 4–6, Level 4–5 (Guitar Chalk).' }
+      ],
+      'Chief BD2': [
+        { name: 'John Mayer: Keeley BD-2', values: { Gain: 3, Tone: 4.5, Volume: 6.5 },
+          why: 'A Keeley-modded BD-2 sat on his 2005 board. Settings are ours: just breaking up, clean when you play soft.' },
+        { name: 'Geese: Blues Driver', values: { Gain: 6, Tone: 5.5, Volume: 5.5 },
+          why: 'Emily Green has a BD-2 on her board (Premier Guitar Rig Rundown). Settings are ours: a wiry, open crunch.' }
+      ],
+      'Rodent Drive': [
+        { name: 'Wednesday: wall of dirt', values: { Distortion: 7.5, Filter: 4.5, Volume: 5.5 },
+          why: 'Karly Hartzman\'s only pedal is a ProCo RAT – a "heavy midrange wall of dirt" (Mixdown). Settings are ours.' },
+        { name: 'Wednesday: steel grit', values: { Distortion: 3.5, Filter: 5.5, Volume: 6 },
+          why: 'Xandy Chelmis runs a RAT 2 on the pedal steel (Mixdown). Settings are ours: low gain, soft top end.' }
+      ],
+      'Facial Fuzz': [
+        { name: 'Black Keys: thick fuzz', values: { Fuzz: 10, Volume: 5, Pickup: 'HB', 'Pickup Level': 7 },
+          why: 'Dan Auerbach\'s fuzzes are a Big Muff and a Shin-ei Companion; he solos on the neck pickup with the treble rolled off (Premier Guitar). The Nano has neither pedal – this is the nearest: dark and woolly.' },
+        { name: 'Jack White: fuzz wall', values: { Fuzz: 10, Volume: 6.5, Pickup: 'Single', 'Pickup Level': 9 },
+          why: 'His fuzz is a Big Muff next to the Whammy (Guitar.com). The Nano has no Muff – this is the nearest: full up and bright.' },
+        { name: 'Frusciante: fuzz solo', values: { Fuzz: 8.5, Volume: 6, Pickup: 'Single', 'Pickup Level': 8 },
+          why: 'A Big Muff on the "Strip My Mind" solo, a Boss FZ-3 on the second "Scar Tissue" solo (Ground Guitar). The nearest fuzz on the Nano; settings are ours.' }
+      ],
+      'Exotic Z Boost': [
+        { name: 'John Mayer: clean boost', values: { Gain: 2, Bass: 5, Treble: 5.5, Volume: 7 },
+          why: 'A Keeley Katana clean boost is on his boards (Guitar Chalk). Settings are ours.' },
+        { name: 'Black Keys: warm boost', values: { Gain: 2, Bass: 6, Treble: 4.5, Volume: 7 },
+          why: 'Dan Auerbach uses a Radial BigShot only for a warm boost (Premier Guitar). Settings are ours.' },
+        { name: 'Frusciante: Micro Amp', values: { Gain: 1.5, Bass: 5, Treble: 5, Volume: 7.5 },
+          why: 'An MXR Micro Amp for a little more volume (gear lists). Settings are ours: flat and louder.' }
+      ],
+      'Crying Wah': [
+        { name: 'Wednesday: fixed filter', values: { Wah: 0.45 },
+          why: 'MJ Lenderman leaves a Cry Baby in one place, as a filter that brings out harmonics (Mixdown). Find the spot by ear.' }
+      ],
+      'Envelope Filter': [
+        { name: 'John Mayer: Q-Tron funk', values: { Sens: 6, Attack: 5, Decay: 4, 'LP/BP/HP': 0, Freq: 400, 'Freq Depth': 70, Reso: 6, Mix: 100, Level: 50 },
+          why: 'He uses a Q-Tron Plus for funky parts (Guitar Chalk). Settings are ours.' },
+        { name: 'Frusciante: fast filter', values: { Sens: 7, Attack: 3, Decay: 2.5, 'LP/BP/HP': -1, Freq: 300, 'Freq Depth': 85, Reso: 7.5, Mix: 100, Level: 50 },
+          why: 'Moog low-pass filters with a fast, wah-like sweep on "Dani California" and "Storm in a Teacup" (Ground Guitar). Settings are ours.' }
+      ],
+      'VCA Comp': [
+        { name: 'Geese: Compressor Plus', values: { Threshold: -28, Ratio: 4, Attack: 20, Release: 250, Makeup: 5, Mix: 70 },
+          why: 'A Keeley Compressor Plus was seen on Cameron Winter\'s board (Equipboard). Settings are ours: some dry signal left in, as its blend allows.' }
+      ],
+      'Poly Octaver': [
+        { name: 'Jack White: Blue Orchid', values: { Dry: 70, Oct: 55, Sub: 80 },
+          why: 'A POG with the octaves below and one above (Guitar World); players hear dry and sub loud and the octave up a little lower. The Nano has one sub octave only.' },
+        { name: 'Frusciante: organ', values: { Dry: 60, Oct: 65, Sub: 40 },
+          why: 'POG octaves for an organ-like sound in the outro of "Snow (Hey Oh)" (Ground Guitar). Settings are ours.' }
+      ],
+      'Wham': [
+        { name: 'Jack White: octave down', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': -12, Blend: 0 },
+          why: 'The "Seven Nation Army" riff: a Whammy on its octave-down setting (Guitar.com).' },
+        { name: 'Jack White: octave solo', values: { Mix: 100, Pedal: 100, 'Heel Pitch 1': 0, 'Toe Pitch 1': 12, Blend: 0 },
+          why: 'For solos he sets the Whammy an octave up to cut through (gear rundowns); some say two octaves – try Toe Pitch 24.' }
+      ],
+      'Chief OC2': [
+        { name: 'Black Keys: OC-2', values: { Output: 0, Dry: 80, 'Oct 1': 50, 'Oct 2': 0 },
+          why: 'A Boss OC-2 sits in Dan Auerbach\'s rack (Premier Guitar). Settings are ours: one octave under the riff.' }
+      ],
+      'Chief CE2W': [
+        { name: 'Frusciante: CE-1 chorus', values: { Mix: 50, Rate: 35, Depth: 60, Type: 'CE1-C', Width: 80 },
+          why: 'His Boss CE-1: the chorus in the outro of "Under the Bridge" and at the start of "Soul to Squeeze" (Ground Guitar, Boss). Settings are ours.' },
+        { name: 'Frusciante: full chorus', values: { Mix: 50, Rate: 60, Depth: 100, Type: 'CE1-C', Width: 100 },
+          why: '"Animal Bar" has a chorus set to maximum (Ground Guitar). Settings are ours.' },
+        { name: 'Wednesday: CE-2', values: { Mix: 50, Rate: 30, Depth: 55, Type: 'CE2-C', Width: 60 },
+          why: 'Xandy Chelmis has a Boss CE-2 on the pedal steel (Mixdown). Settings are ours.' },
+        { name: 'Deftones: clean chorus', values: { Mix: 45, Rate: 25, Depth: 45, Type: 'CE2-C', Width: 100 },
+          why: 'Chino Moreno appears to use a Boss CH-1 Super Chorus in the "Digital Bath" video (Equipboard). Settings are ours: slow and wide under a clean part.' }
+      ],
+      'MX Flanger': [
+        { name: 'Frusciante: Mistress', values: { Mix: 50, Manual: 4, Width: 55, Speed: 20, Regen: 4 },
+          why: 'An Electric Mistress in the bridge of "Hard to Concentrate" (Ground Guitar). Settings are ours: slow and soft.' },
+        { name: 'Deftones: slow flange', values: { Mix: 50, Manual: 5, Width: 70, Speed: 12, Regen: 6 },
+          why: 'The band has used a Boss BF-3 flanger (Killer Rig). Settings are ours.' }
+      ],
+      'MX Phase 95': [
+        { name: 'Black Keys: Tighten Up', values: { Mix: 50, Speed: 45, Type: '90', Mode: 'Block' },
+          why: 'Dan Auerbach uses a Boss PH-3 phaser for "Tighten Up" (Premier Guitar). Settings are ours.' },
+        { name: 'Frusciante: slow phase', values: { Mix: 50, Speed: 10, Type: '90', Mode: 'Script' },
+          why: 'Slow phasing on "Strip My Mind" and "She Looks to Me", a Phase 100 on the "Parallel Universe" outro (Ground Guitar). Settings are ours.' }
+      ],
+      'Tremolo': [
+        { name: 'Black Keys: gentle trem', values: { Rate: 5, Depth: 40, Waveform: 'Triangle', Smoothing: 60, 'LFO Active': 'On' },
+          why: 'A Boss TR-2 across all of his amps; his tech says he never goes overboard with it (Premier Guitar). Settings are ours.' }
+      ],
+      'Analog Delay': [
+        { name: 'John Mayer: Aqua-Puss', values: { Mix: 30, Feedback: 10, 'Delay Time': 200, 'Mod Depth': 0, Drive: 3 },
+          why: 'A Way Huge Aqua-Puss (20–300 ms) is his main delay; none of his settings are published (Ground Guitar). Ours: a short slap – 200 ms is the shortest this model goes.' },
+        { name: 'Frusciante: by hand', values: { Mix: 40, Feedback: 85, 'Delay Time': 350, 'Mod Depth': 10, Drive: 5 },
+          why: 'A DOD analog delay whose feedback he turns by hand on the closing solo of "We Believe" (Ground Guitar). Ours: close to runaway – ride Feedback.' },
+        { name: 'Wednesday: Carbon Copy', values: { Mix: 28, Feedback: 35, 'Delay Time': 380, 'Mod Rate': 0.5, 'Mod Depth': 20, 'Low Pass': 3000 },
+          why: 'Xandy Chelmis has an MXR Carbon Copy on the pedal steel (Mixdown). Settings are ours.' },
+        { name: 'Deftones: Change', values: { Mix: 15, Feedback: 15, 'Delay Time': 400, 'Mod Depth': 10, 'Low Pass': 4000 },
+          why: 'For "Change" the delay sits low in the mix with few repeats; the band has used a Carbon Copy (Killer Rig). Settings are ours.' }
+      ],
+      'Digital Delay': [
+        { name: 'Deftones: Digital Bath', values: { Mix: 15, Feedback: 25, 'Delay Time': 400, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off', 'Low Pass': 8000 },
+          why: 'A slight delay of about 400 ms at 15 % mix (Guitar Chalk\'s reading of the song). Feedback is ours.' },
+        { name: 'Frusciante: quick delay', values: { Mix: 30, Feedback: 15, 'Delay Time': 130, 'Ping Pong': 'Off', 'Mod Rate': 1, 'Mod Depth': 20, 'Dyn Mode': 'Off' },
+          why: 'A DeltaLab Effectron II set to a quick delay with slight modulation on "She\'s Only 18" (Ground Guitar). Settings are ours.' },
+        { name: 'Wednesday: noise delay', values: { Mix: 50, Feedback: 95, 'Delay Time': 300, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
+          why: 'MJ Lenderman uses a TC Flashback as a noise generator: repeats cranked, the time moved by hand (Mixdown). Ours – turn Delay Time while it rings, and mind the volume.' },
+        { name: 'Geese: DD-5', values: { Mix: 25, Feedback: 30, 'Delay Time': 330, 'Ping Pong': 'Off', 'Mod Depth': 0, 'Dyn Mode': 'Off' },
+          why: 'Emily Green has a Boss DD-5 on her board (Premier Guitar Rig Rundown). Settings are ours.' }
+      ],
+      'Tape Delay': [
+        { name: 'Black Keys: tight slap', values: { Mix: 30, Feedback: 8, 'Delay Time': 110, Wow: 2, Flutter: 2, Drive: 40 },
+          why: 'A Fulltone Tape Echo gives Dan Auerbach "a continuous, tight slapback" (Premier Guitar). Settings are ours.' }
+      ],
+      'Hall': [
+        { name: 'Frusciante: Holy Grail', values: { Mix: 35, Decay: 3.5, 'Pre Delay': 15, 'High Pass': 150, 'Low Pass': 6000 },
+          why: 'An EHX Holy Grail when he wants a heavier reverb: the "Strip My Mind" solo and "Hey" (Ground Guitar). Settings are ours.' },
+        { name: 'Wednesday: Holy Grail', values: { Mix: 30, Decay: 2.5, 'Pre Delay': 10, 'High Pass': 180, 'Low Pass': 5000 },
+          why: 'Xandy Chelmis has a Holy Grail on the pedal steel (Mixdown). Settings are ours.' }
+      ],
+      'Mind Hall': [
+        { name: 'Deftones: Digital Bath', values: { Mix: 20, Decay: 2.2, 'Pre Delay': 15, 'High Pass': 200, 'Low Pass': 7000, Damping: 40 },
+          why: 'A plate reverb at about 20 % mix (Guitar Chalk\'s reading of the song). Decay and filters are ours.' }
+      ]
+    };
+    const FX_ARTIST_FOOT = 'Players\' sounds: the pedal is the one the player is documented with; unless a note says otherwise the settings are ' +
+      'our own reading of the records – places to begin. Names of players and bands only say whose sound a setting is modelled on; no affiliation or endorsement.';
+    const fxArtistsOf = model => FX_ARTIST_SOUNDS[String(model || '').replace(/\s*\((M|ST)\)$/, '')] || [];
 
     // ---- Focus view (after Line 6's Helix Stadium and our QC Editor) ----
     // The effect large, a lens to drag over it: the four corners are sounds, the centre is the block as it was when
@@ -13213,7 +13355,7 @@ function parseSelectedCaptureState(payload) {
     function openFocusMenu(index, anchor) {
       closeFocusMenu();
       const block = state.blocks[fpad.key], key = focusModelKey(block.model), info = fxInfoOf(block.model), zone = fpad.zones[index];
-      const starts = (info && info.starts) || [];
+      const starts = (info && info.starts) || [], players = fxArtistsOf(block.model);
       const menu = document.createElement('div');
       menu.id = 'fpMenu';
       menu.className = 'fp-menu';
@@ -13221,6 +13363,8 @@ function parseSelectedCaptureState(payload) {
         '<button data-pick="suggested" class="' + (zone.own ? '' : 'on') + '">' + escapeHTML(FOCUS_CORNERS[key][index].name) + '<small>Our suggestion</small></button>' +
         (starts.length ? '<div class="h">Starting points</div>' + starts.map((st, i) =>
           '<button data-pick="start:' + i + '" class="' + (zone.own && zone.name === st.name ? 'on' : '') + '">' + escapeHTML(st.name) + '</button>').join('') : '') +
+        (players.length ? '<div class="h">Players</div>' + players.map((st, i) =>
+          '<button data-pick="player:' + i + '" class="' + (zone.own && zone.name === st.name ? 'on' : '') + '" title="' + escapeHTML(st.why) + '">' + escapeHTML(st.name) + '</button>').join('') : '') +
         '<div class="h">Your own</div><button data-pick="now">The settings as they are now<small>Kept for ' + escapeHTML(key) + ' in this browser</small></button>';
       menu.addEventListener('click', e => {
         const b = e.target.closest('button');
@@ -13231,7 +13375,7 @@ function parseSelectedCaptureState(payload) {
           const values = {};
           block.params.forEach(p => { values[p.name] = p.meta && p.meta.kind === 'enum' ? String(p.meta.options[p.value]) : p.value; });
           focusOwnSet(key, index, { name: 'My sound ' + (index + 1), values });
-        } else { const st = starts[Number(pick.slice(6))]; focusOwnSet(key, index, { name: st.name, values: st.values }); }
+        } else { const st = pick.startsWith('player:') ? players[Number(pick.slice(7))] : starts[Number(pick.slice(6))]; focusOwnSet(key, index, { name: st.name, values: st.values }); }
         closeFocusMenu();
         focusSetZones();
         fillFocusZones();
@@ -13311,7 +13455,16 @@ function parseSelectedCaptureState(payload) {
       const blockKey = fxInfo.dialogKey, block = blockKey && state.blocks[blockKey], info = block && fxInfoOf(block.model);
       if (!info) return;
       const picture = document.documentElement.classList.contains('pedal-pictures') && MODEL_IMAGES[block.model];
-      const original = info.basedOn || info.like;
+      const original = info.basedOn || info.like, players = fxArtistsOf(block.model);
+      const cards = (caption, list, mark) => (list && list.length ? '<div class="fxi-cap">' + caption + '</div><div class="fxi-starts">' +
+        list.map((st, i) => {
+          const on = fxStartIsOn(block, st);
+          return '<div class="fxi-start' + (on ? ' on' : '') + '"><b>' + escapeHTML(st.name) + '</b>' +
+            '<button data-i="' + i + '"' + mark + ' title="' + (on ? 'These are the current settings' : 'Set these values on the Nano (Orig on the card goes back)') + '">' +
+            (on ? 'Applied' : 'Apply') + '</button>' +
+            '<span class="vals">' + escapeHTML(fxStartText(block, st)) + '</span>' +
+            (st.why ? '<span class="why">' + escapeHTML(st.why) + '</span>' : '') + '</div>';
+        }).join('') + '</div>' : '');
       $('fxiBody').innerHTML = '<div class="fxi-cols"><div>' +
           (picture && (info.basedOn || info.photo) ? '<div class="fxi-photo"><img src="' + escapeHTML(picture) + '" alt=""></div>' : '') +
           (original ? '<div class="fxi-based"><span>' + (info.basedOn ? 'Based on' : 'In the style of') + '</span>' + escapeHTML(original) +
@@ -13319,26 +13472,19 @@ function parseSelectedCaptureState(payload) {
           '<p class="fxi-text">' + escapeHTML(info.text || '') + '</p>' +
           (info.heard ? '<div class="fxi-cap">Heard on</div><p class="fxi-heard">' + escapeHTML(info.heard) + '</p>' : '') +
         '</div><div>' +
-          (info.starts && info.starts.length ? '<div class="fxi-cap">Starting points</div><div class="fxi-starts">' +
-            info.starts.map((st, i) => {
-              const on = fxStartIsOn(block, st);
-              return '<div class="fxi-start' + (on ? ' on' : '') + '"><b>' + escapeHTML(st.name) + '</b>' +
-                '<button data-i="' + i + '" title="' + (on ? 'These are the current settings' : 'Set these values on the Nano (Orig on the card goes back)') + '">' +
-                (on ? 'Applied' : 'Apply') + '</button>' +
-                '<span class="vals">' + escapeHTML(fxStartText(block, st)) + '</span>' +
-                (st.why ? '<span class="why">' + escapeHTML(st.why) + '</span>' : '') + '</div>';
-            }).join('') + '</div>' : '') +
+          cards('Starting points', info.starts, '') + cards('Players\' sounds', players, ' data-players="1"') +
           (info.tips && info.tips.length ? '<div class="fxi-cap">On the Nano</div><ul class="fxi-tips">' +
             info.tips.map(t => '<li>' + escapeHTML(t) + '</li>').join('') + '</ul>' : '') +
         '</div></div>' +
-        (original || info.starts ? '<div class="fxi-foot">' + escapeHTML(info.basedOn ? FX_INFO_FOOT_OWN : FX_LIKE_FOOT) + '</div>' : '');
+        (original || info.starts ? '<div class="fxi-foot">' + escapeHTML(info.basedOn ? FX_INFO_FOOT_OWN : FX_LIKE_FOOT) +
+          (players.length ? '<br>' + escapeHTML(FX_ARTIST_FOOT) : '') + '</div>' : '');
     }
     $('fxiClose').addEventListener('click', closeFxInfoDialog);
     $('fxiFocus').addEventListener('click', () => { const key = fxInfo.dialogKey; closeFxInfoDialog(); openFocusView(key); });
     $('fxInfoOverlay').addEventListener('click', e => { if (e.target === $('fxInfoOverlay')) closeFxInfoDialog(); });
     $('fxiBody').addEventListener('click', e => {
       const b = e.target.closest('.fxi-start button');
-      if (b && fxInfo.dialogKey) applyFxStart(fxInfo.dialogKey, Number(b.dataset.i));
+      if (b && fxInfo.dialogKey) applyFxStart(fxInfo.dialogKey, Number(b.dataset.i), !!b.dataset.players);
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('fxInfoOverlay').hidden) closeFxInfoDialog(); });
 

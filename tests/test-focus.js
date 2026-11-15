@@ -47,6 +47,42 @@ setTimeout(async () => {
     const single = Object.values(all).filter(m => m.name !== 'None' && !focusHas(m.name)).map(m => m.name);
     ok('without a focus view: ' + single.join(', '), single.every(n => /Wah|Adaptive Gate|Volume/.test(n)));
 
+    // ---- players' sounds: every one fits its model and says where it comes from
+    const wrong = []; let sounds = 0;
+    for (const [name, list] of Object.entries(FX_ARTIST_SOUNDS)) {
+      const model = all[name];
+      if (!model) { wrong.push(name + ': no such model'); continue; }
+      if (!fxInfoOf(model.name) || !fxInfoOf(model.name).rich) wrong.push(name + ': no large info dialog to show them in');
+      if (new Set(list.map(c => c.name)).size !== list.length) wrong.push(name + ': a name twice');
+      const blk = { params: structuredClone(model.params) };
+      for (const sound of list) {
+        sounds++;
+        if (sound.name.length > 24 || !/^[^:]+: \S/.test(sound.name)) wrong.push(name + ' / ' + sound.name + ': name');
+        if (!sound.why || sound.why.length < 30) wrong.push(name + ' / ' + sound.name + ': no note');
+        const fit = fxStartParams(blk, sound);
+        for (const [control, value] of Object.entries(sound.values)) {
+          const hit = fit.find(x => x.param.name.toLowerCase() === control.toLowerCase());
+          if (!hit) wrong.push(name + ' / ' + sound.name + ': ' + control + ' = ' + value + ' not on the model');
+          else if (hit.param.meta.kind === 'range' && Math.abs(hit.value - value) > 1e-6) wrong.push(name + ' / ' + sound.name + ': ' + control + ' ' + value + ' becomes ' + hit.value);
+        }
+      }
+    }
+    ok(sounds + ' players\' sounds on ' + Object.keys(FX_ARTIST_SOUNDS).length + ' models fit' + (wrong.length ? ': ' + wrong.slice(0, 10).join('; ') : ''), wrong.length === 0);
+    {
+      const b = state.blocks.pre1, bd2 = b.models.find(m => m.name === 'Chief BD2'), val = n => b.params.find(p => p.name === n).value;
+      openFxInfoDialog('pre1');
+      const cards = [...document.querySelectorAll('#fxiBody .fxi-start')].map(c => c.querySelector('b').textContent);
+      ok('info dialog lists them: ' + cards.join(', '), cards.includes('Blues crunch') && cards.includes('John Mayer: Keeley BD-2') && cards.includes('Geese: Blues Driver'));
+      ok('with the note on what is ours', /Players' sounds: the pedal is the one/.test($('fxiBody').textContent));
+      document.querySelector('#fxiBody .fxi-start button[data-players][data-i="1"]').click();
+      ok('Apply sets a player\'s sound: ' + [val('Gain'), val('Tone'), val('Volume')], val('Gain') === 6 && val('Tone') === 5.5 && val('Volume') === 5.5);
+      ok('marked as applied', document.querySelector('#fxiBody .fxi-start button[data-players][data-i="1"]').textContent === 'Applied');
+      document.querySelector('#fxiBody .fxi-start button:not([data-players])[data-i="0"]').click();
+      ok('starting points still apply: ' + val('Gain'), val('Gain') === 2.5);
+      closeFxInfoDialog();
+      b.params = structuredClone(bd2.params); sent.length = 0; render();
+    }
+
     // ---- the view on Pre FX 1 (Chief BD2, all controls at 5)
     const block = state.blocks.pre1, value = n => block.params.find(p => p.name === n).value;
     ok('the card\'s symbol opens it', !!document.querySelector('#block-pre1 .fx-icon.opens-focus'));
@@ -84,6 +120,11 @@ setTimeout(async () => {
     // another sound for a corner
     document.querySelector('#fpStage .fp-zone.tl .zm').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     ok('corner menu', !!$('fpMenu') && /Sparkle boost/.test($('fpMenu').textContent) && /Hairy lead/.test($('fpMenu').textContent));
+    ok('players in the corner menu', /Players/.test($('fpMenu').textContent) && /John Mayer: Keeley BD-2/.test($('fpMenu').textContent));
+    [...$('fpMenu').querySelectorAll('button')].find(b => /John Mayer: Keeley BD-2/.test(b.textContent)).click();
+    moveFocusLens(0, 0);
+    ok('a player\'s sound in the corner: ' + [value('Gain'), value('Tone')], /John Mayer/.test(document.querySelector('#fpStage .fp-zone.tl').textContent) && value('Gain') === 3 && value('Tone') === 4.5);
+    document.querySelector('#fpStage .fp-zone.tl .zm').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     [...$('fpMenu').querySelectorAll('button')].find(b => /Hairy lead/.test(b.textContent)).click();
     ok('starting point in the corner', /Hairy lead/.test(document.querySelector('#fpStage .fp-zone.tl').textContent) && !$('fpMenu'));
     moveFocusLens(0, 0);
