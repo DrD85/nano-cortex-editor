@@ -1912,7 +1912,7 @@
     .fp-symbol { display: grid; }
     .fp-symbol .fx-icon { width: 132px; height: 132px; border-radius: 30px; }
     .fp-symbol .fx-icon::after { inset: 26px; }
-    #fpLens { position: absolute; z-index: 1; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; pointer-events: none;
+    #fpLens { position: absolute; z-index: 1; width: var(--lens, 44px); height: var(--lens, 44px); margin: calc(var(--lens, 44px) / -2) 0 0 calc(var(--lens, 44px) / -2); border-radius: 50%; pointer-events: none;
               border: 2px solid #fff; background: color-mix(in srgb, var(--block-color) 30%, transparent);
               box-shadow: 0 0 0 1px rgba(0, 0, 0, .55), 0 0 22px color-mix(in srgb, var(--block-color) 55%, transparent); transition: left .12s, top .12s; }
     .fp-stage.dragging #fpLens { transition: none; }
@@ -1952,6 +1952,48 @@
     @media (max-width: 760px) {
       .fp-main { grid-template-columns: 1fr; }
       #fpList { grid-template-columns: 1fr 1fr; gap: 9px 16px; max-height: 180px; }
+    }
+    /* On the iPhone Duo the focus view takes the whole screen, the pad and the controls each on their own part:
+       closed - the values beside the clock corner, the pad below; half open - the values on the upright half, the
+       pad on the half that lies flat; as a book - the pad on the left page, the values on the right; open flat - the
+       pad large, the values below (beside it when the screen is wider than tall). */
+    html[data-duo] #focusOverlay { display: block; background: #0b0c0d; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    html[data-duo] #focusOverlay[hidden] { display: none; }
+    html[data-duo] .fp-panel { position: absolute; inset: 0; width: auto; max-height: none; padding: 0; display: block; overflow: hidden; border: 0;
+      border-top: 2px solid var(--block-color); border-radius: 0; box-shadow: none; background: #0b0c0d; --lens: 60px; }
+    html[data-duo] .fp-panel .tuner-head { position: absolute; top: 0; height: var(--head-h, 56px); left: calc(12px + var(--app-corner-left, 0px));
+      right: calc(var(--head-pad-r, var(--app-corner, 0px)) + 12px); }
+    html[data-duo] .fp-panel .tuner-head .dlg-title { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    html[data-duo] .fp-panel .fxi-sub, html[data-duo] .fp-hint, html[data-duo] .fp-side .fxi-cap { display: none; }
+    html[data-duo] .fp-main { display: block; }
+    html[data-duo] .fp-stage { position: absolute; height: auto; min-height: 0; -webkit-touch-callout: none; }
+    html[data-duo] .fp-side { position: absolute; display: block; overflow: auto; scrollbar-width: none; }
+    html[data-duo] #fpList { max-height: none; overflow: visible; padding: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px 18px; }
+    html[data-duo] .fp-row .n, html[data-duo] .fp-row .v { font-size: 14px; }
+    html[data-duo] .fp-row .bar { height: 7px; border-radius: 4px; }
+    html[data-duo] .fp-zone { height: 44px; padding: 0 5px 0 16px; border-radius: 22px; font-size: 15px; }
+    html[data-duo] .fp-zone .zm { width: 34px; height: 34px; font-size: 15px; }
+    html[data-duo] .fp-zone.centre { height: 30px; padding: 0 14px; font-size: 12px; }
+    html[data-duo] #fpStart { height: 40px; padding: 0 16px; font-size: 14px; }
+    html[data-duo] #fpClose { width: 40px; height: 40px; }
+    html[data-duo] .fp-menu button { padding: 11px 12px; font-size: 15px; }
+    html[data-duo] :is(.sc-node, .duo-row) { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+    html[data-duo="outer"] .fp-panel .tuner-head { right: calc(var(--app-corner, 0px) + 8px); }
+    html[data-duo="outer"] .fp-side { top: calc(var(--head-h, 56px) + 6px); left: 12px; right: calc(var(--app-corner, 0px) + 8px); height: 92px; }
+    html[data-duo="outer"] .fp-stage { top: calc(var(--head-h, 56px) + 106px); left: 12px; right: 12px; bottom: 8px; }
+    html[data-duo="half"] .fp-side { top: calc(var(--head-h, 56px) + 6px); left: 14px; right: 14px; height: calc(var(--fold-start) - var(--head-h, 56px) - 14px); }
+    html[data-duo="half"] #fpList { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 20px; }
+    html[data-duo="half"] .fp-stage { top: calc(var(--fold-start) + var(--fold-size) + 8px); left: 12px; right: 12px; bottom: 8px; }
+    html[data-duo="book"] .fp-panel .tuner-head { right: auto; width: calc(var(--fold-start) - 24px - var(--app-corner-left, 0px)); }
+    html[data-duo="book"] .fp-stage { top: calc(var(--head-h, 56px) + 4px); left: calc(12px + var(--app-corner-left, 0px));
+      width: calc(var(--fold-start) - 24px - var(--app-corner-left, 0px)); bottom: 8px; }
+    html[data-duo="book"] .fp-side { top: 14px; left: calc(var(--fold-start) + var(--fold-size) + 14px); right: calc(14px + var(--app-corner, 0px)); bottom: 10px; }
+    html[data-duo="book"] #fpList { gap: 16px 20px; }
+    html[data-duo="flat"] .fp-stage { top: calc(var(--head-h, 56px) + 4px); left: 12px; right: 12px; bottom: 262px; }
+    html[data-duo="flat"] .fp-side { left: 14px; right: 14px; bottom: 10px; height: 240px; }
+    @media (min-aspect-ratio: 1/1) {
+      html[data-duo="flat"] .fp-stage { right: auto; width: calc(60% - 18px); bottom: 8px; }
+      html[data-duo="flat"] .fp-side { left: calc(60% + 6px); top: calc(var(--head-h, 56px) + 8px); right: calc(14px + var(--app-corner, 0px)); height: auto; }
     }
 
     /* A/B compare: two segments next to Rename; the lit one is the side you hear */
@@ -13354,8 +13396,8 @@ function parseSelectedCaptureState(payload) {
     // The lens and the zone it is nearest to (that pill is filled)
     function placeFocusLens() {
       const [x, y] = fpad.lens, lens = $('fpLens');
-      lens.style.left = 'calc(22px + ' + x + ' * (100% - 44px))';
-      lens.style.top = 'calc(22px + ' + y + ' * (100% - 44px))';
+      lens.style.left = 'calc(var(--lens, 44px) / 2 + ' + x + ' * (100% - var(--lens, 44px)))';
+      lens.style.top = 'calc(var(--lens, 44px) / 2 + ' + y + ' * (100% - var(--lens, 44px)))';
       const far = at => Math.hypot(at[0] - x, at[1] - y);
       let near = 'centre', best = far([0.5, 0.5]);
       FOCUS_AT.forEach((at, i) => { if (far(at) < best) { best = far(at); near = String(i); } });
@@ -13438,7 +13480,10 @@ function parseSelectedCaptureState(payload) {
 
     (() => {
       const stage = $('fpStage');
-      const at = e => { const r = stage.getBoundingClientRect(); moveFocusLens((e.clientX - r.left - 22) / (r.width - 44), (e.clientY - r.top - 22) / (r.height - 44)); };
+      const at = e => {
+        const r = stage.getBoundingClientRect(), lens = $('fpLens').offsetWidth || 44;
+        moveFocusLens((e.clientX - r.left - lens / 2) / (r.width - lens), (e.clientY - r.top - lens / 2) / (r.height - lens));
+      };
       stage.addEventListener('pointerdown', e => {
         if (e.button > 0) return;
         const zone = e.target.closest('.fp-zone');
@@ -16563,6 +16608,7 @@ function parseSelectedCaptureState(payload) {
         const info = duoBlockInfo(key);
         const empty = key !== 'capture' && key !== 'cab' && key !== 'gate' && state.blocks[key].model === 'None';
         const row = document.createElement('div');
+        row.dataset.key = key;
         row.className = 'duo-row' + (key === duo.focus ? ' sel' : '') + (info.on ? '' : ' off');
         row.style.setProperty('--c', info.color);
         row.innerHTML = duoIcon(info, 26) +
@@ -16576,6 +16622,26 @@ function parseSelectedCaptureState(payload) {
         duoList.appendChild(row);
       });
     }
+
+    // A long press on an effect - its tile in the chain, its row in the book's list - opens its focus view (closed,
+    // the tiles are all there is of a block, so this is the way in).
+    (() => {
+      let timer = 0, fired = false, from = null;
+      const stop = () => { clearTimeout(timer); timer = 0; };
+      document.addEventListener('pointerdown', e => {
+        fired = false;
+        stop();
+        if (!duoLayout() || fpad.key) return;
+        const el = e.target.closest('#signalChain .sc-node[data-key], #duoList .duo-row[data-key]');
+        const key = el && el.dataset.key, block = key && state.blocks[key];
+        if (!block || !focusHas(block.model) || e.target.closest('.toggle-switch')) return;
+        from = [e.clientX, e.clientY];
+        timer = setTimeout(() => { timer = 0; fired = true; openFocusView(key); }, 550);
+      }, true);
+      document.addEventListener('pointermove', e => { if (timer && Math.hypot(e.clientX - from[0], e.clientY - from[1]) > 10) stop(); }, true);
+      ['pointerup', 'pointercancel'].forEach(type => document.addEventListener(type, stop, true));
+      document.addEventListener('click', e => { if (fired) { fired = false; e.stopPropagation(); e.preventDefault(); } }, true);   // (the press is not a tap as well)
+    })();
 
     // ---- the meter strip: loudness, tuner, input mute, jam tracks ----
     function duoFooterRender() {

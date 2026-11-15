@@ -155,6 +155,38 @@ setTimeout(async () => {
     openFocusView('post3'); moveFocusLens(1, 1);
     ok('Mind Hall bottom right: Low Pass ' + hall() + ' Hz', hall() === 2500);
     closeFocusView();
+    // ---- the iPhone Duo: the view fills the screen, a long press on a block's tile opens it
+    {
+      const root = document.documentElement;
+      Object.entries({ '--fold-start': '455.5px', '--fold-size': '40px', '--head-h': '82px' }).forEach(([k, v]) => root.style.setProperty(k, v));
+      root.dataset.posture = 'outer'; duoUpdateLayout(); await wait(30);
+      const tile = document.querySelector('#signalChain .sc-node[data-key="post3"]'), r = tile.getBoundingClientRect();
+      const press = type => tile.dispatchEvent(new PointerEvent(type, { bubbles: true, pointerId: 7, clientX: r.left + 20, clientY: r.top + 20 }));
+      const wasOn = state.blocks.post3.on;
+      press('pointerdown'); await wait(200); press('pointerup'); tile.click(); await wait(500);
+      ok('closed: a short tap only switches the block', $('focusOverlay').hidden && state.blocks.post3.on !== wasOn);
+      const tile2 = document.querySelector('#signalChain .sc-node[data-key="post3"]');
+      tile2.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 8, clientX: 30, clientY: 300 })); await wait(700);
+      ok('closed: a long press opens the focus view', !$('focusOverlay').hidden && fpad.key === 'post3');
+      const now = state.blocks.post3.on;
+      tile2.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 8 })); tile2.click();
+      ok('... without switching the block', state.blocks.post3.on === now);
+      const box = el => el.getBoundingClientRect(), stage = box($('fpStage')), side = box(document.querySelector('.fp-side'));
+      ok('closed: values above the pad, nothing overlapping: ' + Math.round(side.bottom) + ' <= ' + Math.round(stage.top), side.bottom <= stage.top && stage.height > 300);
+      root.dataset.posture = 'half'; root.dataset.foldAxis = 'horizontal'; duoUpdateLayout(); await wait(30);
+      openFocusView('post3');
+      const s2 = box($('fpStage')), l2 = box(document.querySelector('.fp-side'));
+      ok('half open: values above the fold, pad below it: ' + Math.round(l2.bottom) + ' / ' + Math.round(s2.top), l2.bottom <= 455.5 && s2.top >= 495.5);
+      root.dataset.foldAxis = 'vertical'; duoUpdateLayout(); await wait(30);
+      openFocusView('post3');
+      const s3 = box($('fpStage')), l3 = box(document.querySelector('.fp-side'));
+      ok('as a book: pad left of the fold, values right of it: ' + Math.round(s3.right) + ' / ' + Math.round(l3.left), s3.right <= 455.5 && l3.left >= 495.5);
+      moveFocusLens(1, 1);
+      const lens = box($('fpLens'));
+      ok('the larger lens stays inside the pad', lens.right <= s3.right + 1 && lens.bottom <= s3.bottom + 1 && lens.width === 60);
+      closeFocusView();
+      delete root.dataset.posture; delete root.dataset.foldAxis; duoUpdateLayout();
+    }
   } catch (e) { out.push('ERROR ' + e.stack.split('\n').slice(0, 2).join(' ')); }
   document.title = out.join(' | ');
 }, 1500);
