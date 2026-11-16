@@ -3504,7 +3504,7 @@
     const $ = id => document.getElementById(id);
 
     // Shown in the header. mac-app/build.sh checks that it matches mac-app/package.json.
-    const EDITOR_VERSION = '1.19.0';
+    const EDITOR_VERSION = '1.19.1';
     const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     const CMD_KEY = IS_MAC ? '⌘' : 'Ctrl+';
     $('editorVersion').textContent = 'v' + EDITOR_VERSION;
@@ -3981,6 +3981,18 @@
       state.amp.treble = fields[7] && fields[7][0] ? fields[7][0].value : 0;
 
       state.gate.on = !(fields[54] && fields[54][0]);
+      // 53 builtInGateValue: the gate's amount as a float, 0-1 (a 0 is left out, like every zero). Until 1.19.0 it was
+      // not read at all and the knob stood at its 50 %. Not right after a change of ours: a state that crossed it on
+      // the way still holds the old amount.
+      const gateField = fields[53] && fields[53][0];
+      const gateAmount = !gateField ? 0
+        : gateField.wire === 5 ? new DataView(Uint8Array.from(gateField.raw).buffer).getFloat32(0, true)
+        : gateField.wire === 1 ? new DataView(Uint8Array.from(gateField.raw).buffer).getFloat64(0, true)
+        : NaN;   // some other kind of field: leave the knob alone
+      if (state.gate.params[0] && Number.isFinite(gateAmount) && Date.now() - gateSentAt > GATE_HOLD_MS) {
+        state.gate.params[0].value = clamp(Math.round(gateAmount * 100), 0, 100);
+      }
+      log('Current gate: ' + (state.gate.on ? 'on' : 'off') + ', ' + (Number.isFinite(gateAmount) ? (gateAmount * 100).toFixed(1) + ' %' : 'amount not readable'));
 
       // 9 bankSelector (1-5), 11 neuralCaptureSelector (position 1-5 in bank, 0 = bypass).
       // The app derives the absolute capture slot from them: (bank-1)*5 + position.
@@ -7930,9 +7942,29 @@ function parseSelectedCaptureState(payload) {
       );
     }
 
+    // When the editor last sent a gate amount: for GATE_HOLD_MS the Nano's state does not move the knob.
+    let gateSentAt = 0;
+    const GATE_HOLD_MS = 600;
+
+    // The gate amount of a preset file. Files from before 1.19.1 hold what the editor showed, which was not the Nano's:
+    // the editor never read the amount (50 % unless the knob was moved) and sent percent + 108 of 255. A moved knob
+    // is turned into what the Nano had; a 50 says nothing - null, and the amount stays as it is.
+    function gateReductionOfFile(data) {
+      const shown = Number(data.gate && data.gate.reduction);
+      if (!Number.isFinite(shown)) return null;
+      const [major = 0, minor = 0, patch = 0] = String(data.editor || '0').split('.').map(n => parseInt(n, 10) || 0);
+      const before = major < 1 || (major === 1 && (minor < 19 || (minor === 19 && patch < 1)));
+      if (!before) return clamp(Math.round(shown), 0, 100);
+      return Math.round(shown) === 50 ? null : clamp(Math.round((clamp(shown, 0, 100) + 108) / 2.55), 0, 100);
+    }
+
     async function setGateReduction(percent) {
       const pct = Math.max(0, Math.min(100, Math.round(percent)));
-      const encoded = pct + 108;
+      gateSentAt = Date.now();
+      // GateAmount (value control 11) is 0-255 like the Nano's knobs, and the state reports it as that / 255 - measured
+      // on a Nano with NanOS 2.3.0: 54 -> 0.2118, 128 -> 0.502, 255 -> 1. Until 1.19.0 the editor sent percent + 108,
+      // which the Nano took as 42 % (for 0) to 82 % (for 100).
+      const encoded = Math.round(pct * 255 / 100);
       const encodedBytes = encodeVarint(encoded);
       const payload = new Uint8Array([0x00, 0xC0, 0x18, 0x0B, 0x20, ...encodedBytes, 0x28, 0x00, 0x1A, 0x00, 0x00, 0x00]);
       payload[0] = payload.length - 2;
@@ -10509,9 +10541,12 @@ function parseSelectedCaptureState(payload) {
           await setCaptureVolumeDb(db);
         }
         if (data.gate) {
-          if (Number.isFinite(Number(data.gate.reduction)) && state.gate.params[0]) {
-            state.gate.params[0].value = clamp(Math.round(Number(data.gate.reduction)), 0, 100);
-            await setGateReduction(state.gate.params[0].value);
+          const reduction = gateReductionOfFile(data);
+          if (reduction !== null && state.gate.params[0]) {
+            state.gate.params[0].value = reduction;
+            await setGateReduction(reduction);
+          } else if (reduction === null && Number.isFinite(Number(data.gate.reduction))) {
+            notes.push('Gate amount: left as it is - a file from before 1.19.1 does not hold it.');
           }
           if (typeof data.gate.on === 'boolean') {
             state.gate.on = data.gate.on;
